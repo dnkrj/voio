@@ -1,2 +1,2 @@
-# videodairy
+# videodiary
 Cambridge's Team Oscar
