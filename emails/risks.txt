@@ -1,0 +1,11 @@
+Hello,
+
+I am Daniel Karaj, project manager for group Oscar, below is our risk report.
+
+The main risk associated with our project is being unable to reliably identify video segments which are interesting. To account for this we need to develope as many approaches as feasable and identify which will be useful.
+Beyond the initial centre of the project, other risks arise in areas such as video conversion and vetting of user content, however none of these are vital to show off a base product.
+
+Let me know if any more depth is needed and what the situation is with the GoPro.
+
+Thank you,
+Team Oscar
