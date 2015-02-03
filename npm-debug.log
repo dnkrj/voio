@@ -1,0 +1,83 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', 'EmailJS' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.36
+4 verbose node symlink /usr/bin/node
+5 verbose cache add [ 'EmailJS', null ]
+6 verbose cache add name=undefined spec="EmailJS" args=["EmailJS",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'EmailJS',
+7 verbose parsed url   path: 'EmailJS',
+7 verbose parsed url   href: 'EmailJS' }
+8 silly lockFile 80234745-EmailJS EmailJS
+9 verbose lock EmailJS /home/voio/.npm/80234745-EmailJS.lock
+10 silly lockFile 80234745-EmailJS EmailJS
+11 silly lockFile 80234745-EmailJS EmailJS
+12 verbose addNamed [ 'EmailJS', '' ]
+13 verbose addNamed [ null, '*' ]
+14 silly lockFile da4f72de-EmailJS EmailJS@
+15 verbose lock EmailJS@ /home/voio/.npm/da4f72de-EmailJS.lock
+16 silly addNameRange { name: 'EmailJS', range: '*', hasData: false }
+17 verbose request where is /EmailJS
+18 verbose request registry https://registry.npmjs.org/
+19 verbose request id 0be386f0f3fac4d2
+20 verbose url raw /EmailJS
+21 verbose url resolving [ 'https://registry.npmjs.org/', './EmailJS' ]
+22 verbose url resolved https://registry.npmjs.org/EmailJS
+23 verbose request where is https://registry.npmjs.org/EmailJS
+24 info trying registry request attempt 1 at 04:00:52
+25 http GET https://registry.npmjs.org/EmailJS
+26 http 404 https://registry.npmjs.org/EmailJS
+27 verbose headers { date: 'Tue, 03 Feb 2015 12:00:52 GMT',
+27 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+27 verbose headers   'content-type': 'application/json',
+27 verbose headers   'cache-control': 'max-age=0',
+27 verbose headers   'content-length': '52',
+27 verbose headers   'accept-ranges': 'bytes',
+27 verbose headers   via: '1.1 varnish',
+27 verbose headers   age: '0',
+27 verbose headers   'x-served-by': 'cache-atl6232-ATL',
+27 verbose headers   'x-cache': 'MISS',
+27 verbose headers   'x-cache-hits': '0',
+27 verbose headers   'x-timer': 'S1422964852.508054,VS0,VE24',
+27 verbose headers   'keep-alive': 'timeout=10, max=50',
+27 verbose headers   connection: 'Keep-Alive' }
+28 silly registry.get cb [ 404,
+28 silly registry.get   { date: 'Tue, 03 Feb 2015 12:00:52 GMT',
+28 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+28 silly registry.get     'content-type': 'application/json',
+28 silly registry.get     'cache-control': 'max-age=0',
+28 silly registry.get     'content-length': '52',
+28 silly registry.get     'accept-ranges': 'bytes',
+28 silly registry.get     via: '1.1 varnish',
+28 silly registry.get     age: '0',
+28 silly registry.get     'x-served-by': 'cache-atl6232-ATL',
+28 silly registry.get     'x-cache': 'MISS',
+28 silly registry.get     'x-cache-hits': '0',
+28 silly registry.get     'x-timer': 'S1422964852.508054,VS0,VE24',
+28 silly registry.get     'keep-alive': 'timeout=10, max=50',
+28 silly registry.get     connection: 'Keep-Alive' } ]
+29 silly lockFile da4f72de-EmailJS EmailJS@
+30 silly lockFile da4f72de-EmailJS EmailJS@
+31 error 404 404 Not Found: EmailJS
+31 error 404
+31 error 404 'EmailJS' is not in the npm registry.
+31 error 404 You should bug the author to publish it
+31 error 404
+31 error 404 Note that you can also install from a
+31 error 404 tarball, folder, or http url, or git url.
+32 error System Linux 3.1.9-vs2.3.2.5vs2.3.2.5+
+33 error command "/usr/bin/node" "/usr/bin/npm" "install" "EmailJS"
+34 error cwd /home/voio/VideoDiary
+35 error node -v v0.10.36
+36 error npm -v 1.4.28
+37 error code E404
+38 verbose exit [ 1, true ]
