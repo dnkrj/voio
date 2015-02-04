@@ -68,21 +68,7 @@ body {
 	border-top: 0;
 }
 
-#container, #profile_container {
-	margin-top: 120px;
-	text-align: center;
-	width: 100%;
-	height: auto;
-}
-
-#login_form {
-	margin-top: 120px;
-	text-align: center;
-	width: 100%;
-	height: auto;
-}
-
-#signup_form {
+#container, #profile_container, #signup_form, #login_form {
 	margin-top: 120px;
 	text-align: center;
 	width: 100%;
