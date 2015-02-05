@@ -16,8 +16,14 @@ a {
 	color: #000;
 }
 
-a:hover{
+a:hover {
 	opacity: 0.6;
+}
+
+h1 {
+	font: 30px 'League Spartan', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 10px;
 }
 
 body {
@@ -102,4 +108,37 @@ body {
 .gif input {
 	width: 280px;
 	margin: 10px;
+}
+
+input {
+	width: 100%;
+	max-width: 600px;
+	height: 60px;
+	background-color: #000;
+	color: #fff;
+	border: 3px solid #000;
+	margin: 30px 0 30px 0;
+	text-align: center;
+	font: 18px 'League Spartan', sans-serif;
+	letter-spacing: 2px;
+	transition: background-color 0.5s, color 0.5s;
+}
+
+input:focus {
+	background-color: #fff;
+	color: #000;
+}
+
+#subbutton {
+	max-width: 606px;
+	height: 66px;
+	letter-spacing: 5px;
+	text-transform: uppercase;
+	transition: background-color 0.5s, color 0.5s, letter-spacing 0.5s;
+}
+
+#subbutton:hover {
+	background-color: #fff;
+	color: #000;
+	letter-spacing: 15px;
 }
