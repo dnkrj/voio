@@ -1,3 +1,6 @@
+#ifndef _GIF_CV
+#define _GIF_CV
+
 #ifndef _GIFLIB
 #define _GIFLIB
 #include <gif_lib.h>
@@ -12,29 +15,30 @@
 #define _OPEN_CV
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #endif
 
-using namespace std;
 using namespace cv;
 
-typedef vector<GifByteType> frame_t;
+typedef std::vector<GifByteType> frame_t;
 
 #include "gifcv.h"
 
 //Utility functions.
-vector<string> &split(const string &s, char delim, vector<string> &elems) {
-    stringstream ss(s, ios_base::in | ios_base::out);
-    string item;
-    while (getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+	std::stringstream ss(s, ios_base::in | ios_base::out);
+	std::string item;
+	while (getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
 }
 
-vector<string> split(const string &s, char delim) {
-    vector<string> elems;
-    split(s, delim, elems);
-    return elems;
+std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
 }
 
 
@@ -44,27 +48,27 @@ GIF::~GIF(void) {}
 int GIF::getUID(void) {return userID;}
 int GIF::getGID(void) {return gifID;}
 bool GIF::isPublished(void) {return published;}
-string GIF::publish(void) {
+std::string GIF::publish(void) {
 	published = true;
 	return gifPath;
 }
 
-void GIF::create(int uid, int gid, string vP) {
+void GIF::create(int uid, int gid, std::string vP) {
 	userID = uid;
 	gifID = gid;
 	videoPath = vP;
 	published = false;
-	vector<string> sp = split(videoPath, '.');
-	gifPath = sp.at(0) + to_string(uid) + to_string(gid) + ".gif";
+	std::vector<std::string> sp = split(videoPath, '.');
+	gifPath = sp.at(0) + to_std::string(uid) + to_std::string(gid) + ".gif";
 }
 
-string GIF::getPath(void) {
+std::string GIF::getPath(void) {
 	return gifPath;
 }
 
-string GIF::getVideoPath(void) {
-	vector<string> sp = split(videoPath, '.');
-	return sp.at(0) + to_string(gifID) + ".avi";
+std::string GIF::getVideoPath(void) {
+	std::vector<std::string> sp = split(videoPath, '.');
+	return sp.at(0) + to_std::string(gifID) + ".avi";
 }
 
 
@@ -102,45 +106,45 @@ bool VideoConverter::addFrame(uint8_t* data, float dt){
   
   	if(frames.size() == 0) {
   
-        frame_t r(N),g(N),b(N);
+		frame_t r(N),g(N),b(N);
 
-        for(int i=0, j=0; i<N; i++) {
-    	   b[i] = data[j++];
-    	   g[i] = data[j++];
-    	   r[i] = data[j++];
-        }
+		for(int i=0, j=0; i<N; i++) {
+			b[i] = data[j++];
+			g[i] = data[j++];
+			r[i] = data[j++];
+		}
 
-        if(GifQuantizeBuffer(gifsx, gifsy, &paletteSize, &(r[0]),&(g[0]),&(b[0]), &(output[0]), outputPalette->Colors) == GIF_ERROR) return false;
+		if(GifQuantizeBuffer(gifsx, gifsy, &paletteSize, &(r[0]),&(g[0]),&(b[0]), &(output[0]), outputPalette->Colors) == GIF_ERROR) return false;
 
-    } else {
-    	for(int i = 0, j=0; i < N; i++) {
+	} else {
+		for(int i = 0, j=0; i < N; i++) {
        		
-       		int minIndex = 0, minDist = 3 * 256 * 256;
-        	GifColorType *c = outputPalette->Colors;
+			int minIndex = 0, minDist = 3 * 256 * 256;
+			GifColorType *c = outputPalette->Colors;
 	
-        	for (int k = 0; k < outputPalette->ColorCount; k++) {
-        		int db = (int(c[k].Blue) - int(data[j])) ;
-				int dg = (int(c[k].Green) - int(data[j+1])) ;
-        	  	int dr = (int(c[k].Red) - int(data[j+2])) ;
-        	  	int dist=dr*dr+dg*dg+db*db;
+			for(int k = 0; k < outputPalette->ColorCount; k++) {
+				int db = (int(c[k].Blue) - int(data[j]));
+				int dg = (int(c[k].Green) - int(data[j+1]));
+				int dr = (int(c[k].Red) - int(data[j+2]));
+				int dist=dr*dr+dg*dg+db*db;
           
-        	  	if (dist < minDist) {
-        	    	minDist  = dist;
-        	    	minIndex = k;
-        	  	}
-       		 }
+				if (dist < minDist) {
+					minDist  = dist;
+					minIndex = k;
+				}
+			}
         
 			j+=3;
-        	output[i] = minIndex;
-    	}	
-  	}
+			output[i] = minIndex;
+		}	
+	}
   
-  	frames.push_back(output);
-  	delay.push_back(int(dt*100.0));
-  	return true;       
+	frames.push_back(output);
+	delay.push_back(int(dt*100.0));
+	return true;       
 }
 
-GIF VideoConverter::extractGif(const string& src, int uid, long start, long end) {
+GIF VideoConverter::extractGif(const std::string& src, int uid, double start, double end) {
 	if(!outputPalette) throw "Error creating colour map.";
 	GIF gif;
 	gif.create(uid, gid, src);
@@ -156,24 +160,24 @@ GIF VideoConverter::extractGif(const string& src, int uid, long start, long end)
         	double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
         	double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
         	cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
-        	cap.set(CV_CAP_PROP_POS_MSEC, double(start));
+        	cap.set(CV_CAP_PROP_POS_MSEC, start);
         	double ratio = width/height;
         	
         	while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
         		if(!cap.read(frame)) throw "Error reading frames.";
         		if(ratio < 1) {
-         		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
+         			getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
 	       		} else if(ratio > 1) {
-        	        getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
+        	        	getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
         		} else {
         			frame_c = frame;
         		}
-            		resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
-            		frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
-            		if(frame_r.isContinuous()) {
-            	    		if(!addFrame(frame_n.data, rate)) throw "Error writing to file.";
-            		}
-        	}	
+			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
+			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
+			if(frame_r.isContinuous()) {
+				if(!addFrame(frame_n.data, rate)) throw "Error writing to file.";
+			}
+		}	
 	}
 
 	if(!save(gif.getPath().c_str())) throw "Error writing to file.";
@@ -185,19 +189,19 @@ GIF VideoConverter::extractGif(const string& src, int uid, long start, long end)
 bool VideoConverter::addLoop(GifFileType *gf) {
 	int loop_count = 0;
 	char nsle[12] = "NETSCAPE2.0";
-    char subblock[3];
+	char subblock[3];
 	if(EGifPutExtensionLeader(gf, APPLICATION_EXT_FUNC_CODE) == GIF_ERROR) {
-    	return false;
-    }
-    if(EGifPutExtensionBlock(gf, 11, nsle) == GIF_ERROR) return false;
-    subblock[0] = 1;
-    subblock[2] = loop_count % 256;
-    subblock[1] = loop_count / 256;
-    if(EGifPutExtensionBlock(gf, 3, subblock) == GIF_ERROR) return false;
-    if(EGifPutExtensionTrailer(gf) == GIF_ERROR) {
-    	return false;
-    }
-    return true;
+		return false;
+	}
+	if(EGifPutExtensionBlock(gf, 11, nsle) == GIF_ERROR) return false;
+	subblock[0] = 1;
+	subblock[2] = loop_count % 256;
+	subblock[1] = loop_count / 256;
+	if(EGifPutExtensionBlock(gf, 3, subblock) == GIF_ERROR) return false;
+	if(EGifPutExtensionTrailer(gf) == GIF_ERROR) {
+		return false;
+	}
+	return true;
 }
 
 bool VideoConverter::save(const char* filename) {
@@ -224,8 +228,8 @@ bool VideoConverter::save(const char* filename) {
        
        
     	for(int j = 0; j<gifsy; j++) {
-    	    if(EGifPutLine(GifFile, &(frames[ni][j*gifsx]), gifsx) == GIF_ERROR) return false;
-    	}
+    			if(EGifPutLine(GifFile, &(frames[ni][j*gifsx]), gifsx) == GIF_ERROR) return false;
+ 		}
   	}
 
   	if(EGifCloseFile(GifFile, NULL) == GIF_ERROR) return false;
@@ -234,25 +238,25 @@ bool VideoConverter::save(const char* filename) {
 }
 
 //Timestamp member functions.
-Timestamp::Timestamp(long a, long b) : start(a), end(b) {}
+Timestamp::Timestamp(double a, double b) : start(a), end(b) {}
 Timestamp::Timestamp(void) {}
-void Timestamp::create(long a, long b) {
+void Timestamp::create(double a, double b) {
 	start = a;
 	end = b;
 }
 Timestamp::~Timestamp(void) {}
-long Timestamp::getStart(void) {return start;}
-long Timestamp::getEnd(void) {return end;}
+double Timestamp::getStart(void) {return start;}
+double Timestamp::getEnd(void) {return end;}
 
 //Filter member functions.
 Filter::Filter(void) : vc(300, 300) {
 }
 Filter::~Filter(void) {}
-vector<GIF> Filter::extractGifs(const string& filename, int uid, vector<Timestamp>& ts) {
+std::vector<GIF> Filter::extractGifs(const std::string& filename, int uid, std::vector<Timestamp>& ts) {
 	int size = int(ts.size());
-	vector<GIF> gifs;
+	std::vector<GIF> gifs;
 	if(size>MAX) {
-		gifs = vector<GIF>(MAX);
+		gifs = std::vector<GIF>(MAX);
 		double x = (double) (MAX);
 		double y = (double) (size);
 		double z = y/x;
@@ -264,7 +268,7 @@ vector<GIF> Filter::extractGifs(const string& filename, int uid, vector<Timestam
 			u = int(x);
 		}
 	} else {
-		gifs = vector<GIF>(size);
+		gifs = std::vector<GIF>(size);
 		for(int i = 0; i<size; i++) {
 			gifs[i] = vc.extractGif(filename, uid, ts[i].getStart(), ts[i].getEnd());
 		}
@@ -281,7 +285,7 @@ int main(int argc, char** argv) {
 			return 1;
 		}
 		Filter f;
-		vector<Timestamp> ts(4);
+		std::vector<Timestamp> ts(4);
 		Timestamp x1(0, 500);
 		Timestamp x2(500, 1000);
 		Timestamp x3(1000, 1500);
@@ -290,10 +294,12 @@ int main(int argc, char** argv) {
 		ts[1] = x2;
 		ts[2] = x3;
 		ts[3] = x4;
-		vector<GIF> vs = f.extractGifs(string(argv[1]), atoi(argv[2]), ts); 
-	} catch(string s) {
+		std::vector<GIF> vs = f.extractGifs(std::string(argv[1]), atoi(argv[2]), ts); 
+	} catch(std::string s) {
 		cout << s << endl;
 		return 2;
 	}
-    return 0;
+	return 0;
 }
+
+#endif
