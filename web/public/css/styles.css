@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'league_spartanregular';
+    src: url('leaguespartan-bold-webfont.eot');
+    src: url('leaguespartan-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('leaguespartan-bold-webfont.woff2') format('woff2'),
+         url('leaguespartan-bold-webfont.woff') format('woff'),
+         url('leaguespartan-bold-webfont.ttf') format('truetype'),
+         url('leaguespartan-bold-webfont.svg#league_spartanregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 a {
 	text-decoration: none;
 	transition: opacity 0.2s;
