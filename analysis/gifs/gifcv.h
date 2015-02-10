@@ -1,3 +1,23 @@
+#ifndef _GIFLIB
+#define _GIFLIB
+#include <gif_lib.h>
+#endif
+
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include <string>
+
+#ifndef _OPEN_CV
+#define _OPEN_CV
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#endif
+
+typedef std::vector<GifByteType> frame_t;
+
 /*
 Class representing a produced GIF with file path, user ID and GIF ID and whether or not
 it has been published.
@@ -6,17 +26,17 @@ it has been published.
 class GIF {
 	int userID;
 	int gifID;
-	string gifPath;
-	string videoPath;
+	std::string gifPath;
+	std::string videoPath;
 	bool published;
 	public:
 		int getUID(void);
 		int getGID(void);
 		bool isPublished(void);
-		string getVideoPath(void);
-		string getPath(void);
-		string publish(void);// Returns filepath of GIF
-		void create(int uid, int gid, string vP);
+		std::string getVideoPath(void);
+		std::string getPath(void);
+		std::string publish(void);// Returns filepath of GIF
+		void create(int uid, int gid, std::string vP);
 		GIF();
 		~GIF();
 };
@@ -35,9 +55,9 @@ class VideoConverter {
 	int gifsy;
 	int paletteSize;
 	ColorMapObject* outputPalette;
-	VideoCapture cap;
-	vector<frame_t> frames;
-	vector<int> delay;
+	cv::VideoCapture cap;
+	std::vector<frame_t> frames;
+	std::vector<int> delay;
 	bool addLoop(GifFileType *gf);
 	public:
   		VideoConverter(int sx, int sy);
@@ -46,23 +66,23 @@ class VideoConverter {
   		bool addFrame(uint8_t* data,  float dt);
 		bool clear(void);
 		bool reset(void);
-		GIF extractGif(const string& src, int uid, long start, long end);
-		GIF& extractVid(const string& src, int uid, long start, long end);
+		GIF extractGif(const std::string& src, int uid, double start, double end);
+		GIF& extractVid(const std::string& src, int uid, long start, long end);
 };
 
 /*
 Timestamp class with integer variables defining start and end of video segment in milliseconds.
 */
 class Timestamp {
-	long start;
-	long end;
+	double start;
+	double end;
 	public:
 		Timestamp();
-		Timestamp(long a, long b);
-		void create(long a, long b);
+		Timestamp(double a, double b);
+		void create(double a, double b);
 		~Timestamp();
-		long getStart(void);
-		long getEnd(void);
+		double getStart(void);
+		double getEnd(void);
 };
 
 /*
@@ -75,5 +95,5 @@ class Filter {
 	public:
 		Filter();
 		~Filter();
-		vector<GIF> extractGifs(const string& filename, int uid, vector<Timestamp>& ts);
+		std::vector<GIF> extractGifs(const std::string& filename, int uid, std::vector<Timestamp>& ts);
 };

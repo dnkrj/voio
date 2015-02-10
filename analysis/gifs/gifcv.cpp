@@ -19,15 +19,15 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #endif
 
-using namespace cv;
-
-typedef std::vector<GifByteType> frame_t;
+//typedef std::vector<GifByteType> frame_t;
 
 #include "gifcv.h"
 
+using namespace cv;
+
 //Utility functions.
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
-	std::stringstream ss(s, ios_base::in | ios_base::out);
+	std::stringstream ss(s, std::ios_base::in | std::ios_base::out);
 	std::string item;
 	while (getline(ss, item, delim)) {
 		elems.push_back(item);
@@ -59,7 +59,7 @@ void GIF::create(int uid, int gid, std::string vP) {
 	videoPath = vP;
 	published = false;
 	std::vector<std::string> sp = split(videoPath, '.');
-	gifPath = sp.at(0) + to_std::string(uid) + to_std::string(gid) + ".gif";
+	gifPath = sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
 }
 
 std::string GIF::getPath(void) {
@@ -68,7 +68,7 @@ std::string GIF::getPath(void) {
 
 std::string GIF::getVideoPath(void) {
 	std::vector<std::string> sp = split(videoPath, '.');
-	return sp.at(0) + to_std::string(gifID) + ".avi";
+	return sp.at(0) + std::to_string(gifID) + ".avi";
 }
 
 
@@ -99,7 +99,7 @@ bool VideoConverter::reset(void) {
 	return true;
 }
 
-bool VideoConverter::addFrame(uint8_t* data, float dt){
+bool VideoConverter::addFrame(uint8_t* data, float dt) {
 	int N = gifsx*gifsy;
   	
 	frame_t output(N);
@@ -151,27 +151,27 @@ GIF VideoConverter::extractGif(const std::string& src, int uid, double start, do
     
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
-        	Mat frame;
-        	Mat frame_c;
-        	Mat frame_r;
-        	Mat frame_n;
-        	double fps = cap.get(CV_CAP_PROP_FPS);
-        	float rate = (float) (1/fps);
-        	double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
-        	double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-        	cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
-        	cap.set(CV_CAP_PROP_POS_MSEC, start);
-        	double ratio = width/height;
+        Mat frame;
+        Mat frame_c;
+        Mat frame_r;
+        Mat frame_n;
+        double fps = cap.get(CV_CAP_PROP_FPS);
+        float rate = (float) (1/fps);
+        double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+        double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+        cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
+        cap.set(CV_CAP_PROP_POS_MSEC, start);
+        double ratio = width/height;
         	
-        	while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-        		if(!cap.read(frame)) throw "Error reading frames.";
-        		if(ratio < 1) {
-         			getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
-	       		} else if(ratio > 1) {
-        	        	getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
-        		} else {
-        			frame_c = frame;
-        		}
+        while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
+        	if(!cap.read(frame)) throw "Error reading frames.";
+        	if(ratio < 1) {
+         		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
+	       	} else if(ratio > 1) {
+                getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
+       		} else {
+        		frame_c = frame;
+        	}
 			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
 			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
 			if(frame_r.isContinuous()) {
@@ -278,10 +278,10 @@ std::vector<GIF> Filter::extractGifs(const std::string& filename, int uid, std::
 }
 
 //Test program.
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 	try {
 		if(argc != 3) {
-			cout << "Usage: gifcv <filename> <uid>" << endl;
+			std::cout << "Usage: gifcv <filename> <uid>" << std::endl;
 			return 1;
 		}
 		Filter f;
@@ -296,10 +296,10 @@ int main(int argc, char** argv) {
 		ts[3] = x4;
 		std::vector<GIF> vs = f.extractGifs(std::string(argv[1]), atoi(argv[2]), ts); 
 	} catch(std::string s) {
-		cout << s << endl;
+		std::cout << s << std::endl;
 		return 2;
 	}
 	return 0;
-}
+}*/
 
 #endif

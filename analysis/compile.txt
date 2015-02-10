@@ -1,0 +1,1 @@
+g++ -std=c++11 -Wall main.cpp LazyStrategy.o "gifs/gifcv.o" -lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_video -lopencv_imgproc -lgif -o main

@@ -1,15 +1,17 @@
 #include "LazyStrategy.h"
 #ifndef _OPEN_CV
-#define 
+#define _OPEN_CV
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #endif
 
+#include <string>
+
 using namespace cv;
 
-std::vector<double>  LazyStrategy::processVideo(const std::string & filename, int secondsPerClip)
+std::vector<double>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
 {
 	VideoCapture vidReader(filename);
 	long frameCount = vidReader.get(CAP_PROP_FRAME_COUNT);
@@ -25,7 +27,7 @@ std::vector<double>  LazyStrategy::processVideo(const std::string & filename, in
 		if (totalTimeSeconds > secondsPerClip)
 		{
 			timestamps.push_back(0.0);
-			timestamps.push_back(secondsPerClip);
+			timestamps.push_back(secondsPerClip*1000);
 		}
 		return timestamps;
 	}
@@ -34,8 +36,8 @@ std::vector<double>  LazyStrategy::processVideo(const std::string & filename, in
 	{
 		int randomTime = rand() % (60-secondsPerClip);
 		randomTime += i * 60;
-		timestamps.push_back(randomTime);
-		timestamps.push_back(randomTime + secondsPerClip);
+		timestamps.push_back((randomTime)*1000);
+		timestamps.push_back((randomTime + secondsPerClip)*1000);
 	}
 
 	return timestamps;
