@@ -41,10 +41,10 @@ module.exports = function(app, passport) {
 
     // PROFILE
     // we will want this protected so you have to be logged in to visit
-    // we will use route middleware to verify this (the isLoggedIn function)
+    // the isLoggedIn function verifies this
     app.get('/profile', isLoggedIn, function(req, res) {
         res.render('profile.html', {
-            // user : req.user // get the user out of session and pass to template
+            user : req.user, // get the user out of session and pass to template
             message: req.flash('loginMessage')
         });
     });
@@ -64,5 +64,5 @@ function isLoggedIn(req, res, next) {
         return next();
 
     // if they aren't redirect them to the home page
-    res.redirect('/');
+    res.redirect('/login');
 }
