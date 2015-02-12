@@ -1,3 +1,6 @@
+#ifndef _GIF_CV
+#define _GIF_CV
+
 #ifndef _GIFLIB
 #define _GIFLIB
 #include <gif_lib.h>
@@ -97,3 +100,4 @@ class Filter {
 		~Filter();
 		std::vector<GIF> extractGifs(const std::string& filename, int uid, std::vector<Timestamp>& ts);
 };
+#endif
