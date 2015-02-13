@@ -82,7 +82,9 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 	for (int i = 0; i < samplesPerWindow; i++)
 	{
 		readAhead.read(frame);
+		if(frame.empty()) return timestamps;
 		cvtColor(frame, greyFrame, COLOR_BGR2GRAY);
+		if(greyFrame.empty()) return timestamps;
 		faceCascade.detectMultiScale(greyFrame, detectedFaces, scalingPerRun, minNeighbours);
 		facesInSample[i] = detectedFaces.size();
 		Windows[0].numFaces += facesInSample[i];
