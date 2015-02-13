@@ -54,6 +54,36 @@ module.exports = function(app, passport) {
         req.logout();
         res.redirect('/');
     });
+
+    // EMAIL VERIFICATION
+    var rand; // SHOULD BE IN DB
+    var host;
+    var link;
+    app.get('/send', function(req, res) {
+        rand = Math.floor((Math.random() *100) + 54);
+        host = req.get('host');
+        link="http://"+req.get('host')+"/verify?id="+rand;
+        mailOptions = {
+            to      : req.query.to,
+            subject : "Please confirm your Email Account",
+            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+        }
+        // TODO -  work out how exporting to module works
+        transport.sendMail(mailOptions, function(error, response) {
+            if (error) {
+                console.log(error);
+                res.end("error");
+            } else {
+                res.end("sent");
+            }
+        });
+    });
+
+    app.get('/verify', function(req, res) {
+        if (req.query.id == rand) { // CHECK VALUE IN DB
+            res.end("<h1>Email " + mailOptions.to + " is been Successfully verified");
+        }
+    })
 };
 
 // route middleware to make sure a user is logged in

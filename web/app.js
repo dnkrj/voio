@@ -1,28 +1,41 @@
-var express  = require('express');
-var app      = express();
-var path	 = require('path');
-var port     = 80;
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash    = require('connect-flash');
-
+var express  	 = require('express');
+var path	 	 = require('path');
+var mongoose 	 = require('mongoose');
+var passport 	 = require('passport');
+var flash    	 = require('connect-flash');
 var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
-var exphbs      = require('express3-handlebars');
+var exphbs       = require('express3-handlebars');
+var nodemailer   = require("nodemailer");
+// var mandrill	 = require('mandrill-api/mandrill');
+var engines 	 = require('consolidate');
 
-var engines = require('consolidate');
+var configDB 	 = require('./config/database.js');
 
-var configDB = require('./config/database.js');
+
+var port = 80;
+var app  = express();
+
 
 mongoose.connect(configDB.url); // connect to our database
 
 
-//app.use(express.static(__dirname)); // Current directory is root
-app.use(express.static(__dirname + '/public')); //  "public" off of current is root
+app.use(express.static(__dirname + '/public')); //  "public" off of current directory is root
 
 require('./config/passport.js')(passport); // pass passport for configuration
+
+// set up email transport
+var transport = nodemailer.createTransport({
+    host: 'smtp.mandrillapp.com',
+    port: 587,
+    auth: {
+        user: 'natemail@mail.com',
+        pass: '04X5kWuFBO6pD6OQ7xBKlA'
+    }
+});
+module.exports = transport;
 
 // set up our express application
 app.use(logger('dev')); // log every request to the console

@@ -7,8 +7,8 @@ var bcrypt   = require('bcrypt-nodejs');
 var userSchema = mongoose.Schema({
     local           : {
         email       : String,
+        verified    : Boolean,
         password    : String,
-        gifs        : [{type: mongoose.Schema.Types.ObjectId, ref: 'Gif'}]
     },
     gifs            : {
         url         : String,
