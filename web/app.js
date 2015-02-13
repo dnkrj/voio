@@ -8,8 +8,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 var exphbs       = require('express3-handlebars');
-var nodemailer   = require("nodemailer");
-// var mandrill	 = require('mandrill-api/mandrill');
 var engines 	 = require('consolidate');
 
 var configDB 	 = require('./config/database.js');
@@ -26,16 +24,6 @@ app.use(express.static(__dirname + '/public')); //  "public" off of current dire
 
 require('./config/passport.js')(passport); // pass passport for configuration
 
-// set up email transport
-var transport = nodemailer.createTransport({
-    host: 'smtp.mandrillapp.com',
-    port: 587,
-    auth: {
-        user: 'natemail@mail.com',
-        pass: '04X5kWuFBO6pD6OQ7xBKlA'
-    }
-});
-module.exports = transport;
 
 // set up our express application
 app.use(logger('dev')); // log every request to the console
