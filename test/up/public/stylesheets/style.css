@@ -1,0 +1,202 @@
+@font-face {
+    font-family: 'League Spartan';
+    src: url('leaguespartan-bold-webfont.eot');
+    src: url('leaguespartan-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('leaguespartan-bold-webfont.woff2') format('woff2'),
+         url('leaguespartan-bold-webfont.woff') format('woff'),
+         url('leaguespartan-bold-webfont.ttf') format('truetype'),
+         url('leaguespartan-bold-webfont.svg#league_spartanregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+a {
+	text-decoration: none;
+	transition: opacity 0.2s;
+	color: #000;
+}
+
+a:hover {
+	opacity: 0.6;
+}
+
+h1 {
+	font: 30px 'League Spartan', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 10px;
+}
+
+body {
+	margin: 0 0 0 0;
+	font: 14px 'League Spartan', sans-serif;
+	color: black;
+}
+
+#title {
+	height: 80px;
+	width: 100%;
+	padding: 0;
+	position: fixed;
+	top:0;
+	left:0;
+	background-color: #fff;
+	z-index: 2;
+	border-bottom: 1px solid #ccc;
+	opacity: 0.95;
+}
+
+#logo {
+	float:left;
+	padding-left: 0px;
+	margin-right: -270px;
+	z-index: 4;
+}
+
+#menu {
+	float: right;
+	height: 80px;
+	overflow: hidden;
+	margin: 0;
+	text-align: right;
+	z-index: 2;
+}
+
+#menu:hover {
+	height: auto;
+}
+
+#menu li {
+	list-style: none;
+	font-size: 24px;
+	line-height: 80px;
+	height:80px;
+	padding: 0 40px 0 40px;
+	background-color: #fff;
+	border-top: 1px solid #ccc;
+	transition: opacity 0.2s;
+}
+
+#menu li:hover {
+	opacity: 0.8;
+}
+
+#menu #open {
+	font-size: 32px;
+	background-color: transparent;
+	border-top: 0;
+}
+
+#container, #profile_container, #upload_container, #signup_form, #login_form {
+	margin-top: 120px;
+	text-align: center;
+	width: 100%;
+	height: auto;
+}
+
+.gif {
+	height: 300px;
+	width: 300px;
+	margin: 5px 10px 10px 10px;
+	display: inline-block;
+	background-color: #9a9;
+}
+
+.gif .form {
+
+}
+
+.gif input {
+	width: 280px;
+	margin: 10px;
+}
+
+/*
+Log In
+*/
+
+input {
+	width: 100%;
+	max-width: 600px;
+	height: 60px;
+	background-color: #000;
+	color: #fff;
+	border: 3px solid #000;
+	margin: 30px 0 30px 0;
+	text-align: center;
+	font: 18px 'League Spartan', sans-serif;
+	letter-spacing: 2px;
+	transition: background-color 0.5s, color 0.5s;
+}
+
+input:focus {
+	background-color: #fff;
+	color: #000;
+}
+
+#subbutton {
+	max-width: 606px;
+	height: 66px;
+	letter-spacing: 5px;
+	text-transform: uppercase;
+	transition: background-color 0.5s, color 0.5s, letter-spacing 0.5s;
+}
+
+#subbutton:hover {
+	background-color: #fff;
+	color: #000;
+	letter-spacing: 15px;
+}
+
+/*
+Upload
+*/
+
+#upload_container {
+	max-width: 800px;
+	margin: 120px auto 0 auto;
+}
+
+.fileinput-button {
+	position: relative;
+	overflow: hidden;
+
+	height: 60px;
+	max-width: 600px;
+	border: 3px solid #000;
+	margin: 30px auto 30px auto;
+
+	background-color: #fff;
+	color: #000;
+	
+	text-align: center;
+	font: 18px 'League Spartan', sans-serif;
+	text-transform: uppercase;
+	line-height: 60px;
+	letter-spacing: 2px;
+	transition: letter-spacing 0.5s;
+}
+
+.fileinput-button:hover {
+	letter-spacing: 10px;
+}
+
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.progress {
+  height: 20px;
+  overflow: hidden;
+  border: 3px solid #000;
+}
+
+.progress-bar {
+  float: left;
+  width: 0;
+  height: 100%;
+  background-color: #548;
+}

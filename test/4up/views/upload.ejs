@@ -1,0 +1,13 @@
+<% include head %>
+<% include title %>
+    <div id="upload_container">
+        <h1>Upload</h1>
+        <form id="fileupload" action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="fileinput-button">
+                <span>Select Files...</span>
+                <input type="file" name="files[]" multiple>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
