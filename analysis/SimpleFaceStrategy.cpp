@@ -152,7 +152,6 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 
 			timestamps.push_back(startTime);
 			timestamps.push_back(endTime);
-			timestamps.push_back(Windows[i].numFaces);
 		}
 		if (added == numGIFs)
 		{
