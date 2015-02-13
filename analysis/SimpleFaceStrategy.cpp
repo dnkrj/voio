@@ -7,20 +7,12 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 5
+#define minNeighbours 4
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 4
+#define samplesPerSecond 5
 
-using namespace cv;
-void skipFrames(VideoCapture & vid, int numFramesToSkip)
-{
-	for (int i = 0; i < numFramesToSkip; i++)
-	{
-		vid.grab();
-	}
-}
 
 /*
 This algorithm approaches the problem in the following way:
@@ -39,6 +31,23 @@ Once we have our value for each window, we sort it.
 Next we choose a number of windows (those with the highest value associated with it)
 */
 
+struct Window
+{
+	int numFaces;
+	int index;
+};
+
+bool sortFunc(Window l, Window r) { return l.numFaces > r.numFaces; }
+
+
+using namespace cv;
+void skipFrames(VideoCapture & vid, int numFramesToSkip)
+{
+	for (int i = 0; i < numFramesToSkip; i++)
+	{
+		vid.grab();
+	}
+}
 
 std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filename, int secondsPerClip)
 {
@@ -62,33 +71,21 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 	CascadeClassifier faceCascade;
 	faceCascade.load(face_cascade_name);
 
-	String s = "outvid_simple_face.avi";
-	Size size = Size(1280, 720);
-	namedWindow("test");
-	VideoWriter writer;
-	writer.open(s, -1, fps, size);
-	if (writer.isOpened())
-	{
-		std::cout << "opened";
-	}
-
 	Mat frame;
+	Mat greyFrame;
 	int * facesInSample = new int[samplesPerWindow];
-	int * windowValues = new int[numWindows];
-	windowValues[0] = 0;
+	Window * Windows  = new Window[numWindows];
+	Windows[0].index = 0;
+	Windows[0].numFaces = 0;
 	int windowIndex = 0;
 	int facesIndex = 0;
 	for (int i = 0; i < samplesPerWindow; i++)
 	{
 		readAhead.read(frame);
-		faceCascade.detectMultiScale(frame, detectedFaces, scalingPerRun, minNeighbours);
+		cvtColor(frame, greyFrame, COLOR_BGR2GRAY);
+		faceCascade.detectMultiScale(greyFrame, detectedFaces, scalingPerRun, minNeighbours);
 		facesInSample[i] = detectedFaces.size();
-		windowValues[0] += facesInSample[i];
-		for (Rect r : detectedFaces)
-		{
-			rectangle(frame, r, Scalar(255, 255, 255));
-		}
-		writer.write(frame);
+		Windows[0].numFaces += facesInSample[i];
 		skipFrames(readAhead, numFramesToSkip);
 	}
 	windowIndex = 1;
@@ -98,8 +95,9 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 		//Detect faces
 		faceCascade.detectMultiScale(frame, detectedFaces, scalingPerRun, minNeighbours);
 		//Update window values
-		windowValues[windowIndex] = windowValues[windowIndex - 1];
-		windowValues[windowIndex] += (detectedFaces.size() - facesInSample[facesIndex]);
+		Windows[windowIndex].numFaces = Windows[windowIndex - 1].numFaces;
+		Windows[windowIndex].numFaces += (detectedFaces.size() - facesInSample[facesIndex]);
+		Windows[windowIndex].index = windowIndex;
 		//Update sampleBuffer
 		facesInSample[facesIndex] = detectedFaces.size();
 		//Update indexes
@@ -113,37 +111,57 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 	//Cleanup any non-set windows
 	while (windowIndex < numWindows)
 	{
-		windowValues[windowIndex] = 0;
+		Windows[windowIndex].numFaces = 0;
+		Windows[windowIndex].index = windowIndex;
 		windowIndex++;
 	}
 	
-
-	int maxIndex = 0;
-	for (int x = 0; x < 10; x++)
+	std::sort(Windows, &Windows[numWindows], sortFunc);
+	int numGIFs = ((frameCount / fps) / 60) + 5;
+	
+	int secondsBetweenWindow = 15;
+	double indexGap = samplesPerSecond * secondsBetweenWindow;
+	std::cout << Windows[0].numFaces << std::endl;
+	std::cout << Windows[numWindows - 1].numFaces << std::endl;
+	for (int i = 0; i < numWindows; i++)
 	{
-		maxIndex = 0;
-		for (int t = 0; t <windowSize; t++)
+		for (int x = i+1; x < numWindows; x++)
 		{
-			if (windowValues[t] > windowValues[maxIndex])
+			if (abs(Windows[i].index - Windows[x].index) < indexGap)
 			{
-				maxIndex = t;
+				if (Windows[i].numFaces != 0)
+				{
+					//std::cout << "Deleting index " << x << std::endl;
+					Windows[x].numFaces = 0;
+				}
 			}
 		}
-
-		double endFrame = (maxIndex + 1) * windowSize;
-		double startFrame = endFrame - windowSize;
-
-		double endTime = endFrame / fps;
-		double startTime = startFrame / fps;
-
-		timestamps.push_back(startTime);
-		timestamps.push_back(endTime);
-		timestamps.push_back(windowValues[maxIndex]);
-		windowValues[maxIndex] = 0;
 	}
-	writer.release();
+	int added = 0;
+	for (int i = 0; i < numWindows; i++)
+	{
+		std::cout << Windows[i].numFaces;
+		if (Windows[i].numFaces != 0)
+		{
+			added++;
+			double endFrame = windowSize + (framesPerSample * Windows[i].index);
+			double startFrame = endFrame - windowSize;
+
+			double endTime = endFrame / fps;
+			double startTime = startFrame / fps;
+
+			timestamps.push_back(startTime);
+			timestamps.push_back(endTime);
+			timestamps.push_back(Windows[i].numFaces);
+		}
+		if (added == numGIFs)
+		{
+			break;
+		}
+	}
+
 	delete[] facesInSample;
-	delete[] windowValues;
+	delete[] Windows;
 
 	return timestamps;
 }
