@@ -11,7 +11,7 @@
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 5
+#define samplesPerSecond 4
 
 
 /*
