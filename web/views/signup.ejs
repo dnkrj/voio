@@ -1,0 +1,14 @@
+<% include head %>
+<% include title %>
+		<div id="signup_form">
+			<h1>Register</h1>
+			<form action="/signup" method="post">
+				<input class="textin" placeholder="email" type="text" name="email"><br/>
+				<input id="pass1" onChange="verifyPassword()" class="textin" placeholder="password" type="password" name="password"><br/>
+				<input id="pass2" onChange="verifyPassword()" class="textin" placeholder="password" type="password" name="verify_password"><br/>
+				<input id="subbutton" type="submit" value="Register" disabled>
+			</form>
+		</div>
+	</body>
+	<script src="/javascripts/signup.js"></script>
+</html>
