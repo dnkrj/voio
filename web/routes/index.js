@@ -47,12 +47,17 @@ module.exports = function(passport) {
 	// verification is done by the "isLoggedIn" function
 	router.get('/profile', isLoggedIn, function(req, res) {
 		res.render('profile', {
-			title : 'Profule &middot; Voio',
+			title : 'Profile &middot; Voio',
 			user  : req.user
 		})
 	});
 
-
+    /* GET logout page */
+    // logs the user out and then redirects to the home page
+    router.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
+    });
 
 
 	return router;

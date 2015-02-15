@@ -7,18 +7,18 @@ var bodyParser   = require('body-parser');
 
 var app = express();
 
-// setup user accounts (database, authentication)
+// setup user accounts section (database, authentication)
 var mongoose = require('mongoose');
 var passport = require('passport');
 var session  = require('express-session');
 
-var configDB     = require('./config/config/database.js');
-var configPass   = require('./config/config/passport.js')(passport); // pass passport for configuration
+var configDB     = require('./config/database.js');
+var configPass   = require('./config/passport.js')(passport); // pass passport for configuration
 
 mongoose.connect(configDB.url); // connect to our database
 
-app.use(cookieParser()); // read cookies (needed for auth)
 // required for passport
+app.use(cookieParser()); // read cookies (needed for auth)
 app.use(session({ 
                     secret: 'voioioioioioioio',
                     resave: false,
@@ -28,9 +28,8 @@ app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
 
-var routes = require('./routes/index')(passport);
-var users = require('./routes/users');
-
+// setup routing
+var routes = require('./routes/index')(passport); //pass passport object for use
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -38,18 +37,10 @@ app.set('view engine', 'ejs');
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev')); // log every request to the server
-//app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // allows wider range of inputs to forms
-//app.use(cookieParser());
 app.use(express.static(__dirname + '/public')); //  "public" off of current directory is root
 
-
-// ASK DAN -why are these separate?
-// What advatages does it bring?
-// How does it work?
-// http://expressjs.com/api.html#app.use
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

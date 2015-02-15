@@ -1,17 +1,26 @@
 {
-  "name": "4up",
+  "name": "web",
   "version": "0.0.0",
   "private": true,
-  "scripts": {
-    "start": "node ./bin/www"
-  },
+  "description": "Front end of video diaries project",
+  "main": "./bin/www",
   "dependencies": {
-    "body-parser": "~1.10.2",
-    "cookie-parser": "~1.3.3",
-    "debug": "~2.1.1",
-    "ejs": "~2.2.3",
-    "express": "~4.11.1",
-    "morgan": "~1.5.1",
-    "serve-favicon": "~2.2.0"
-  }
+    "bcrypt-nodejs": "^0.0.3",
+    "body-parser": "^1.10.2",
+    "cookie-parser": "^1.3.3",
+    "debug": "^2.1.1",
+    "ejs": "^2.2.4",
+    "express": "^4.11.2",
+    "express-session": "^1.10.2",
+    "morgan": "^1.5.1",
+    "mongoose": "^3.8.23",
+    "passport": "^0.2.1",
+    "passport-local": "^1.0.0",
+    "serve-favicon": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "team oscar (front end)"
 }

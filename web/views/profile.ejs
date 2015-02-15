@@ -1,6 +1,11 @@
 <% include head %>
 <% include title %>
 		<div id="profile_container">
+			<p>
+                <strong>id</strong>: <%= user._id %><br>
+                <strong>email</strong>: <%= user.local.email %><br>
+                <strong>password</strong>: <%= user.local.password %>
+            </p>
 			<form action="/logout" method="get">
 				<input id="logoutbtn" type="submit" value="Log Out">
 			</form>
