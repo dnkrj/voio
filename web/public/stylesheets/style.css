@@ -50,6 +50,9 @@ body {
 	padding-left: 0px;
 	margin-right: -270px;
 	z-index: 4;
+	width: 230px;
+	height: 84px;
+	background: transparent url('/images/voio.png') no-repeat center scroll;
 }
 
 #menu {

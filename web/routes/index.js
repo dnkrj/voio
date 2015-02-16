@@ -7,7 +7,8 @@ module.exports = function(passport) {
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
 		res.render('index', {
-	      	title : 'Voio',
+			user: req.user,
+	      	title: 'Voio'
 	    });
 	});
 
@@ -31,43 +32,54 @@ module.exports = function(passport) {
 		});
 	});
 
-	/* GET upload page. */
-	router.get('/upload', function(req, res, next) {
-	    res.render('upload', { title : 'Upload &middot; Voio' });
-	});
+	//Pages for logged out users
 
 	/* GET signup page */
-	router.get('/signup', function (req, res, next) {
+	router.get('/signup', isLoggedIn(false), function (req, res, next) {
 		res.render('signup', { title : 'Signup &middot; Voio' })
 	});
 
 	/* POST signup page */
 	router.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/profile', // redirect to the secure profile section
+		successRedirect : '/upload', // redirect to the secure profile section
 		failureRedirect : '/signup',  // redirect back to the signup page if there is an error
 									  // TODO - return error
 	}));
 
 	/* GET login page */
-    router.get('/login', function(req, res) {
+    router.get('/login', isLoggedIn(false), function (req, res) {
         res.render('login', { title : 'Login &middot; Voio' }); 
     });
 
     /* POST login page */
     router.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/profile', // redirect to the secure profile section
+        successRedirect : '/profile', // redirect to the user page
         failureRedirect : '/login',   // redirect back to the signup page if there is an error
     								  // TODO - return error
     }));
 
-	/* GET profile page */
-	// we want this protected to you have to be logged in to access this
-	// verification is done by the "isLoggedIn" function
-	router.get('/profile', isLoggedIn, function(req, res) {
-		res.render('profile', {
-			title : 'Profile &middot; Voio',
-			user  : req.user
-		})
+	
+	// Pages for logged in users
+
+	/* Redirects profile to user page */
+	router.get('/profile', isLoggedIn(true), function(req, res) {
+		res.redirect('/u/'+req.user.local.email);
+	});
+
+	/* GET upload page */
+	router.get('/upload', isLoggedIn(true), function(req, res) {
+	    res.render('upload', {
+	    	title : 'Upload &middot; Voio',
+	    	user: req.user
+	    });
+	});
+
+	/* GET pending page */
+	router.get('/pending', isLoggedIn(true), function(req, res) {
+	    res.render('pending', {
+	    	title : 'Pending &middot; Voio',
+	    	user: req.user
+	    });
 	});
 
     /* GET logout page */
@@ -81,12 +93,13 @@ module.exports = function(passport) {
 	return router;
 };
 
-function isLoggedIn(req, res, next) {
+function isLoggedIn (loggedin) {
+    return function (req, res, next) {
+    	// if user is authentication matches in the session, carry on 
+    	if (req.isAuthenticated() === loggedin)
+    	    return next();
 
-    // if user is authenticated in the session, carry on 
-    if (req.isAuthenticated())
-        return next();
-
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
+    	// if they aren't redirect them to the home page
+    	res.redirect('/');
+    }
 }

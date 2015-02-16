@@ -1,0 +1,23 @@
+body {
+	background: #fff url("/images/bg.jpg") no-repeat center fixed;
+	background-size: cover;
+	color: #fff;
+}
+
+a {
+	color: white;
+}
+
+#menu li {
+	background: transparent;
+	border:none;
+}
+
+#title {
+	background: transparent;
+	border: none;
+}
+
+#logo {
+	background-image: url('/images/voiow.png');
+}
