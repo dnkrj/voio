@@ -6,13 +6,26 @@ module.exports = function(passport) {
 	
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
-		var dirList = fs.readdir(__dirname + '/../public/gifs', function(err, files){
+		res.render('index', {
+	      	title : 'Voio',
+	    });
+	});
+
+	/* GET user page. */
+	router.get('/u/:id', function(req, res, next) {
+		var username = req.params.id;
+		fs.readdir(__dirname + '/../public/users/' + username + '/gifs', function(err, files){
 			var gifs = [];
-			files.forEach(function(gifDir) {
-    			gifs.push('"'+gifDir+'"');
-			});
-			res.render('index', {
-	      		title : 'Voio',
+			if (files === undefined) {
+				username = "no gifs here."
+			} else {
+				files.forEach(function(gifDir) {
+    				gifs.push('"'+gifDir+'"');
+				});
+			}	
+			res.render('user', {
+	      		title : username + '&middot; Voio',
+	      		user: username,
 	  	    	gifs  : gifs
 	    	});
 		});

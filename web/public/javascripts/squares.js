@@ -13,10 +13,10 @@ $(window).scroll(function() {
 });
 
 function addGif() {
-  var url = gifURL();
-  var id = url.split(".")[0];
-  $("#container").append("<a href='#'><div class='gif' id='" + id + "'>" + "<img class='freezeframe' src='/gifs/" + url + "'>" + "</div></a>");
-  console.log(id);  
+  var gif = gifURL();
+  var url = "/users/" + username + "/gifs/" + gif;
+  var id = gif.split(".")[0];
+  $("#container").append("<a href='#'><div class='gif' id='" + id + "'>" + "<img class='freezeframe' src='" + url + "'>" + "</div></a>");
   $('#' + id).css('display', 'none');
   $('#' + id).fadeIn(1000);
 }

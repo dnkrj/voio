@@ -1,8 +1,12 @@
 <% include head %>
+	<script>
+		var gifs = [<%- gifs %>];
+		var username = "<%- user %>";
+	</script>
+	<script src="/javascripts/squares.js"></script>
 <% include title %>
 		<div id="container">
 			<h1><%= user %></h1>
-  			<p>Look at all these photos.</p>
 		</div>
 	</body>
 	<script src="/javascripts/squares.js"></script>
