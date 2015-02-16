@@ -2,6 +2,7 @@
 <% include title %>
 		<div id="login_form">
 			<h1>Log In</h1>
+			<% if (message.length > 0) { %> <div class="message"><%= message %></div> <% } %>
 			<form action="/login" method="post">
 				<input class="textin" placeholder="email" type="text" name="email"><br/>
 				<input class="textin" placeholder="password" type="password" name="password"><br/>

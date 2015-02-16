@@ -4,6 +4,7 @@ var favicon      = require('serve-favicon');
 var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
+var flash        = require('connect-flash');
 
 var app = express();
 
@@ -30,6 +31,9 @@ app.use(passport.session()); // persistent login sessions
 
 // setup routing
 var routes = require('./routes/index')(passport); //pass passport object for use
+
+// Use connect-flash middleware for displaying messages to user
+app.use(flash());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

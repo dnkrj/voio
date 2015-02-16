@@ -36,7 +36,10 @@ module.exports = function(passport) {
 
 	/* GET signup page */
 	router.get('/signup', isLoggedIn(false), function (req, res, next) {
-		res.render('signup', { title : 'Signup &middot; Voio' })
+		res.render('signup', { 
+			title : 'Signup &middot; Voio',
+			message: req.flash('signupMessage')
+			})
 	});
 
 	/* POST signup page */
@@ -48,7 +51,10 @@ module.exports = function(passport) {
 
 	/* GET login page */
     router.get('/login', isLoggedIn(false), function (req, res) {
-        res.render('login', { title : 'Login &middot; Voio' }); 
+        res.render('login', { 
+        	title : 'Login &middot; Voio',
+        	message: req.flash('loginMessage')
+        }); 
     });
 
     /* POST login page */

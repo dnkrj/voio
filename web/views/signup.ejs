@@ -2,6 +2,7 @@
 <% include title %>
 		<div id="signup_form">
 			<h1>Sign Up</h1>
+			<% if (message.length > 0) { %> <div class="message" ><%= message %></div> <% } %>
 			<form action="/signup" method="post">
 				<input class="textin" placeholder="email" type="text" name="email"><br/>
 				<input id="pass1" onChange="verifyPassword()" class="textin" placeholder="password" type="password" name="password"><br/>

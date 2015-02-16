@@ -29,50 +29,50 @@ module.exports = function(passport) {
     // LOCAL SIGNUP
     // we are using named strategies since we have one for login and one for signup
     passport.use('local-signup', new LocalStrategy({
-        // by default, local strategy uses username and password, we will override with email
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : true // allows us to pass back the entire request to the callback
-    },
-    function(req, email, password, done) {
+            // by default, local strategy uses username and password, we will override with email
+            usernameField : 'email',
+            passwordField : 'password',
+            passReqToCallback : true // allows us to pass back the entire request to the callback
+        },
+        function(req, email, password, done) {
 
-        // asynchronous
-        // User.findOne wont fire unless data is sent back
-        process.nextTick(function() {
+            // asynchronous
+            // User.findOne wont fire unless data is sent back
+            process.nextTick(function() {
 
-            // find a user whose email is the same as the forms email
-            // we are checking to see if the user trying to login already exists
-            User.findOne({ 'local.email' :  email }, function(err, user) {
-                // if there are any errors, return the error
-                if (err)
-                    return done(err);
+                // find a user whose email is the same as the forms email
+                // we are checking to see if the user trying to login already exists
+                User.findOne({ 'local.email' :  email }, function(err, user) {
+                    // if there are any errors, return the error
+                    if (err)
+                        return done(err);
 
-                // check to see if theres already a user with that email
-                if (user) {
-                    return done(null, false, console.log('Signup error: email already taken: ' + user.email));
-                } else {
+                    // check to see if theres already a user with that email
+                    if (user) {
+                        return done(null, false, req.flash('signupMessage', 'Email already taken'));
+                    } else {
 
-                    // if there is no user with that email
-                    // create the user
-                    var newUser            = new User();
+                        // if there is no user with that email
+                        // create the user
+                        var newUser            = new User();
 
-                    // set the user's local credentials
-                    newUser.local.email    = email;
-                    newUser.local.password = newUser.generateHash(password);
-                    newUser.local.verified = false;
-                    newUser.local.vericode = random();
+                        // set the user's local credentials
+                        newUser.local.email    = email;
+                        newUser.local.password = newUser.generateHash(password);
+                        newUser.local.verified = false;
+                        newUser.local.vericode = random();
 
-                    // save the user
-                    newUser.save(function(err) {
-                        if (err)
-                            throw err;
-                        return done(null, newUser);
-                    });
-                }
+                        // save the user
+                        newUser.save(function(err) {
+                            if (err)
+                                throw err;
+                            return done(null, newUser);
+                        });
+                    }
 
-            });    
+                });    
 
-        });
+            });
 
     }));
 
@@ -96,11 +96,11 @@ module.exports = function(passport) {
 
             // if no user is found, return the message
             if (!user)
-                return done(null, false, console.log('Login error: user not found: ' + email));
+                return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
 
             // if the user is found but the password is wrong
             if (!user.validPassword(password))
-                return done(null, false, console.log('login error: incorrect password: ' + password)); 
+                return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
 
             // all is well, return successful user
             return done(null, user);
