@@ -6,11 +6,16 @@ module.exports = function(passport) {
 	
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
-		var gifs = getGifs();
-	    res.render('index', {
-	      	title : 'Voio',
-	  	    gifs  : gifs
-	    });
+		var dirList = fs.readdir(__dirname + '/../public/gifs', function(err, files){
+			var gifs = [];
+			files.forEach(function(gifDir) {
+    			gifs.push('"'+gifDir+'"');
+			});
+			res.render('index', {
+	      		title : 'Voio',
+	  	    	gifs  : gifs
+	    	});
+		});
 	});
 
 	/* GET upload page. */
@@ -61,15 +66,6 @@ module.exports = function(passport) {
 
 
 	return router;
-};
-
-function getGifs() {
-	var dirList = fs.readdirSync(__dirname + '/../public/gifs');
-	var gifs = [];
-	dirList.forEach(function(gifDir) {
-    	gifs.push('"'+gifDir+'"');
-	});
-	return gifs;
 };
 
 function isLoggedIn(req, res, next) {
