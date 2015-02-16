@@ -1,10 +1,9 @@
 // config/passport.js
+var fs = require('fs');
 
 // load all the things we need
 var LocalStrategy   = require('passport-local').Strategy;
-
-// load up the user model
-var User            = require('./user');
+var User            = require('./user'); // user model
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -64,8 +63,14 @@ module.exports = function(passport) {
 
                         // save the user
                         newUser.save(function(err) {
-                            if (err)
-                                throw err;
+                            if (err) { throw err };
+                            
+                            fs.mkdir("./web/user_files/" + email, 7777, function(err) {
+                                if (err) { throw err };
+                                fs.mkdir("./web/user_files/" + email + "/gifs/", 7777, function(err) {
+                                    if (err) { throw err };                                
+                                });
+                            });
                             return done(null, newUser);
                         });
                     }
