@@ -28,35 +28,44 @@ module.exports = function(passport) {
     // LOCAL SIGNUP
     // we are using named strategies since we have one for login and one for signup
     passport.use('local-signup', new LocalStrategy({
-            // by default, local strategy uses username and password, we will override with email
-            usernameField : 'email',
+            // by default, local strategy uses username and password
+            usernameField : 'username',
             passwordField : 'password',
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
-        function(req, email, password, done) {
+        function(req, username, password, done) {
+            if (password !== req.body.verify_password) {
+                return done(null, false, req.flash('signupMessage', 'Passwords do not match'))
+            }
 
             // asynchronous
             // User.findOne wont fire unless data is sent back
             process.nextTick(function() {
 
-                // find a user whose email is the same as the forms email
+                // find a user whose username is the same as the forms username
                 // we are checking to see if the user trying to login already exists
-                User.findOne({ 'local.email' :  email }, function(err, user) {
+                User.findOne({ 'local.username' :  username }, function(err, user) {
+                    User.findOne({ 'local.email' : req.body.email }, function(err, user) {
+                        if (user) {
+                            return done(null, flase, req.flash('signupMessage', 'Email already used'))
+                        }
+                    })
                     // if there are any errors, return the error
                     if (err)
                         return done(err);
 
-                    // check to see if theres already a user with that email
+                    // check to see if there's already a user with that username
                     if (user) {
-                        return done(null, false, req.flash('signupMessage', 'Email already taken'));
+                        return done(null, false, req.flash('signupMessage', 'Username already taken'));
                     } else {
 
-                        // if there is no user with that email
+                        // if there is no user with that username
                         // create the user
                         var newUser            = new User();
 
                         // set the user's local credentials
-                        newUser.local.email    = email;
+                        newUser.local.username = username;
+                        newUser.local.email    = req.body.email;
                         newUser.local.password = newUser.generateHash(password);
                         newUser.local.verified = false;
                         newUser.local.vericode = random();
@@ -65,53 +74,56 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err) { throw err };
                             
-                            fs.mkdir("./web/user_files/" + email, 7777, function(err) {
+                            fs.mkdir("./web/user_files/" + username, 7777, function(err) {
                                 if (err) { throw err };
-                                fs.mkdir("./web/user_files/" + email + "/gifs/", 7777, function(err) {
+                                fs.mkdir("./web/user_files/" + username + "/gifs/", 7777, function(err) {
                                     if (err) { throw err };                                
                                 });
                             });
                             return done(null, newUser);
                         });
                     }
-
                 });    
-
             });
-
-    }));
+        })
+    );
 
 
     // LOCAL LOGIN
     // we are using named strategies since we have one for login and one for signup
     passport.use('local-login', new LocalStrategy({
-        // by default, local strategy uses username and password, we will override with email
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : true // allows us to pass back the entire request to the callback
-    },
-    function(req, email, password, done) { // callback with email and password from our form
+            // by default, local strategy uses username and password
+            usernameField : 'username',
+            passwordField : 'password',
+            passReqToCallback : true // allows us to pass back the entire request to the callback
+        },
+        function(req, username, password, done) { // callback with username and password from our form
+            console.log("LOGIN FUNCTION CALLED: " + username + " " + password);
+            // find a user whose username is the same as the form's username
+            // we are checking to see if the user trying to login already exists
+            User.findOne({ 'local.username' :  username }, function(err, user) {
+                // if there are any errors, return the error before anything else
+                if (err) return done(err);
 
-        // find a user whose email is the same as the forms email
-        // we are checking to see if the user trying to login already exists
-        User.findOne({ 'local.email' :  email }, function(err, user) {
-            // if there are any errors, return the error before anything else
-            if (err)
-                return done(err);
+                // if no user is found, return the message
+                if (!user) {
+                    User.findOne( { 'local.email' : req.body.email }, function(err, email) {
+                        if (!user) {
+                            return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
+                        } else {
+                            user = email;
+                        }
+                    });
+                }
 
-            // if no user is found, return the message
-            if (!user)
-                return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
+                // if the user is found but the password is wrong
+                if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
 
-            // if the user is found but the password is wrong
-            if (!user.validPassword(password))
-                return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
-
-            // all is well, return successful user
-            return done(null, user);
-        });
-
-    }));
+                // all is well, return successful user
+                return done(null, user);
+            });
+        })
+    );
 
 };
 

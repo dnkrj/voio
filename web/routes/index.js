@@ -61,7 +61,6 @@ module.exports = function(passport) {
     router.post('/login', passport.authenticate('local-login', {
         successRedirect : '/profile', // redirect to the user page
         failureRedirect : '/login',   // redirect back to the signup page if there is an error
-    								  // TODO - return error
     }));
 
 	
