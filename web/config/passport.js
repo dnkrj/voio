@@ -34,6 +34,7 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) {
+            console.log("SIGNUP FUNCTION CALLED: " + username + " " + password);
             if (password !== req.body.verify_password) {
                 return done(null, false, req.flash('signupMessage', 'Passwords do not match'))
             }
@@ -74,10 +75,21 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err) { throw err };
                             
-                            fs.mkdir("./web/user_files/" + username, 7777, function(err) {
+                            fs.mkdir("./web/user/" + username, 7777, function(err) {
                                 if (err) { throw err };
-                                fs.mkdir("./web/user_files/" + username + "/gifs/", 7777, function(err) {
-                                    if (err) { throw err };                                
+                                fs.mkdir("./web/user/" + username + "/gifs/", 7777, function(err) {
+                                    if (err) { throw err };  
+                                    fs.mkdir("./web/user/" + username + "/gifs/pending", 7777, function(err) { 
+                                        if (err) { throw err};
+                                        fs.mkdir("./web/user/" + username + "/gifs/approved", 7777, function(err) { 
+                                            if (err) { throw err};
+                                            fs.mkdir("./web/user/" + username + "/gifs/disapproved", 7777, function(err) { 
+                                                if (err) { throw err};
+                                                
+                                            });
+                                        });
+                                    });
+
                                 });
                             });
                             return done(null, newUser);
@@ -107,7 +119,7 @@ module.exports = function(passport) {
 
                 // if no user is found, return the message
                 if (!user) {
-                    User.findOne( { 'local.email' : req.body.email }, function(err, email) {
+                    User.findOne( { 'local.email' : username }, function(err, email) {
                         if (!user) {
                             return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
                         } else {
