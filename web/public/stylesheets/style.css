@@ -103,6 +103,20 @@ body {
 	display: inline-block;
 }
 
+.message {
+	width: 100%;
+	max-width: 600px;
+	height: 60px;
+	background-color: #fff;
+	color: #c02;
+	border: 3px solid #c02;
+	margin: 30px auto 30px auto;
+	text-align: center;
+	font: 18px 'League Spartan', sans-serif;
+	line-height: 60px;
+	letter-spacing: 2px;
+}
+
 /*
 Log In
 */
