@@ -34,9 +34,9 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) {
-            if (password !== req.body.verify_password) {
-                return done(null, false, req.flash('signupMessage', 'Passwords do not match'))
-            }
+            if (password !== req.body.verify_password) return done(null, false, req.flash('signupMessage', 'Passwords do not match'));
+            if (username.indexOf("@") !== -1) return done(null, false, req.flash('signupMessage', 'Username cannot conatain "@" symbol'));
+            if ((req.body.email.indexOf("@") === -1) || (req.body.email.indexOf(".") === -1)) return done(null, false, req.flash('signupMessage', 'Invalid email'));
 
             // asynchronous
             // User.findOne wont fire unless data is sent back
@@ -54,11 +54,8 @@ module.exports = function(passport) {
 
                     return User.findOne({ 'local.email' : req.body.email }, function(err, email) {
                         if (err) return done(err);
-                        console.log("INSIDE EMAIL QUERY ........................................");
-                        console.log(email);
 
                         if (email) {
-                            console.log("EMAIL OBJECT FOUND.......................................");
                             return done(null, false, req.flash('signupMessage', 'Email already used'));
                         };
                         // if there are any errors, return the error
@@ -110,28 +107,35 @@ module.exports = function(passport) {
         function(req, username, password, done) { // callback with username and password from our form
             // find a user whose username is the same as the form's username
             // we are checking to see if the user trying to login already exists
-            User.findOne({ 'local.username' :  username }, function(err, user) {
-                // if there are any errors, return the error before anything else
-                if (err) return done(err);
+            if (username.indexOf("@") === -1) {
+                User.findOne({ 'local.username' :  username }, function(err, user) {
+                    // if there are any errors, return the error before anything else
+                    if (err) return done(err);
 
-                if (!user) {
-                    return User.findOne( { 'local.email' : email}, function(err, email) {
-                        // if no user is found, return the message
-                        if (!email) return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
-                        // if the user is found but the password is wrong
-                        if (!email.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
+                    if (!user) return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
+                    // if the user is found but the password is wrong
+                    if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
 
-                        // all is well, return successful user
-                        return done(null, user);               
-                    });
-                }
+                    // all is well, return successful user
+                    return done(null, user);
+                });
+            } else {
+                User.findOne({ 'local.email' :  username }, function(err, email) {
+                    console.log(" checking email");
+                    console.log(email);
+                    // if there are any errors, return the error before anything else
+                    if (err) return done(err);
 
-                // if the user is found but the password is wrong
-                if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
+                    if (!email) return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
 
-                // all is well, return successful user
-                return done(null, user);
-            });
+                    // if the user is found but the password is wrong
+                    if (!email.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
+
+                    // all is well, return successful user
+                    return done(null, email);
+                }); 
+
+            }
         })
     );
 
