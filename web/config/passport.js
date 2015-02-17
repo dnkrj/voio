@@ -78,21 +78,17 @@ module.exports = function(passport) {
                         // save the user
                         newUser.save(function(err) {
                             if (err) { throw err };
-                            fs.mkdir(__dirname + "/../public/user/" + username, 7777, function(err) {
+                            fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
                                 if (err) { throw err };
-                                fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/", 7777, function(err) {
-                                    if (err) { throw err };  
-                                    fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/p", 7777, function(err) { 
+                                fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
+                                    if (err) { throw err};
+                                    fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
                                         if (err) { throw err};
-                                        fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/a", 7777, function(err) { 
+                                        fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
                                             if (err) { throw err};
-                                            fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/d", 7777, function(err) { 
-                                                if (err) { throw err};
-                                                return done(null, newUser);
-                                            });
+                                            return done(null, newUser);
                                         });
                                     });
-
                                 });
                             });
                         });
