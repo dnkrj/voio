@@ -14,7 +14,7 @@ $(window).scroll(function() {
 
 function addGif() {
   var gif = gifURL();
-  var url = "/users/" + username + "/gifs/" + gif;
+  var url = "/user/" + username + "/a/" + gif;
   var id = gif.split(".")[0];
   $("#container").append("<a href='#'><div class='gif' id='" + id + "'>" + "<img class='freezeframe' src='" + url + "'>" + "</div></a>");
   $('#' + id).css('display', 'none');

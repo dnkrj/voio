@@ -17,7 +17,7 @@ module.exports = function(passport) {
 	/* GET user page. */
 	router.get('/u/:id', function(req, res, next) {
 		var username = req.params.id;
-		fs.readdir(__dirname + '/../public/users/' + username + '/gifs', function(err, files){
+		fs.readdir(__dirname + '/../public/user/' + username + '/a', function(err, files){
 			var gifs = [];
 			if (files === undefined) {
 				username = "no gifs here."
@@ -74,11 +74,16 @@ module.exports = function(passport) {
 	});
 
 	/* GET upload page */
-	router.get('/upload', isLoggedIn(true), function(req, res) {
+	router.get('/upload', isLoggedIn(false), function(req, res) {
 	    res.render('upload', {
 	    	title : 'Upload &middot; Voio',
 	    	user: req.user
 	    });
+	});
+
+	router.post('/upload', function(req, res) {
+		console.log("//// File uploaded at: " + req.files.upFile.path);
+		res.end();
 	});
 
 	/* GET pending page */
@@ -95,7 +100,6 @@ module.exports = function(passport) {
         req.logout();
         res.redirect('/');
     });
-
 
     // Requests for emailing
     router.get('/send', function(req, res) {
@@ -120,10 +124,8 @@ module.exports = function(passport) {
         if (req.query.id == rand) {
             //approve in DB
         }
-    })
-
-
-
+    });
+    
 	return router;
 };
 

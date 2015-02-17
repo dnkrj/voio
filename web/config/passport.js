@@ -47,7 +47,7 @@ module.exports = function(passport) {
                 User.findOne({ 'local.username' :  username }, function(err, user) {
                     User.findOne({ 'local.email' : req.body.email }, function(err, user) {
                         if (user) {
-                            return done(null, flase, req.flash('signupMessage', 'Email already used'))
+                            return done(null, false, req.flash('signupMessage', 'Email already used'))
                         }
                     })
                     // if there are any errors, return the error
@@ -73,25 +73,23 @@ module.exports = function(passport) {
                         // save the user
                         newUser.save(function(err) {
                             if (err) { throw err };
-                            
-                            fs.mkdir("./web/user/" + username, 7777, function(err) {
+                            fs.mkdir(__dirname + "/../public/user/" + username, 7777, function(err) {
                                 if (err) { throw err };
-                                fs.mkdir("./web/user/" + username + "/gifs/", 7777, function(err) {
+                                fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/", 7777, function(err) {
                                     if (err) { throw err };  
-                                    fs.mkdir("./web/user/" + username + "/gifs/pending", 7777, function(err) { 
+                                    fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/p", 7777, function(err) { 
                                         if (err) { throw err};
-                                        fs.mkdir("./web/user/" + username + "/gifs/approved", 7777, function(err) { 
+                                        fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/a", 7777, function(err) { 
                                             if (err) { throw err};
-                                            fs.mkdir("./web/user/" + username + "/gifs/disapproved", 7777, function(err) { 
+                                            fs.mkdir(__dirname + "/../public/user/" + username + "/gifs/d", 7777, function(err) { 
                                                 if (err) { throw err};
-                                                
+                                                return done(null, newUser);
                                             });
                                         });
                                     });
 
                                 });
                             });
-                            return done(null, newUser);
                         });
                     }
                 });    
