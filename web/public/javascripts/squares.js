@@ -16,7 +16,7 @@ function addGif() {
   var gif = gifURL();
   var url = "/user/" + username + "/a/" + gif;
   var id = gif.split(".")[0];
-  $("#container").append("<a href='#'><div class='gif' id='" + id + "'>" + "<img class='freezeframe' src='" + url + "'>" + "</div></a>");
+  $("#container").append("<a href='/u/" + username + "/" + id + "'><div class='gif' id='" + id + "'>" + "<img src='" + url + "'>" + "</div></a>");
   $('#' + id).css('display', 'none');
   $('#' + id).fadeIn(1000);
 }
