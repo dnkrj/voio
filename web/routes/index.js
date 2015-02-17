@@ -101,8 +101,9 @@ module.exports = function(passport) {
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
 	    res.render('pending', {
-	    	title : 'Pending &middot; Voio',
-	    	user  : req.user
+	    	title    : 'Pending &middot; Voio',
+	    	username : req.user.local.username,
+	    	user     : req.user
 	    });
 	});
 
