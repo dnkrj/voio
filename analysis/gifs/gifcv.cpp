@@ -152,8 +152,6 @@ GIF VideoConverter::extractGif(const std::string& src, int uid, double start, do
         Mat frame_c;
         Mat frame_r;
         Mat frame_n;
-        double fps = cap.get(CV_CAP_PROP_FPS);
-        float rate = (float) (1/fps);
         double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
         double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
         cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
@@ -161,6 +159,8 @@ GIF VideoConverter::extractGif(const std::string& src, int uid, double start, do
         double ratio = width/height;
         	
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
+			double fps = cap.get(CV_CAP_PROP_FPS);
+			float rate = (float) (1/fps);
         	if(!cap.read(frame)) throw "Error reading frames.";
         	if(ratio < 1) {
          		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
