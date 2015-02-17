@@ -3,10 +3,10 @@
 		var gifs = [<%- gifs %>];
 		var username = "<%- userpage %>";
 	</script>
-	<script src="/javascripts/squares.js"></script>
+	<script src="/javascripts/squares.js"></script>	
 <% include title %>
 		<div id="container">
-			<% if (user !== undefined && !user.verified) { %> <button id="verify">Click here to verify email.</button> <% } %>
+			<% if ((typeof user !== 'undefined') && (user.username === userpage) && (!user.verified)) { %> <button id="verify" onclick="location.href = 'http://<%- hostname %>/send?to=<%- user.email %>&code=<%- user.vericode %>'">Click here to verify email.</button> <% } %>
 			<h1><%= userpage %></h1>
 		</div>
 	</body>

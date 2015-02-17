@@ -25,13 +25,22 @@ module.exports = function(passport) {
 				files.forEach(function(gifDir) {
     				gifs.push('"'+gifDir+'"');
 				});
-			}	
-			res.render('user', {
-	      		title      : username + '&middot; Voio',
-	      		userpage   : username,
-	  	    	gifs       : gifs,
-	  	    	user       : req.user
-	    	});
+			}
+			if (req.user) {	
+				res.render('user', {
+		      		title    : username + '&middot; Voio',
+		      		userpage : username,
+		  	    	gifs     : gifs,
+		  	    	user     : req.user.local,
+		  	    	hostname   : req.hostname
+		    	});
+		    } else {
+		    	res.render('user', {
+		      		title    : username + '&middot; Voio',
+		      		userpage : username,
+		  	    	gifs     : gifs
+		    	});
+		    }
 		});
 	});
 
@@ -116,27 +125,51 @@ module.exports = function(passport) {
 
     // Requests for emailing
     router.get('/send', function(req, res) {
-        host = req.get('host');
-        link="http://"+req.get('host')+"/verify?id="+rand;
-        mailOptions = {
-            to      : req.query.to,
-            subject : "Please confirm your Email Account",
-            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-        }
-        transport.sendMail(mailOptions, function(error, response) {
-            if (error) {
-                console.log(error);
-                res.end("error");
-            } else {
-                res.end("sent");
-            }
-        });
+    	User.findOne({ 'local.email' : req.query.to }, function(err, user) {
+    		if (err) {
+    			console.log(err);
+    			res.redirect('/profile');
+    		}
+    		if (typeof user !== 'undefined') {
+		        link="http://" + req.hostname + "/verify?email=" + req.query.to + 
+		        										"&code=" + req.query.code +
+		        										"&_id="  + user._id;
+		        mailOptions = {
+		            to      : req.query.to,
+		            from    : "no-reply@voio.io",
+		            subject : "Please confirm your Email Account",
+		            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+		        }
+		        transport.sendMail(mailOptions, function(error, response) {
+		            if (error) {
+		                console.log(error);
+		                req.flash('profileMessage', "Unable to send email");
+		                res.redirect('/profile');
+		            } else {
+		                res.redirect('/profile');
+		            }
+		        });    			
+    		}
+    	});
     });
 
     router.get('/verify', function(req, res) {
-        if (req.query.id == rand) {
-            //approve in DB
-        }
+    	var id    = req.query._id;
+        var email = req.query.email;
+        var code  = req.query.code;
+        console.log("verifying");
+        User.findOneAndUpdate( 
+        	{ 
+        		'_id'            : id,
+        		'local.email'    : email, 
+        		'local.vericode' : code }, 
+        	{ 'local.verified' : true },
+        	{},
+        	function(err) {
+        		if (err) console.log(err);
+        		res.redirect("/login");
+        	}
+        );
     });
     
 	return router;
