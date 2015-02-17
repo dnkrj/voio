@@ -12,10 +12,13 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 using namespace cv;
 
 //const double ws;
+const int nX = 25;
+const int nY = 25;
 
 MotionAnalyzer::MotionAnalyzer() {}
 
@@ -181,6 +184,25 @@ std::vector<Timestamp> MotionAnalyzer::expandWindows(std::vector<Timestamp>& ts,
 	return ret;
 }
 
+//Precondition: points are ordered as {{(x1,y1), (x2,y1), ...}, {(x1,y2), (x2,y2), ...}, ...}
+double MotionAnalyzer::calcRotation(std::vector<Point2f>& values, double dx, double dy) {
+	std::vector<double> vals;
+	for(int y = 2; y<nY-2; y++) {
+		for(int x = 2; x<nX-2; x++) {
+			vals.push_back(std::abs(gx(values, dx, x, y) - fy(values, dy, x, y)));
+		}
+	}
+	return mean(vals)[0];
+}
+
+double MotionAnalyzer::gx(std::vector<Point2f>& values, double delta, int x, int y) {
+	return (values[y*nX + x + 1].y - values[y*nX + x - 1].y)/(2*delta);
+}
+
+double MotionAnalyzer::fy(std::vector<Point2f>& values, double delta, int x, int y) {
+	return (values[(y + 1)*nX + x].x - values[(y - 1)*nX + x].x)/(2*delta);
+}
+
 std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, double length, double clipLength) {
     TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
     Size subPixWinSize(10,10), winSize(31,31);
@@ -190,13 +212,30 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
     std::vector<Timestamp> ret;
     std::vector<double> values;
     std::vector<uchar> status;
+    std::vector<Point2f> fields[2];
 	std::vector<float> err;
     Timestamp best;
     double sumr = 0;
     unsigned int index = 0;
 
     if(!cap.isOpened()) throw "Cannot open file.";
-    for(unsigned int i = 0; i<ts.size(); i += 1) {
+    
+    Mat temp;
+	cap >> temp;
+	if(temp.empty()) throw "Empty frames.";
+
+	Size sz = temp.size();
+	double width = double(sz.width);
+	double height = double(sz.height);
+	double dx = width/double(nX);
+	double dy = height/double(nY);
+	for(int y = 0; y<nY; y++) {
+		for(int x = 0; x<nX; x++) {
+			fields[0].push_back(Point2f(float(x*dx), float(y*dy)));
+		}
+	}
+    
+    for(unsigned int i = 0; i<ts.size(); i++) {
     	double sum = 0;
     	double start = ts[i].getStart();
     	double end = ts[i].getEnd();
@@ -208,6 +247,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		Mat f;
 		cap >> f;
 		if(f.empty()) throw "Empty frames.";
+	
 		f.copyTo(image);
 		cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
@@ -224,6 +264,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 
 			if(prevGray.empty()) gray.copyTo(prevGray);
 			calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize, 3, termcrit, 0, 0.001);
+			calcOpticalFlowPyrLK(prevGray, gray, fields[0], fields[1], status, err, winSize, 3, termcrit, 0, 0.001);
 			Mat xptsA(points[0].size(), 1, CV_32F, &points[0][0].x, 2 * sizeof(float));
 			Mat xptsB(points[0].size(), 1, CV_32F, &points[1][0].x, 2 * sizeof(float));
 			Mat yptsA(points[0].size(), 1, CV_32F, &points[0][0].y, 2 * sizeof(float));
@@ -232,7 +273,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 			subtract(yptsA, yptsB, diffy);	
 			magnitude(diffx, diffy, mag);
 			
-			double val = mean(mag)[0];
+			double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], dx, dy);
 			sum += val;
 			values.push_back(val);
 			index++;
@@ -240,6 +281,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 			gray.copyTo(prevGray);
 			std::swap(points[0], points[1]);
 		}
+		
 		best = Timestamp(start, cap.get(CV_CAP_PROP_POS_MSEC));
 		sumr = sum;
 		
@@ -261,6 +303,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 
 				if(prevGray.empty()) gray.copyTo(prevGray);
 				calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize, 3, termcrit, 0, 0.001);
+				calcOpticalFlowPyrLK(prevGray, gray, fields[0], fields[1], status, err, winSize, 3, termcrit, 0, 0.001);
 				Mat xptsA(points[0].size(), 1, CV_32F, &points[0][0].x, 2 * sizeof(float));
 				Mat xptsB(points[0].size(), 1, CV_32F, &points[1][0].x, 2 * sizeof(float));
 				Mat yptsA(points[0].size(), 1, CV_32F, &points[0][0].y, 2 * sizeof(float));
@@ -270,7 +313,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 				magnitude(diffx, diffy, mag);
 				//std::cout << "Round: " << round << std::endl;
 				
-				double val = mean(mag)[0];
+				double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], dx, dy);
 				update(values, sum, val, index);
 				index++;
 				if(sum>sumr) {
@@ -290,7 +333,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	}
 	int i = 0;
 	for(auto& kv : func) {
-		if(i>7) break;
+		if(i>14) break;
 		std::cout << kv.first << std::endl;
 		ret.push_back(kv.second);
 		i++;

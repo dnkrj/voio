@@ -26,6 +26,10 @@ class MotionAnalyzer : Strategy {
 	std::vector<Timestamp> expandWindows(std::vector<Timestamp>& ts, double mn, double length);
 	std::vector<Timestamp> findBest(std::vector<Timestamp>& ts, double mn, double length);
 	std::vector<Timestamp> finalFilter(std::vector<Timestamp>& ts, double length, double clipLength);
+	double calcRotation(std::vector<cv::Point2f>& values, double dx, double dy);
+	double gx(std::vector<cv::Point2f>& values, double delta, int x, int y);
+	double fy(std::vector<cv::Point2f>& values, double delta, int x, int y);
+	
 	public:
 		MotionAnalyzer();
 		~MotionAnalyzer();
