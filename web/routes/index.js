@@ -124,30 +124,44 @@ module.exports = function(passport) {
 
     // Requests for emailing
     router.get('/send', function(req, res) {
-        link="http://" + req.hostname + "/verify?email=" + req.query.to + "&code="+req.query.code;
-        mailOptions = {
-            to      : req.query.to,
-            from    : "no-reply@voio.io",
-            subject : "Please confirm your Email Account",
-            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-        }
-        transport.sendMail(mailOptions, function(error, response) {
-            if (error) {
-                console.log(error);
-                req.flash('profileMessage', "Unable to send email");
-                res.redirect('/profile');
-            } else {
-                res.redirect('/profile');
-            }
-        });
+    	User.findOne({ 'local.email' : req.query.to }, function(err, user) {
+    		if (err) {
+    			console.log(err);
+    			res.redirect('/profile');
+    		}
+    		if (typeof user !== 'undefined') {
+		        link="http://" + req.hostname + "/verify?email=" + req.query.to + 
+		        										"&code=" + req.query.code +
+		        										"&_id="  + user._id;
+		        mailOptions = {
+		            to      : req.query.to,
+		            from    : "no-reply@voio.io",
+		            subject : "Please confirm your Email Account",
+		            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+		        }
+		        transport.sendMail(mailOptions, function(error, response) {
+		            if (error) {
+		                console.log(error);
+		                req.flash('profileMessage', "Unable to send email");
+		                res.redirect('/profile');
+		            } else {
+		                res.redirect('/profile');
+		            }
+		        });    			
+    		}
+    	});
     });
 
     router.get('/verify', function(req, res) {
+    	var id    = req.query._id;
         var email = req.query.email;
         var code  = req.query.code;
         console.log("verifying");
         User.findOneAndUpdate( 
-        	{ 'local.email' :  email, 'local.vericode' : code }, 
+        	{ 
+        		'_id'            : id,
+        		'local.email'    : email, 
+        		'local.vericode' : code }, 
         	{ 'local.verified' : true },
         	{},
         	function(err) {
