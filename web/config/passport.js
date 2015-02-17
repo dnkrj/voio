@@ -3,7 +3,7 @@ var fs = require('fs');
 
 // load all the things we need
 var LocalStrategy   = require('passport-local').Strategy;
-var User            = require('./user'); // user model
+var User            = require('./user'); // user model (db)
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -34,7 +34,6 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) {
-            console.log("SIGNUP FUNCTION CALLED: " + username + " " + password);
             if (password !== req.body.verify_password) {
                 return done(null, false, req.flash('signupMessage', 'Passwords do not match'))
             }
@@ -110,7 +109,6 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, username, password, done) { // callback with username and password from our form
-            console.log("LOGIN FUNCTION CALLED: " + username + " " + password);
             // find a user whose username is the same as the form's username
             // we are checking to see if the user trying to login already exists
             User.findOne({ 'local.username' :  username }, function(err, user) {
@@ -120,7 +118,7 @@ module.exports = function(passport) {
                 // if no user is found, return the message
                 if (!user) {
                     User.findOne( { 'local.email' : username }, function(err, email) {
-                        if (!user) {
+                        if (!email) {
                             return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
                         } else {
                             user = email;

@@ -28,6 +28,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
+// setupt emailing
 
 // setup routing
 var routes = require('./routes/index')(passport); //pass passport object for use

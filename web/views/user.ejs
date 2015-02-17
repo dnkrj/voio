@@ -6,6 +6,7 @@
 	<script src="/javascripts/squares.js"></script>
 <% include title %>
 		<div id="container">
+			<% if (!userobject.verified) { %> <button id="verify">Click here to verify email.</button> <% } %>
 			<h1><%= user %></h1>
 		</div>
 	</body>

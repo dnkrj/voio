@@ -1,5 +1,7 @@
-var express = require('express');
-var fs = require('fs');
+var express   = require('express');
+var fs        = require('fs');
+var transport = require('../config/transport'); // email configuration
+var User      = require('../config/user'); // user model (db)
 
 module.exports = function(passport) {
 	var router = express.Router();
@@ -25,9 +27,10 @@ module.exports = function(passport) {
 				});
 			}	
 			res.render('user', {
-	      		title : username + '&middot; Voio',
-	      		user: username,
-	  	    	gifs  : gifs
+	      		title      : username + '&middot; Voio',
+	      		user       : username,
+	  	    	gifs       : gifs,
+	  	    	userobject : req.user
 	    	});
 		});
 	});
@@ -67,7 +70,7 @@ module.exports = function(passport) {
 
 	/* Redirects profile to user page */
 	router.get('/profile', isLoggedIn(true), function(req, res) {
-		res.redirect('/u/'+req.user.local.email);
+		res.redirect('/u/'+req.user.local.username);
 	});
 
 	/* GET upload page */
@@ -92,6 +95,33 @@ module.exports = function(passport) {
         req.logout();
         res.redirect('/');
     });
+
+
+    // Requests for emailing
+    router.get('/send', function(req, res) {
+        host = req.get('host');
+        link="http://"+req.get('host')+"/verify?id="+rand;
+        mailOptions = {
+            to      : req.query.to,
+            subject : "Please confirm your Email Account",
+            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+        }
+        transport.sendMail(mailOptions, function(error, response) {
+            if (error) {
+                console.log(error);
+                res.end("error");
+            } else {
+                res.end("sent");
+            }
+        });
+    });
+
+    router.get('/verify', function(req, res) {
+        if (req.query.id == rand) {
+            //approve in DB
+        }
+    })
+
 
 
 	return router;
