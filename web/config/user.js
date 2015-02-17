@@ -11,10 +11,6 @@ var userSchema = mongoose.Schema({
         verified    : Boolean,
         vericode    : Number,
         password    : String,
-    },
-    gifs            : {
-        url         : String,
-        approved    : Boolean
     }
 });
 
