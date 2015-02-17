@@ -38,60 +38,55 @@ module.exports = function(passport) {
             if (username.indexOf("@") !== -1) return done(null, false, req.flash('signupMessage', 'Username cannot conatain "@" symbol'));
             if ((req.body.email.indexOf("@") === -1) || (req.body.email.indexOf(".") === -1)) return done(null, false, req.flash('signupMessage', 'Invalid email'));
 
-            // asynchronous
-            // User.findOne wont fire unless data is sent back
-            process.nextTick(function() {
+            // find a user whose username is the same as the forms username
+            // we are checking to see if the user trying to login already exists
+            User.findOne({ 'local.username' :  username }, function(err, user) {
+                if (err) return done(err);
 
-                // find a user whose username is the same as the forms username
-                // we are checking to see if the user trying to login already exists
-                User.findOne({ 'local.username' :  username }, function(err, user) {
+                // check to see if there's already a user with that username
+                if (user) {
+                    return done(null, false, req.flash('signupMessage', 'Username already taken'));
+                };
+
+                return User.findOne({ 'local.email' : req.body.email }, function(err, email) {
                     if (err) return done(err);
 
-                    // check to see if there's already a user with that username
-                    if (user) {
-                        return done(null, false, req.flash('signupMessage', 'Username already taken'));
+                    if (email) {
+                        return done(null, false, req.flash('signupMessage', 'Email already used'));
                     };
-
-                    return User.findOne({ 'local.email' : req.body.email }, function(err, email) {
-                        if (err) return done(err);
-
-                        if (email) {
-                            return done(null, false, req.flash('signupMessage', 'Email already used'));
-                        };
-                        // if there are any errors, return the error
+                    // if there are any errors, return the error
 
 
-                        // if there is no user with that username
-                        // create the user
-                        var newUser = new User();
+                    // if there is no user with that username
+                    // create the user
+                    var newUser = new User();
 
-                        // set the user's local credentials
-                        newUser.local.username = username;
-                        newUser.local.email    = req.body.email;
-                        newUser.local.password = newUser.generateHash(password);
-                        newUser.local.verified = false;
-                        newUser.local.vericode = random();
+                    // set the user's local credentials
+                    newUser.local.username = username;
+                    newUser.local.email    = req.body.email;
+                    newUser.local.password = newUser.generateHash(password);
+                    newUser.local.verified = false;
+                    newUser.local.vericode = random();
 
-                        // save the user
-                        newUser.save(function(err) {
+                    // save the user
+                    newUser.save(function(err) {
+                        if (err) { throw err };
+                        fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
                             if (err) { throw err };
-                            fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
-                                if (err) { throw err };
-                                fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
+                            fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
+                                if (err) { throw err};
+                                fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
                                     if (err) { throw err};
-                                    fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
+                                    fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
                                         if (err) { throw err};
-                                        fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
-                                            if (err) { throw err};
-                                            return done(null, newUser);
-                                        });
+                                        return done(null, newUser);
                                     });
                                 });
                             });
                         });
                     });
-                });    
-            });
+                });
+            }); 
         })
     );
 
@@ -121,8 +116,6 @@ module.exports = function(passport) {
                 });
             } else {
                 User.findOne({ 'local.email' :  username }, function(err, email) {
-                    console.log(" checking email");
-                    console.log(email);
                     // if there are any errors, return the error before anything else
                     if (err) return done(err);
 

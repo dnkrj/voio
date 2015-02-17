@@ -4,11 +4,11 @@
 		var username = "<%- userpage %>";
 	</script>
 	<script src="/javascripts/squares.js"></script>
+	<script src="/javascripts/user.js"></script>	
 <% include title %>
 		<div id="container">
-			<% if (user !== undefined && !user.verified) { %> <button id="verify">Click here to verify email.</button> <% } %>
+			<% if (!verified) { %> <button id="verify" onclick="verifyemail( <%- email %> , <%- vericode %> )">Click here to verify email.</button> <% } %>
 			<h1><%= userpage %></h1>
 		</div>
 	</body>
-	<script src="/javascripts/squares.js"></script>
 </html>

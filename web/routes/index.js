@@ -17,6 +17,7 @@ module.exports = function(passport) {
 	/* GET user page. */
 	router.get('/u/:id', function(req, res, next) {
 		var username = req.params.id;
+		console.log(req.user.local.verified);
 		fs.readdir(__dirname + '/../public/user/' + username + '/a', function(err, files){
 			var gifs = [];
 			if (files === undefined) {
@@ -30,7 +31,9 @@ module.exports = function(passport) {
 	      		title      : username + '&middot; Voio',
 	      		userpage   : username,
 	  	    	gifs       : gifs,
-	  	    	user       : req.user
+	  	    	email      : req.user.local.email,
+	  	    	vericode   : req.user.local.vericode,
+	  	    	verified   : req.user.local.verified
 	    	});
 		});
 	});
@@ -104,8 +107,10 @@ module.exports = function(passport) {
 
     // Requests for emailing
     router.get('/send', function(req, res) {
+    	console.log("send email function called.................................................................");
         host = req.get('host');
         link="http://"+req.get('host')+"/verify?id="+rand;
+        console.log(link);
         mailOptions = {
             to      : req.query.to,
             subject : "Please confirm your Email Account",
@@ -122,9 +127,8 @@ module.exports = function(passport) {
     });
 
     router.get('/verify', function(req, res) {
-        if (req.query.id == rand) {
-            //approve in DB
-        }
+        // TODO - approve in DB
+        res.redirect("/login");
     });
     
 	return router;

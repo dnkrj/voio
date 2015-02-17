@@ -1,7 +1,7 @@
-$(document).ready(function(){
-    var from,to,subject,text;
-    $("#verify").click(function(){      
-        to=userobject.email;
-        $.get("http://localhost:3000/send",{to:to});
-	});
-});
+function verifyemail(email, vericode) {      
+	console.log("SENDING EMAIL FUNCTION");
+    $.get("http://localhost:80/send",{ 
+    	to   : email,
+    	code : vericode
+    });
+};
