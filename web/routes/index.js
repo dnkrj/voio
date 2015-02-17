@@ -35,6 +35,17 @@ module.exports = function(passport) {
 		});
 	});
 
+	router.get('/u/:id/:gif', function(req, res, next) {
+		var username = req.params.id;
+		var gifview = req.params.gif;
+		res.render('gif', {
+	      	title      : username + '&middot; Voio',
+	      	userpage   : username,
+	  	    gifview    : gifview,
+	  	    user       : req.user
+	    });
+	});
+
 	//Pages for logged out users
 
 	/* GET signup page */
