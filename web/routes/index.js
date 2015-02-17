@@ -17,7 +17,6 @@ module.exports = function(passport) {
 	/* GET user page. */
 	router.get('/u/:id', function(req, res, next) {
 		var username = req.params.id;
-		console.log(req.user.local.verified);
 		fs.readdir(__dirname + '/../public/user/' + username + '/a', function(err, files){
 			var gifs = [];
 			if (files === undefined) {
@@ -26,15 +25,22 @@ module.exports = function(passport) {
 				files.forEach(function(gifDir) {
     				gifs.push('"'+gifDir+'"');
 				});
-			}	
-			res.render('user', {
-	      		title      : username + '&middot; Voio',
-	      		userpage   : username,
-	  	    	gifs       : gifs,
-	  	    	email      : req.user.local.email,
-	  	    	vericode   : req.user.local.vericode,
-	  	    	verified   : req.user.local.verified
-	    	});
+			}
+			if (req.user) {	
+				res.render('user', {
+		      		title    : username + '&middot; Voio',
+		      		userpage : username,
+		  	    	gifs     : gifs,
+		  	    	user     : req.user.local,
+		  	    	hostname   : req.hostname
+		    	});
+		    } else {
+		    	res.render('user', {
+		      		title    : username + '&middot; Voio',
+		      		userpage : username,
+		  	    	gifs     : gifs
+		    	});
+		    }
 		});
 	});
 
@@ -118,28 +124,37 @@ module.exports = function(passport) {
 
     // Requests for emailing
     router.get('/send', function(req, res) {
-    	console.log("send email function called.................................................................");
-        host = req.get('host');
-        link="http://"+req.get('host')+"/verify?id="+rand;
-        console.log(link);
+        link="http://" + req.hostname + "/verify?email=" + req.query.to + "&code="+req.query.code;
         mailOptions = {
             to      : req.query.to,
+            from    : "no-reply@voio.io",
             subject : "Please confirm your Email Account",
             html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
         }
         transport.sendMail(mailOptions, function(error, response) {
             if (error) {
                 console.log(error);
-                res.end("error");
+                req.flash('profileMessage', "Unable to send email");
+                res.redirect('/profile');
             } else {
-                res.end("sent");
+                res.redirect('/profile');
             }
         });
     });
 
     router.get('/verify', function(req, res) {
-        // TODO - approve in DB
-        res.redirect("/login");
+        var email = req.query.email;
+        var code  = req.query.code;
+        console.log("verifying");
+        User.findOneAndUpdate( 
+        	{ 'local.email' :  email, 'local.vericode' : code }, 
+        	{ 'local.verified' : true },
+        	{},
+        	function(err) {
+        		if (err) console.log(err);
+        		res.redirect("/login");
+        	}
+        );
     });
     
 	return router;
