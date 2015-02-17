@@ -45,23 +45,28 @@ module.exports = function(passport) {
                 // find a user whose username is the same as the forms username
                 // we are checking to see if the user trying to login already exists
                 User.findOne({ 'local.username' :  username }, function(err, user) {
-                    User.findOne({ 'local.email' : req.body.email }, function(err, user) {
-                        if (user) {
-                            return done(null, false, req.flash('signupMessage', 'Email already used'))
-                        }
-                    })
-                    // if there are any errors, return the error
-                    if (err)
-                        return done(err);
+                    if (err) return done(err);
 
                     // check to see if there's already a user with that username
                     if (user) {
                         return done(null, false, req.flash('signupMessage', 'Username already taken'));
-                    } else {
+                    };
+
+                    return User.findOne({ 'local.email' : req.body.email }, function(err, email) {
+                        if (err) return done(err);
+                        console.log("INSIDE EMAIL QUERY ........................................");
+                        console.log(email);
+
+                        if (email) {
+                            console.log("EMAIL OBJECT FOUND.......................................");
+                            return done(null, false, req.flash('signupMessage', 'Email already used'));
+                        };
+                        // if there are any errors, return the error
+
 
                         // if there is no user with that username
                         // create the user
-                        var newUser            = new User();
+                        var newUser = new User();
 
                         // set the user's local credentials
                         newUser.local.username = username;
@@ -91,7 +96,7 @@ module.exports = function(passport) {
                                 });
                             });
                         });
-                    }
+                    });
                 });    
             });
         })
@@ -113,14 +118,15 @@ module.exports = function(passport) {
                 // if there are any errors, return the error before anything else
                 if (err) return done(err);
 
-                // if no user is found, return the message
                 if (!user) {
-                    User.findOne( { 'local.email' : username }, function(err, email) {
-                        if (!email) {
-                            return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
-                        } else {
-                            user = email;
-                        }
+                    return User.findOne( { 'local.email' : email}, function(err, email) {
+                        // if no user is found, return the message
+                        if (!email) return done(null, false, req.flash('loginMessage', 'Incorrect username/email'));
+                        // if the user is found but the password is wrong
+                        if (!email.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password')); 
+
+                        // all is well, return successful user
+                        return done(null, user);               
                     });
                 }
 
