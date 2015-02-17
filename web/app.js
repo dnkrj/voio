@@ -1,10 +1,12 @@
-var express      = require('express');
-var path         = require('path');
-var favicon      = require('serve-favicon');
-var logger       = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var flash        = require('connect-flash');
+var express        = require('express');
+var path           = require('path');
+var favicon        = require('serve-favicon');
+var logger         = require('morgan');
+var cookieParser   = require('cookie-parser');
+var bodyParser     = require('body-parser');
+var multer         = require('multer');
+var methodoverride = require('method-override');
+var flash          = require('connect-flash');
 
 var app = express();
 
@@ -42,6 +44,8 @@ app.set('view engine', 'ejs');
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev')); // log every request to the server
 app.use(bodyParser.urlencoded({ extended: true })); // allows wider range of inputs to forms
+app.use(multer({ dest: './uploads/'}))
+app.use(methodoverride());
 app.use(express.static(__dirname + '/public')); //  "public" off of current directory is root
 
 app.use('/', routes);
