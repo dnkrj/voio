@@ -28,9 +28,9 @@ module.exports = function(passport) {
 			}	
 			res.render('user', {
 	      		title      : username + '&middot; Voio',
-	      		user       : username,
+	      		userpage   : username,
 	  	    	gifs       : gifs,
-	  	    	userobject : req.user
+	  	    	user       : req.user
 	    	});
 		});
 	});
@@ -40,9 +40,9 @@ module.exports = function(passport) {
 	/* GET signup page */
 	router.get('/signup', isLoggedIn(false), function (req, res, next) {
 		res.render('signup', { 
-			title : 'Signup &middot; Voio',
-			message: req.flash('signupMessage')
-			})
+			title	: 'Signup &middot; Voio',
+			message : req.flash('signupMessage')
+		});
 	});
 
 	/* POST signup page */
@@ -54,8 +54,8 @@ module.exports = function(passport) {
 	/* GET login page */
     router.get('/login', isLoggedIn(false), function (req, res) {
         res.render('login', { 
-        	title : 'Login &middot; Voio',
-        	message: req.flash('loginMessage')
+        	title	: 'Login &middot; Voio',
+        	message : req.flash('loginMessage')
         }); 
     });
 
@@ -74,15 +74,16 @@ module.exports = function(passport) {
 	});
 
 	/* GET upload page */
-	router.get('/upload', isLoggedIn(false), function(req, res) {
+	router.get('/upload', isLoggedIn(true), function(req, res) {
 	    res.render('upload', {
 	    	title : 'Upload &middot; Voio',
-	    	user: req.user
+	    	user  : req.user
 	    });
 	});
 
 	router.post('/upload', function(req, res) {
 		console.log("//// File uploaded at: " + req.files.upFile.path);
+		console.log(req.user);
 		res.end();
 	});
 
@@ -90,7 +91,7 @@ module.exports = function(passport) {
 	router.get('/pending', isLoggedIn(true), function(req, res) {
 	    res.render('pending', {
 	    	title : 'Pending &middot; Voio',
-	    	user: req.user
+	    	user  : req.user
 	    });
 	});
 

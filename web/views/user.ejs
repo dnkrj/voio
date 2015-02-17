@@ -1,13 +1,13 @@
 <% include head %>
 	<script>
 		var gifs = [<%- gifs %>];
-		var username = "<%- user %>";
+		var username = "<%- userpage %>";
 	</script>
 	<script src="/javascripts/squares.js"></script>
 <% include title %>
 		<div id="container">
-			<% if (!userobject.verified) { %> <button id="verify">Click here to verify email.</button> <% } %>
-			<h1><%= user %></h1>
+			<% if (user !== undefined && !user.verified) { %> <button id="verify">Click here to verify email.</button> <% } %>
+			<h1><%= userpage %></h1>
 		</div>
 	</body>
 	<script src="/javascripts/squares.js"></script>
