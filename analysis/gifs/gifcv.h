@@ -17,6 +17,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/video/video.hpp"
 #endif
 
 typedef std::vector<GifByteType> frame_t;
@@ -93,7 +94,7 @@ Filter class which should be called by analysis algorithms and will output upto 
 Currently only picks evenly distributed segments across video, but can implement ordering based on how interesting video is on a non binary scale.
 */
 class Filter {
-	static int MAX = 15;
+	const static int MAX = 15;
 	VideoConverter vc;
 	public:
 		Filter();
