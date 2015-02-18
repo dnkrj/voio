@@ -93,7 +93,7 @@ Filter class which should be called by analysis algorithms and will output upto 
 Currently only picks evenly distributed segments across video, but can implement ordering based on how interesting video is on a non binary scale.
 */
 class Filter {
-	int MAX = 15;
+	const int MAX = 15;
 	VideoConverter vc;
 	public:
 		Filter();

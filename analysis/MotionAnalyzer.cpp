@@ -17,6 +17,9 @@
 using namespace cv;
 
 //const double ws;
+/*
+Number of grid points is nX*nY.
+*/
 const int nX = 25;
 const int nY = 25;
 
@@ -41,7 +44,7 @@ void MotionAnalyzer::getWindows(double length, std::vector<Timestamp>& ts) {
 		}
 	}
 	else if(length<600000) {
-		for(double x = 0; x<length - 5000; x += 4500) {
+		for(double x = 0; x<length - 5000; x += 4000) {
 			ts.push_back(Timestamp(x, x + 5000));
 		}
 	} else {
@@ -204,23 +207,23 @@ double MotionAnalyzer::fy(std::vector<Point2f>& values, double delta, int x, int
 }
 
 std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, double length, double clipLength) {
-    TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
-    Size subPixWinSize(10,10), winSize(31,31);
+	TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
+	Size subPixWinSize(10,10), winSize(31,31);
 
-    const int MAX_COUNT = 500;
-    std::map<double, Timestamp> func;
-    std::vector<Timestamp> ret;
-    std::vector<double> values;
-    std::vector<uchar> status;
-    std::vector<Point2f> fields[2];
+	const int MAX_COUNT = 500;
+	std::map<double, Timestamp> func;
+	std::vector<Timestamp> ret;
+	std::vector<double> values;
+	std::vector<uchar> status;
+	std::vector<Point2f> fields[2];
 	std::vector<float> err;
-    Timestamp best;
-    double sumr = 0;
-    unsigned int index = 0;
+	Timestamp best;
+	double sumr = 0;
+	unsigned int index = 0;
 
-    if(!cap.isOpened()) throw "Cannot open file.";
+	if(!cap.isOpened()) throw "Cannot open file.";
     
-    Mat temp;
+	Mat temp;
 	cap >> temp;
 	if(temp.empty()) throw "Empty frames.";
 
@@ -235,11 +238,11 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		}
 	}
     
-    for(unsigned int i = 0; i<ts.size(); i++) {
-    	double sum = 0;
-    	double start = ts[i].getStart();
-    	double end = ts[i].getEnd();
-    	std::cout << "Analyzing: " << start << ", " << end << std::endl;
+	for(unsigned int i = 0; i<ts.size(); i++) {
+		double sum = 0;
+		double start = ts[i].getStart();
+		double end = ts[i].getEnd();
+		std::cout << "Analyzing: " << start << ", " << end << std::endl;
 		Mat gray, prevGray, image, diffx, diffy, mag;
 		std::vector<Point2f> points[2];
 		cap.set(CV_CAP_PROP_POS_MSEC, start);
@@ -355,7 +358,7 @@ std::vector<Timestamp> MotionAnalyzer::processVideo(const std::string& filename,
 		getWindows(length, windows);
 		//std::cout << "Performing preprocessing." << std::endl;
 		//double mn = preProcess(windows, 1, 110);
-		std::cout << "Performing final analysis." << std::endl;
+		std::cout << "Performing analysis." << std::endl;
 		return finalFilter(windows, length, clipLen);
 	}
 }
