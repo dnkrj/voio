@@ -110,8 +110,7 @@ module.exports = function(passport) {
 		res.end();
         var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
                     __dirname+ '/../public/upload/'+req.user.local.username+'/p';
-        var path = __dirname + '/../bin'
-        console.log("Bash call is : \n" + bashCall);
+        var path = __dirname + '/../bin' //Adds our bin to our path
         child = exec(bashCall,
                      {env :{PATH: path}},// adding environment
                     function (error, stdout, stderr) {      // one easy function to capture data/errors
