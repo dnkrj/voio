@@ -108,7 +108,8 @@ module.exports = function(passport) {
 		console.log("//// File uploaded at: " + req.files.upFile.path);
 		console.log(req.user);
 		res.end();
-        var bashCall ='signalAnalysis '+req.files.upFile.path + ' /public/upload/'+req.user._id+'/p';
+        var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
+                    __dirname+ '/../public/upload/'+req.user.local.username+'/p';
         console.log("Bash call is : \n" + bashCall);
         child = exec(bashCall, // command line argument directly in string
             function (error, stdout, stderr) {      // one easy function to capture data/errors
