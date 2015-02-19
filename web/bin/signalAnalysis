@@ -1,3 +1,5 @@
 !/#/bin/sh
 
-../../analysis/output/AnalysisMain.o $1 $2
+echo "Testing that command is working  $1 $2"
+
+# ../../analysis/output/AnalysisMain.o $1 $2
