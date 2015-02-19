@@ -110,15 +110,17 @@ module.exports = function(passport) {
 		res.end();
         var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
                     __dirname+ '/../public/upload/'+req.user.local.username+'/p';
+        var path = __dirname + '/../bin'
         console.log("Bash call is : \n" + bashCall);
-        child = exec(bashCall, // command line argument directly in string
-            function (error, stdout, stderr) {      // one easy function to capture data/errors
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error) {
-                  console.log('exec error: ' + error);
-                }
-            });
+        child = exec(bashCall,
+                     {env :{PATH: path}},// adding environment
+                    function (error, stdout, stderr) {      // one easy function to capture data/errors
+                        console.log('stdout: ' + stdout);
+                        console.log('stderr: ' + stderr);
+                        if (error) {
+                          console.log('exec error: ' + error);
+                        }
+                    });
         
 	});
 
