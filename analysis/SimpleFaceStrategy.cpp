@@ -3,6 +3,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "gifs/gifcv.h"
 #include <iostream>
 
 //Configurations for strategy
@@ -49,9 +50,9 @@ void skipFrames(VideoCapture & vid, int numFramesToSkip)
 	}
 }
 
-std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filename, int secondsPerClip)
+std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & filename, int secondsPerClip)
 {
-	std::vector<double> timestamps;
+	std::vector<Timestamp> timestamps;
 	VideoCapture readAhead(filename);
 	
 
@@ -151,9 +152,7 @@ std::vector<double> SimpleFaceStrategy::processVideo(const std::string & filenam
 
 			double endTime = endFrame / fps;
 			double startTime = startFrame / fps;
-
-			timestamps.push_back(startTime);
-			timestamps.push_back(endTime);
+			timestamps.push_back(Timestamp(startTime, endTime));
 		}
 		if (added == numGIFs)
 		{

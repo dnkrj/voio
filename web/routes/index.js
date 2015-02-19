@@ -2,6 +2,9 @@ var express   = require('express');
 var fs        = require('fs');
 var transport = require('../config/transport'); // email configuration
 var User      = require('../config/user'); // user model (db)
+var util = require('util'), //Calling bash script
+    exec = require('child_process').exec,
+    child
 
 module.exports = function(passport) {
 	var router = express.Router();
@@ -105,6 +108,18 @@ module.exports = function(passport) {
 	router.post('/upload', function(req, res) {
 		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
+        var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
+                    __dirname+ '/../public/upload/'+req.user.local.username+'/p';
+        console.log("Bash call is : \n" + bashCall);
+        child = exec(bashCall, // command line argument directly in string
+            function (error, stdout, stderr) {      // one easy function to capture data/errors
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error) {
+                  console.log('exec error: ' + error);
+                }
+            });
+        
 	});
 
 	/* GET pending page */
