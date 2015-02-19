@@ -1,0 +1,13 @@
+
+
+Main function takes:
+
+filename
+output directory
+
+For naming of GIF's we use
+VideoName + $GifIndex$
+
+(EG video0 video1 video2..)
+
+
