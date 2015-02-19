@@ -3,7 +3,7 @@ var fs        = require('fs');
 var transport = require('../config/transport'); // email configuration
 var User      = require('../config/user'); // user model (db)
 var util = require('util'), //Calling bash script
-    exec = require('child_process').exec,
+var exec = require('child_process').exec,
     child
 
 module.exports = function(passport) {
@@ -108,7 +108,9 @@ module.exports = function(passport) {
 		console.log("//// File uploaded at: " + req.files.upFile.path);
 		console.log(req.user);
 		res.end();
-        child = exec('signalAnalysis '+req.files.upFile.path + ' /public/upload/'+req.user+'/p', // command line argument directly in string
+        var bashCall ='signalAnalysis '+req.files.upFile.path + ' /public/upload/'+req.user+'/p';
+        console.log("Bash call is : \n" + bashCall);
+        child = exec(bashCall, // command line argument directly in string
             function (error, stdout, stderr) {      // one easy function to capture data/errors
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
