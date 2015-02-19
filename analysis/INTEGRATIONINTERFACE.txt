@@ -1,4 +1,4 @@
-
+Main file should be: AnalysisMain.o
 
 Main function takes:
 
