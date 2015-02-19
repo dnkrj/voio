@@ -2,6 +2,6 @@
 class SimpleFaceStrategy : Strategy
 {
 public:
-	std::vector<Timestamp> processVideo(const std::string& filename, int secondsPerClip) override;
+	std::vector<Timestamp> processVideo(const std::string& filename, int secondsPerClip);
 };
 
