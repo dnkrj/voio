@@ -1,4 +1,4 @@
-!/#/bin/sh
+#!/bin/sh
 
 echo "Testing that command is working  $1 $2"
 
