@@ -3,7 +3,7 @@ var fs        = require('fs');
 var transport = require('../config/transport'); // email configuration
 var User      = require('../config/user'); // user model (db)
 var util = require('util'), //Calling bash script
-var exec = require('child_process').exec,
+    exec = require('child_process').exec,
     child
 
 module.exports = function(passport) {
