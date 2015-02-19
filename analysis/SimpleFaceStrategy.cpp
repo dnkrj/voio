@@ -50,9 +50,9 @@ void skipFrames(VideoCapture & vid, int numFramesToSkip)
 	}
 }
 
-std::vector<TimeStamp> SimpleFaceStrategy::processVideo(const std::string & filename, int secondsPerClip)
+std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & filename, int secondsPerClip)
 {
-	std::vector<TimeStamp> timestamps;
+	std::vector<Timestamp> timestamps;
 	VideoCapture readAhead(filename);
 	
 
@@ -152,7 +152,7 @@ std::vector<TimeStamp> SimpleFaceStrategy::processVideo(const std::string & file
 
 			double endTime = endFrame / fps;
 			double startTime = startFrame / fps;
-			timestamps.push_back(TimeStamp(startTime, endTime));
+			timestamps.push_back(Timestamp(startTime, endTime));
 		}
 		if (added == numGIFs)
 		{
