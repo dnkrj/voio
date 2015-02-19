@@ -150,11 +150,14 @@ module.exports = function(passport) {
 		        link="http://" + req.hostname + "/verify?email=" + req.query.to + 
 		        										"&code=" + req.query.code +
 		        										"&_id="  + user._id;
+		        console.log(req.query.code);
+		        console.log(user.code);
+		        console.log(link);
 		        mailOptions = {
 		            to      : req.query.to,
 		            from    : "no-reply@voio.io",
 		            subject : "Please confirm your Email Account",
-		            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+		            html    : "Hello " + user.local.username + ",<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
 		        }
 		        transport.sendMail(mailOptions, function(error, response) {
 		            if (error) {
