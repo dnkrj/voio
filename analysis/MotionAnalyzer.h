@@ -63,6 +63,11 @@ class MotionAnalyzer : Strategy {
 	*/
 	double fy(std::vector<cv::Point2f>& values, double delta, int x, int y);
 	
+	/*
+	Fill features-to-track array with random with values, when no good features are found.
+	*/
+	void fillRandom(std::vector<cv::Point2f>& list, int amount, double width, double height);
+	
 	public:
 		MotionAnalyzer();
 		~MotionAnalyzer();

@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 using namespace cv;
 
@@ -24,7 +26,9 @@ Number of grid points is nX*nY.
 const int nX = 25;
 const int nY = 25;
 
-MotionAnalyzer::MotionAnalyzer() {}
+MotionAnalyzer::MotionAnalyzer() {
+	std::srand(std::time(0));
+}
 
 MotionAnalyzer::~MotionAnalyzer() {}
 
@@ -165,7 +169,7 @@ std::vector<Timestamp> MotionAnalyzer::expandWindows(std::vector<Timestamp>& ts,
 			Mat yptsA(points[0].size(), 1, CV_32F, &points[0][0].y, 2 * sizeof(float));
 			Mat yptsB(points[0].size(), 1, CV_32F, &points[1][0].y, 2 * sizeof(float));
 			subtract(xptsA, xptsB, diffx);
-			subtract(yptsA, yptsB, diffy);	
+			subtract(yptsA, yptsB, diffy);
 			magnitude(diffx, diffy, mag);
 			
 			double val = mean(mag)[0];
@@ -205,6 +209,18 @@ double MotionAnalyzer::gx(std::vector<Point2f>& values, double delta, int x, int
 
 double MotionAnalyzer::fy(std::vector<Point2f>& values, double delta, int x, int y) {
 	return (values[(y + 1)*nX + x].x - values[(y - 1)*nX + x].x)/(2*delta);
+}
+
+void MotionAnalyzer::fillRandom(std::vector<Point2f>& list, int amount, double width, double height) {
+	//int minX = 1;
+	//int minY = 1;
+	int maxX = int(width) - 1;
+	int maxY = int(height) - 1;
+	for(int i = 0; i<amount; i++) {
+		int randX = output = 1 + (std::rand() % (int) (maxX));
+		int randY = output = 1 + (std::rand() % (int) (maxY));
+		list.push_back(Point2f(float(randX), float(randY)));
+	}
 }
 
 std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, double length, double clipLength) {
@@ -256,6 +272,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
 		goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
+		if(points[0].size() < 1) fillRandom(points[0], 30, width, height);
 		cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
 
 	
@@ -297,6 +314,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 			cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
 			goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
+			if(points[0].size() < 1) fillRandom(points[0], 30, width, height);
 			cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
 						
 			while(round<4) {
@@ -337,7 +355,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	}
 	int i = 0;
 	for(auto& kv : func) {
-		if(i>14) break;
+		if(i>10) break;
 		std::cout << kv.first << std::endl;
 		ret.push_back(kv.second);
 		i++;
