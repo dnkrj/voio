@@ -29,13 +29,14 @@ module.exports = function(passport) {
     				gifs.push('"'+gifDir+'"');
 				});
 			}
+			gifs.reverse();
 			if (req.user) {	
 				res.render('user', {
 		      		title    : username + '&middot; Voio',
 		      		userpage : username,
 		  	    	gifs     : gifs,
 		  	    	user     : req.user.local,
-		  	    	hostname   : req.hostname
+		  	    	hostname : req.hostname
 		    	});
 		    } else {
 		    	res.render('user', {
@@ -105,8 +106,7 @@ module.exports = function(passport) {
 	});
 
 	router.post('/upload', function(req, res) {
-		console.log("//// File uploaded at: " + req.files.upFile.path);
-		console.log(req.user);
+		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
         var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
                     __dirname+ '/../public/upload/'+req.user.local.username+'/p';
@@ -125,10 +125,53 @@ module.exports = function(passport) {
 
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
-	    res.render('pending', {
-	    	title : 'Pending &middot; Voio',
-	    	user  : req.user
-	    });
+		var username = req.user.local.username;
+	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
+	    	var gifs = [];
+			if (files !== undefined) {
+				files.forEach(function(gifDir) {
+    				gifs.push('"'+gifDir+'"');	
+				});
+			}
+			res.render('pending', {
+				title    : 'Pending &middot; Voio',
+				username : username,
+				user     : req.user,
+				gifs     : gifs
+			});
+		});   
+	});
+
+	/* GET Approve Gif */
+	router.get('/a/:gif', isLoggedIn(true), function(req, res) {
+		var username = req.user.local.username;
+		var gifname = req.params.gif;
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  __dirname + '/../public/user/' + username + '/a/' + Date.now() + '.gif',
+				  function (err) {
+				  	if (err) {
+				  		console.log("/// FAILed to approve: " + gifname + ", for user: " + username);
+				  	} else {
+				  		console.log("/// Approved: " + gifname + ", for user: " + username);
+				  	}
+				  	res.end();
+				  });
+	});
+
+	/* GET Delete Gif */
+	router.get('/d/:gif', isLoggedIn(true), function(req, res) {
+		var username = req.user.local.username;
+		var gifname = req.params.gif;
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.gif',
+				  function (err) {
+				  	if (err) {
+				  		console.log("/// FAILed to delete: " + gifname + ", for user: " + username);
+				  	} else {
+				  		console.log("/// Deleted: " + gifname + ", for user: " + username);
+				  	}
+				  	res.end();
+				  });
 	});
 
     /* GET logout page */

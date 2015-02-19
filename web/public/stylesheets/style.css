@@ -26,6 +26,12 @@ h1 {
 	letter-spacing: 10px;
 }
 
+h2 {
+	font: 15px 'League Spartan', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 5px;
+}
+
 body {
 	margin: 0 0 0 0;
 	font: 14px 'League Spartan', sans-serif;
@@ -103,13 +109,34 @@ body {
 	display: inline-block;
 }
 
+.pending {
+	height: 360px;
+}
+
+.delete {
+	height: 50px;
+	width: 300px;
+	margin-top: -5px;
+	text-align: center;
+	line-height: 50px;
+	background-color: #000;
+	color: #fff;
+	text-transform: uppercase;
+	letter-spacing: 3px;
+	transition: opacity 0.2s;
+}
+
+.delete:hover {
+	opacity: 0.6;
+}
+
 .message {
 	width: 100%;
 	max-width: 600px;
 	min-height: 60px;
 	background-color: #fff;
-	color: #c02;
-	border: 3px solid #c02;
+	color: #84a;
+	border: 3px solid #84a;
 	margin: 30px auto 30px auto;
 	text-align: center;
 	font: 18px 'League Spartan', sans-serif;
@@ -209,5 +236,5 @@ Upload
 
 .bar {
   height: 100%;
-  background-color: #c02;
+  background-color: #84a;
 }
