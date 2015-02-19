@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo "Testing that command is working  $1 $2"
+echo "Calling AnalysisMain.o $1 $2"
 
-# ../../analysis/output/AnalysisMain.o $1 $2
+../../analysis/output/AnalysisMain.o $1 $2
