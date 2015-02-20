@@ -22,29 +22,6 @@
 
 typedef std::vector<GifByteType> frame_t;
 
-/*
-Class representing a produced GIF with file path, user ID and GIF ID and whether or not
-it has been published.
-*/
-
-class GIF {
-	int userID;
-	int gifID;
-	std::string gifPath;
-	std::string videoPath;
-	bool published;
-	public:
-		int getUID(void);
-		int getGID(void);
-		bool isPublished(void);
-		std::string getVideoPath(void);
-		std::string getPath(void);
-		std::string publish(void);// Returns filepath of GIF
-		void create(int uid, int gid, std::string vP);
-		GIF();
-		~GIF();
-};
-
 /*Based on Marco Tarini's AnimatedGifSaver at
 http://sourceforge.net/p/giflib/patches/6/
 Updated to use giflib V5 and integrate with OpenCV.
@@ -64,14 +41,16 @@ class VideoConverter {
 	std::vector<int> delay;
 	bool addLoop(GifFileType *gf);
 	public:
+		std::string getPath(int uid, int gid, std::string vP, const std::string& prepath);
+		std::string getVideoPath(int uid, int vid, std::string vP, const std::string& prepath);
   		VideoConverter(int sx, int sy);
   		~VideoConverter();
   		bool save(const char* filename);
   		bool addFrame(uint8_t* data,  float dt);
 		bool clear(void);
 		bool reset(void);
-		GIF extractGif(const std::string& src, int uid, double start, double end);
-		GIF& extractVid(const std::string& src, int uid, long start, long end);
+		void extractGif(const std::string& src, const std::string& path, int uid, double start, double end);
+		void extractVid(const std::string& src, const std::string& path, int uid, double start, double end);
 };
 
 /*
@@ -99,6 +78,7 @@ class Filter {
 	public:
 		Filter();
 		~Filter();
-		std::vector<GIF> extractGifs(const std::string& filename, int uid, std::vector<Timestamp>& ts);
+		void extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts);
+		void extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts);
 };
 #endif
