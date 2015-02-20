@@ -72,32 +72,27 @@ module.exports = function(passport) {
                     fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
                         if (err) { 
                             console.log(err);
-                            req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
-                            res.redirect('/singup');
+                            return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
                         }
                         fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
                             if (err) { 
                                 console.log(err);
-                                req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
-                                res.redirect('/singup');
+                                return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
                             }
                             fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
                                 if (err) { 
                                     console.log(err);
-                                    req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
-                                    res.redirect('/singup');
+                                    return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
                                 }
                                 fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
                                     if (err) { 
                                         console.log(err);
-                                        req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
-                                        res.redirect('/singup');
+                                        return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
                                     }
                                     newUser.save(function(err) {
                                         if (err) { 
                                             console.log(err);
-                                            req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
-                                            res.redirect('/singup');
+                                            return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
                                         }
                                         return done(null, newUser);
                                     })

@@ -12,13 +12,14 @@ var userSchema = new mongoose.Schema({
         vericode    : Number,
         password    : String,
         gifs		: [mongoose.Schema.ObjectId]
-    },
-    gifs			: {
-    	caption		: String,
-    	tags		: [String],
-    	likes		: Number,
-    	op			: mongoose.Schema.ObjectId
     }
+});
+
+var gifSchema = new mongoose.Schema({
+	caption		: String,
+	tags		: [String],
+	likes		: Number,
+	op			: mongoose.Schema.ObjectId
 });
 
 // methods
