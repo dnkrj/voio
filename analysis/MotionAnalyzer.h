@@ -26,18 +26,6 @@ class MotionAnalyzer : Strategy {
 	void getWindows(double length, std::vector<Timestamp>& ts);
 	
 	/*
-	Functions not in use.
-	*/
-	Timestamp expand(Timestamp t, double length);
-	double preProcess(std::vector<Timestamp>& ts, double minThresh, double maxThresh);
-	std::vector<Timestamp> expandWindows(std::vector<Timestamp>& ts, double mn, double length);
-	std::vector<Timestamp> findBest(std::vector<Timestamp>& ts, double mn, double length);
-	/*
-	End.
-	*/
-	
-	
-	/*
 	Takes an input of a list of windowed segments (as timestamps), the video length and the required length,
 	returning a list of timestamps (15 as a maximum). Performs optical flow calculations using OpenCV
 	calcOpticalFlowPyrLK() and performs analysis on linear movement and rotational movement, currently
@@ -62,6 +50,11 @@ class MotionAnalyzer : Strategy {
 	Numerical partial derivative of the x component of the field with respect to y.
 	*/
 	double fy(std::vector<cv::Point2f>& values, double delta, int x, int y);
+	
+	/*
+	Fill features-to-track array with random with values, when no good features are found.
+	*/
+	void fillRandom(std::vector<cv::Point2f>& list, int amount, double width, double height);
 	
 	public:
 		MotionAnalyzer();

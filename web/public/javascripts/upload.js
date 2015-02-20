@@ -28,7 +28,7 @@ $(function() {
     };
     
     xhr.onload = function() {
-      $('div.progress').fadeOut();
+      $('div.progress').slideUp(500);
       $('div.message').text("Upload Complete.");
     };
     

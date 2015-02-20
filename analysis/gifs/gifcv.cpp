@@ -17,14 +17,12 @@
 #include "opencv2/video/video.hpp"
 #endif
 
-//typedef std::vector<GifByteType> frame_t;
-
 #include "gifcv.h"
 
 using namespace cv;
 
 //Utility functions.
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s, std::ios_base::in | std::ios_base::out);
 	std::string item;
 	while (getline(ss, item, delim)) {
@@ -33,44 +31,23 @@ std::vector<std::string> &split(const std::string &s, char delim, std::vector<st
 	return elems;
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string& s, char delim) {
 	std::vector<std::string> elems;
 	split(s, delim, elems);
 	return elems;
 }
 
-
-//GIF member functions.
-GIF::GIF(void) {}
-GIF::~GIF(void) {}
-int GIF::getUID(void) {return userID;}
-int GIF::getGID(void) {return gifID;}
-bool GIF::isPublished(void) {return published;}
-std::string GIF::publish(void) {
-	published = true;
-	return gifPath;
-}
-
-void GIF::create(int uid, int gid, std::string vP) {
-	userID = uid;
-	gifID = gid;
-	videoPath = vP;
-	published = false;
-	std::vector<std::string> sp = split(videoPath, '.');
-	gifPath = sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
-}
-
-std::string GIF::getPath(void) {
-	return gifPath;
-}
-
-std::string GIF::getVideoPath(void) {
-	std::vector<std::string> sp = split(videoPath, '.');
-	return sp.at(0) + std::to_string(gifID) + ".avi";
-}
-
-
 //VideoConverter member functions.
+std::string VideoConverter::getPath(int uid, int gid, std::string vP, const std::string& prepath) {
+	std::vector<std::string> sp = split(vP, '.');
+	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
+}
+
+std::string VideoConverter::getVideoPath(int uid, int vid, std::string vP, const std::string& prepath) {
+	std::vector<std::string> sp = split(vP, '.');
+	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".mp4";
+}
+
 VideoConverter::VideoConverter(int sx, int sy) {
 	gid = 0;
 	gifsx = sx;
@@ -142,10 +119,8 @@ bool VideoConverter::addFrame(uint8_t* data, float dt) {
 	return true;       
 }
 
-GIF VideoConverter::extractGif(const std::string& src, int uid, double start, double end) {
+void VideoConverter::extractGif(const std::string& src, const std::string& path, int uid, double start, double end) {
 	if(!outputPalette) throw "Error creating colour map.";
-	GIF gif;
-	gif.create(uid, gid, src);
     
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
@@ -178,10 +153,40 @@ GIF VideoConverter::extractGif(const std::string& src, int uid, double start, do
 		}	
 	}
 
-	if(!save(gif.getPath().c_str())) throw "Error writing to file.";
+	if(!save(getPath(uid, gid, src, path).c_str())) throw "Error writing to file.";
 	gid++;
 	if(!clear()) throw "Error clearing frames.";
-	return gif;
+}
+
+void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
+	if(!cap.open(src)) throw "Error opening file.";
+	else {
+        Mat frame;
+        Mat frame_c;
+        Mat frame_r;
+        Mat frame_n;
+        double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+        double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+        cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
+        cap.set(CV_CAP_PROP_POS_MSEC, start);
+        double ratio = width/height;
+        VideoWriter video(getPath(uid, gid, src, path), cap.get(CV_CAP_PROP_FOURCC), cap.get(CV_CAP_PROP_POS_MSEC), Size(gifsx, gifsy), true);
+        	
+        while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
+        	if(!cap.read(frame)) throw "Error reading frames.";
+        	if(ratio < 1) {
+         		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
+	       	} else if(ratio > 1) {
+                getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
+       		} else {
+        		frame_c = frame;
+        	}
+			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
+			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
+			video.write(frame_n);
+		}	
+	}
+	gid++;
 }
 
 bool VideoConverter::addLoop(GifFileType *gf) {
@@ -250,52 +255,43 @@ double Timestamp::getEnd(void) {return end;}
 Filter::Filter(void) : vc(300, 300) {
 }
 Filter::~Filter(void) {}
-std::vector<GIF> Filter::extractGifs(const std::string& filename, int uid, std::vector<Timestamp>& ts) {
+void Filter::extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts) {
 	int size = int(ts.size());
-	std::vector<GIF> gifs;
 	if(size>MAX) {
-		gifs = std::vector<GIF>(MAX);
 		double x = (double) (MAX);
 		double y = (double) (size);
 		double z = y/x;
 		int u = 0;
 		x = 0;
 		while(u<size) {
-			gifs[u] = vc.extractGif(filename, uid, ts[u].getStart(), ts[u].getEnd());
+			vc.extractGif(filename, path, uid, ts[u].getStart(), ts[u].getEnd());
 			x += z;
 			u = int(x);
 		}
 	} else {
-		gifs = std::vector<GIF>(size);
 		for(int i = 0; i<size; i++) {
-			gifs[i] = vc.extractGif(filename, uid, ts[i].getStart(), ts[i].getEnd());
+			vc.extractGif(filename, path, uid, ts[i].getStart(), ts[i].getEnd());
 		}
 	}
 	if(!vc.reset()) throw "Error clearing frames.";
-	return gifs;
 }
-
-//Test program.
-/*int main(int argc, char** argv) {
-	try {
-		if(argc != 3) {
-			std::cout << "Usage: gifcv <filename> <uid>" << std::endl;
-			return 1;
+void Filter::extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts) {
+	int size = int(ts.size());
+	if(size>MAX) {
+		double x = (double) (MAX);
+		double y = (double) (size);
+		double z = y/x;
+		int u = 0;
+		x = 0;
+		while(u<size) {
+			vc.extractVid(filename, path, uid, ts[u].getStart(), ts[u].getEnd());
+			x += z;
+			u = int(x);
 		}
-		Filter f;
-		std::vector<Timestamp> ts(4);
-		Timestamp x1(0, 500);
-		Timestamp x2(500, 1000);
-		Timestamp x3(1000, 1500);
-		Timestamp x4(1500, 2000);
-		ts[0] = x1;
-		ts[1] = x2;
-		ts[2] = x3;
-		ts[3] = x4;
-		std::vector<GIF> vs = f.extractGifs(std::string(argv[1]), atoi(argv[2]), ts); 
-	} catch(std::string s) {
-		std::cout << s << std::endl;
-		return 2;
+	} else {
+		for(int i = 0; i<size; i++) {
+			vc.extractVid(filename, path, uid, ts[i].getStart(), ts[i].getEnd());
+		}
 	}
-	return 0;
-}*/
+	if(!vc.reset()) throw "Error clearing frames.";
+}

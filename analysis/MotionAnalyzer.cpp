@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 using namespace cv;
 
@@ -24,27 +26,24 @@ Number of grid points is nX*nY.
 const int nX = 25;
 const int nY = 25;
 
-MotionAnalyzer::MotionAnalyzer() {}
+MotionAnalyzer::MotionAnalyzer() {
+	std::srand(std::time(0));
+}
 
 MotionAnalyzer::~MotionAnalyzer() {}
 
-Timestamp MotionAnalyzer::expand(Timestamp t, double length) {
-	double x, y;
-	if(t.getStart()>2500) x = t.getStart() - 2500;
-	else x = t.getStart();
-	if(t.getEnd()<length - 2500) y = t.getEnd() + 2500;
-	else y = t.getEnd();
-	return Timestamp(x, y);
-}
-
 void MotionAnalyzer::getWindows(double length, std::vector<Timestamp>& ts) {
 	ts.clear();
-	if(length<60000) {
-		for(double x = 0; x<length - 5000; x += 3500) {
+	if(length<15000) {
+		for(double x = 0; x<length - 4000; x += 1000) {
+			ts.push_back(Timestamp(x, x + 4000));
+		}
+	} else if(length<60000) {
+		for(double x = 0; x<length - 5000; x += 3000) {
 			ts.push_back(Timestamp(x, x + 5000));
 		}
 	}
-	else if(length<600000) {
+	else if(length<3000000) {
 		for(double x = 0; x<length - 5000; x += 4000) {
 			ts.push_back(Timestamp(x, x + 5000));
 		}
@@ -56,136 +55,12 @@ void MotionAnalyzer::getWindows(double length, std::vector<Timestamp>& ts) {
 	}
 }
 
-double MotionAnalyzer::preProcess(std::vector<Timestamp>& ts, double minThresh, double maxThresh) {
-	
-    TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20 ,0.03);
-    Size subPixWinSize(10,10), winSize(31,31);
-
-    const int MAX_COUNT = 500;
-    double sum = 0;
-    double N = 0;
-    double start;
-    double end;
-
-    if(!cap.isOpened()) throw "Cannot open file.";
-    for(unsigned int i = 0; i<ts.size(); i++, N++) {
-    	start = ts[i].getStart();
-    	end = ts[i].getEnd();
-		Mat gray, prevGray, image, diffx, diffy, mag;
-		std::vector<Point2f> points[2];
-		std::vector<double> movements;
-		cap.set(CV_CAP_PROP_POS_MSEC, start);
-		Mat f;
-		cap >> f;
-		if(f.empty()) throw "Empty frames.";
-		f.copyTo(image);
-		cvtColor(image, prevGray, COLOR_BGR2GRAY);
-	
-		goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
-		cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
-		
-		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-			Mat frame;
-			cap >> frame;
-			if(frame.empty()) throw "Empty frames.";
-			
-			frame.copyTo(image);
-			cvtColor(image, gray, COLOR_BGR2GRAY);
-			std::vector<uchar> status;
-			std::vector<float> err;
-			if(prevGray.empty()) gray.copyTo(prevGray);
-			calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize, 3, termcrit, 0, 0.001);
-			Mat xptsA(points[0].size(), 1, CV_32F, &points[0][0].x, 2 * sizeof(float));
-			Mat xptsB(points[0].size(), 1, CV_32F, &points[1][0].x, 2 * sizeof(float));
-			Mat yptsA(points[0].size(), 1, CV_32F, &points[0][0].y, 2 * sizeof(float));
-			Mat yptsB(points[0].size(), 1, CV_32F, &points[1][0].y, 2 * sizeof(float));
-			subtract(xptsA, xptsB, diffx);
-			subtract(yptsA, yptsB, diffy);	
-			magnitude(diffx, diffy, mag);
-			double val = mean(mag)[0];
-			if(val<maxThresh && val>minThresh) {
-				movements.push_back(val);
-			}
-			
-			gray.copyTo(prevGray);
-			std::swap(points[0], points[1]);
-		}
-		sum += mean(movements)[0];
-    }
-	return sum/N;
-}
-
 static double update(std::vector<double>& values, double& sum, double value, unsigned int& index) {	
 	if(index>=values.size()) index = 0;
 	sum -= values[index];
 	values[index] = value;
 	sum += value;
 	return sum;
-}
-
-std::vector<Timestamp> MotionAnalyzer::expandWindows(std::vector<Timestamp>& ts, double mn, double length) {
-    TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
-    Size subPixWinSize(10,10), winSize(31,31);
-
-    const int MAX_COUNT = 500;
-    double count = 0;
-    std::map<double, Timestamp> func;
-    std::vector<Timestamp> ret;
-
-    if(!cap.isOpened()) throw "Cannot open file.";
-    for(unsigned int i = 0; i<ts.size(); i++) {
-    	double start = ts[i].getStart();
-    	double end = ts[i].getEnd();
-		Mat gray, prevGray, image, diffx, diffy, mag;
-		std::vector<Point2f> points[2];
-		cap.set(CV_CAP_PROP_POS_MSEC, start);
-		
-		Mat f;
-		cap >> f;
-		if(f.empty()) throw "Empty frames.";
-		f.copyTo(image);
-		cvtColor(image, prevGray, COLOR_BGR2GRAY);
-	
-		goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
-		cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
-	
-		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-			Mat frame;
-			cap >> frame;
-			if(frame.empty()) throw "Empty frames.";
-	  
-			frame.copyTo(image);
-			cvtColor(image, gray, COLOR_BGR2GRAY);
-			std::vector<uchar> status;
-			std::vector<float> err;
-			if(prevGray.empty()) gray.copyTo(prevGray);
-			calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize, 3, termcrit, 0, 0.001);
-			Mat xptsA(points[0].size(), 1, CV_32F, &points[0][0].x, 2 * sizeof(float));
-			Mat xptsB(points[0].size(), 1, CV_32F, &points[1][0].x, 2 * sizeof(float));
-			Mat yptsA(points[0].size(), 1, CV_32F, &points[0][0].y, 2 * sizeof(float));
-			Mat yptsB(points[0].size(), 1, CV_32F, &points[1][0].y, 2 * sizeof(float));
-			subtract(xptsA, xptsB, diffx);
-			subtract(yptsA, yptsB, diffy);	
-			magnitude(diffx, diffy, mag);
-			
-			double val = mean(mag)[0];
-			if(val>mn) count += val;
-			
-			gray.copyTo(prevGray);
-			std::swap(points[0], points[1]);
-		}
-		if(count < 0.05) {
-			func.insert(std::pair<double, Timestamp>(1E100, Timestamp(start, end)));
-		} else func.insert(std::pair<double, Timestamp>(1/count, Timestamp(start, end)));
-	}
-	int i = 0;
-	for(auto& kv : func) {
-		if(i>14) break;
-		//std::cout << kv.first << std::endl;
-		ret.push_back(expand(kv.second, length));
-		i++;
-	}
-	return ret;
 }
 
 //Precondition: points are ordered as {{(x1,y1), (x2,y1), ...}, {(x1,y2), (x2,y2), ...}, ...}
@@ -205,6 +80,18 @@ double MotionAnalyzer::gx(std::vector<Point2f>& values, double delta, int x, int
 
 double MotionAnalyzer::fy(std::vector<Point2f>& values, double delta, int x, int y) {
 	return (values[(y + 1)*nX + x].x - values[(y - 1)*nX + x].x)/(2*delta);
+}
+
+void MotionAnalyzer::fillRandom(std::vector<Point2f>& list, int amount, double width, double height) {
+	//int minX = 1;
+	//int minY = 1;
+	int maxX = int(width) - 1;
+	int maxY = int(height) - 1;
+	for(int i = 0; i<amount; i++) {
+		int randX = 1 + (std::rand() % (int) (maxX));
+		int randY = 1 + (std::rand() % (int) (maxY));
+		list.push_back(Point2f(float(randX), float(randY)));
+	}
 }
 
 std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, double length, double clipLength) {
@@ -256,6 +143,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
 		goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
+		if(points[0].size() < 1) fillRandom(points[0], 30, width, height);
 		cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
 
 	
@@ -297,6 +185,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 			cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
 			goodFeaturesToTrack(prevGray, points[0], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
+			if(points[0].size() < 1) fillRandom(points[0], 30, width, height);
 			cornerSubPix(prevGray, points[0], subPixWinSize, Size(-1,-1), termcrit);
 						
 			while(round<4) {
@@ -337,12 +226,12 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	}
 	int i = 0;
 	for(auto& kv : func) {
-		if(i>14) break;
+		if(i>10) break;
 		std::cout << kv.first << std::endl;
 		ret.push_back(kv.second);
 		i++;
 	}
-	std::cout << "Saving GIFs." << std::endl;
+	std::cout << "Saving clips." << std::endl;
 	return ret;
 }
 
@@ -357,8 +246,6 @@ std::vector<Timestamp> MotionAnalyzer::processVideo(const std::string& filename,
 		std::cout << "Creating windows." << std::endl;
 		std::vector<Timestamp> windows;
 		getWindows(length, windows);
-		//std::cout << "Performing preprocessing." << std::endl;
-		//double mn = preProcess(windows, 1, 110);
 		std::cout << "Performing analysis." << std::endl;
 		return finalFilter(windows, length, clipLen);
 	}

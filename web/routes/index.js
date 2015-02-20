@@ -29,13 +29,14 @@ module.exports = function(passport) {
     				gifs.push('"'+gifDir+'"');
 				});
 			}
+			gifs.reverse();
 			if (req.user) {	
 				res.render('user', {
 		      		title    : username + '&middot; Voio',
 		      		userpage : username,
 		  	    	gifs     : gifs,
 		  	    	user     : req.user.local,
-		  	    	hostname   : req.hostname
+		  	    	hostname : req.hostname
 		    	});
 		    } else {
 		    	res.render('user', {
@@ -105,26 +106,72 @@ module.exports = function(passport) {
 	});
 
 	router.post('/upload', function(req, res) {
-		console.log("//// File uploaded at: " + req.files.upFile.path);
-		console.log(req.user);
+		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
-        child = exec('signalAnalysis '+req.files.upFile.path + ' /public/upload/'+req.user+'/p', // command line argument directly in string
-            function (error, stdout, stderr) {      // one easy function to capture data/errors
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error) {
-                  console.log('exec error: ' + error);
-                }
-            });
+        var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
+                    __dirname+ '/../public/upload/'+req.user.local.username+'/p';
+        var path = __dirname + '/../bin' //Adds our bin to our path
+        child = exec(bashCall,
+                     {env :{PATH: path}},// adding environment
+                    function (error, stdout, stderr) {      // one easy function to capture data/errors
+                        console.log('stdout: ' + stdout);
+                        console.log('stderr: ' + stderr);
+                        if (error) {
+                          console.log('exec error: ' + error);
+                        }
+                    });
         
 	});
 
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
-	    res.render('pending', {
-	    	title : 'Pending &middot; Voio',
-	    	user  : req.user
-	    });
+		var username = req.user.local.username;
+	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
+	    	var gifs = [];
+			if (files !== undefined) {
+				files.forEach(function(gifDir) {
+    				gifs.push('"'+gifDir+'"');	
+				});
+			}
+			res.render('pending', {
+				title    : 'Pending &middot; Voio',
+				username : username,
+				user     : req.user,
+				gifs     : gifs
+			});
+		});   
+	});
+
+	/* GET Approve Gif */
+	router.get('/a/:gif', isLoggedIn(true), function(req, res) {
+		var username = req.user.local.username;
+		var gifname = req.params.gif;
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  __dirname + '/../public/user/' + username + '/a/' + Date.now() + '.gif',
+				  function (err) {
+				  	if (err) {
+				  		console.log("/// FAILed to approve: " + gifname + ", for user: " + username);
+				  	} else {
+				  		console.log("/// Approved: " + gifname + ", for user: " + username);
+				  	}
+				  	res.end();
+				  });
+	});
+
+	/* GET Delete Gif */
+	router.get('/d/:gif', isLoggedIn(true), function(req, res) {
+		var username = req.user.local.username;
+		var gifname = req.params.gif;
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.gif',
+				  function (err) {
+				  	if (err) {
+				  		console.log("/// FAILed to delete: " + gifname + ", for user: " + username);
+				  	} else {
+				  		console.log("/// Deleted: " + gifname + ", for user: " + username);
+				  	}
+				  	res.end();
+				  });
 	});
 
     /* GET logout page */
@@ -145,11 +192,14 @@ module.exports = function(passport) {
 		        link="http://" + req.hostname + "/verify?email=" + req.query.to + 
 		        										"&code=" + req.query.code +
 		        										"&_id="  + user._id;
+		        console.log(req.query.code);
+		        console.log(user.code);
+		        console.log(link);
 		        mailOptions = {
 		            to      : req.query.to,
 		            from    : "no-reply@voio.io",
 		            subject : "Please confirm your Email Account",
-		            html    : "Hello voio user,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
+		            html    : "Hello " + user.local.username + ",<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
 		        }
 		        transport.sendMail(mailOptions, function(error, response) {
 		            if (error) {

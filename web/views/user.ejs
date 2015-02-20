@@ -6,7 +6,6 @@
 	<script src="/javascripts/squares.js"></script>	
 <% include title %>
 		<div id="container">
-			<% if ((typeof user !== 'undefined') && (user.username === userpage) && (!user.verified)) { %> <button id="verify" onclick="location.href = 'http://<%- hostname %>/send?to=<%- user.email %>&code=<%- user.vericode %>'">Click here to verify email.</button> <% } %>
 			<h1><%= userpage %></h1>
 		</div>
 	</body>
