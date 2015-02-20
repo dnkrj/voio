@@ -101,7 +101,7 @@ module.exports = function(passport) {
 	router.get('/upload', isLoggedIn(true), function(req, res) {
 	    res.render('upload', {
 	    	title : 'Upload &middot; Voio',
-	    	user  : req.user
+	    	user  : req.user.local
 	    });
 	});
 
@@ -136,7 +136,7 @@ module.exports = function(passport) {
 			res.render('pending', {
 				title    : 'Pending &middot; Voio',
 				username : username,
-				user     : req.user,
+				user     : req.user.local,
 				gifs     : gifs
 			});
 		});   
