@@ -5,6 +5,7 @@
 	</script>
 	<script src="/javascripts/squares.js"></script>	
 <% include title %>
+		<% if (message.length > 0) { %> <div class="message"><%= message %></div> <% } %>
 		<div id="container">
 			<h1><%= userpage %></h1>
 		</div>

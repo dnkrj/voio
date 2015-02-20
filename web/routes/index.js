@@ -36,7 +36,8 @@ module.exports = function(passport) {
 		      		userpage : username,
 		  	    	gifs     : gifs,
 		  	    	user     : req.user.local,
-		  	    	hostname : req.hostname
+		  	    	hostname : req.hostname,
+		  	    	message  : req.flash('profileMessage')
 		    	});
 		    } else {
 		    	res.render('user', {
@@ -186,6 +187,7 @@ module.exports = function(passport) {
     	User.findOne({ 'local.email' : req.query.to }, function(err, user) {
     		if (err) {
     			console.log(err);
+    			req.flash('profileMessage', "There was a problem on our side, we'll try and fix it soon!");
     			res.redirect('/profile');
     		}
     		if (typeof user !== 'undefined') {
@@ -204,10 +206,11 @@ module.exports = function(passport) {
 		        transport.sendMail(mailOptions, function(error, response) {
 		            if (error) {
 		                console.log(error);
-		                req.flash('profileMessage', "Unable to send email");
+		                req.flash('profileMessage', "There was a problem, sending your email.\n We'll do our best to fix it soon! Maybe try again?");
 		                res.redirect('/profile');
 		            } else {
 		                res.redirect('/profile');
+		                req.flash('profileMessage', "Email sent! Please check your inbox.");
 		            }
 		        });    			
     		}
