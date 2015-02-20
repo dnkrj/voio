@@ -12,7 +12,7 @@ module.exports = function(passport) {
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
 		res.render('index', {
-			user: req.user,
+			user: req.user.local,
 	      	title: 'Voio'
 	    });
 	});
@@ -55,7 +55,7 @@ module.exports = function(passport) {
 	      	title      : username + '&middot; Voio',
 	      	userpage   : username,
 	  	    gifview    : gifview,
-	  	    user       : req.user
+	  	    user       : req.user.local
 	    });
 	});
 
