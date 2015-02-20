@@ -69,18 +69,38 @@ module.exports = function(passport) {
                     newUser.local.vericode = random();
 
                     // save the user
-                    newUser.save(function(err) {
-                        if (err) { throw err };
-                        fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
-                            if (err) { throw err };
-                            fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
-                                if (err) { throw err};
-                                fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
-                                    if (err) { throw err};
-                                    fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
-                                        if (err) { throw err};
+                    fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
+                        if (err) { 
+                            console.log(err);
+                            req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
+                            res.redirect('/singup');
+                        }
+                        fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
+                            if (err) { 
+                                console.log(err);
+                                req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
+                                res.redirect('/singup');
+                            }
+                            fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
+                                if (err) { 
+                                    console.log(err);
+                                    req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
+                                    res.redirect('/singup');
+                                }
+                                fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
+                                    if (err) { 
+                                        console.log(err);
+                                        req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
+                                        res.redirect('/singup');
+                                    }
+                                    newUser.save(function(err) {
+                                        if (err) { 
+                                            console.log(err);
+                                            req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!");
+                                            res.redirect('/singup');
+                                        }
                                         return done(null, newUser);
-                                    });
+                                    })
                                 });
                             });
                         });

@@ -11,10 +11,16 @@ module.exports = function(passport) {
 	
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
-		res.render('index', {
-			user: req.user.local,
-	      	title: 'Voio'
-	    });
+		if (req.user) {
+			res.render('index', {
+				user: req.user.local,
+		      	title: 'Voio'
+		    });
+		} else {
+			res.render('index', {
+		      	title: 'Voio'
+		    });			
+		}
 	});
 
 	/* GET user page. */
