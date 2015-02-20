@@ -1,10 +1,13 @@
 var express   = require('express');
 var fs        = require('fs');
+
 var transport = require('../config/transport'); // email configuration
-var User      = require('../config/user'); // user model (db)
-var util = require('util'), //Calling bash script
-    exec = require('child_process').exec,
-    child
+var User      = require('../config/user');      // user model (db)
+var Gif       = require('../config/gif');       // gif model (db)
+
+var util      = require('util'); //Calling bash script
+var exec      = require('child_process').exec;
+var child; // ASK DAN - why is this global?
 
 module.exports = function(passport) {
 	var router = express.Router();
@@ -151,15 +154,38 @@ module.exports = function(passport) {
 
 	/* GET Approve Gif */
 	router.get('/a/:gif', isLoggedIn(true), function(req, res) {
-		var username = req.user.local.username;
-		var gifname = req.params.gif;
+		var username   = req.user.local.username;
+		var gifname    = req.params.gif;
+
+		var newGif = new Gif();
+		var newgifname = newGif._id;
+
+		newGif.caption = "";
+		newGif.tags    = "";
+		newGif.likes   = 0;
+		newGif.posted  = new Date();
+		newGif.url     = username + '/u/' + newgifname;
+		newGif.op      = req.user._id;
+
+
 		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
-				  __dirname + '/../public/user/' + username + '/a/' + Date.now() + '.gif',
+				  __dirname + '/../public/user/' + username + '/a/' + newgifname,
 				  function (err) {
 				  	if (err) {
 				  		console.log("/// FAILed to approve: " + gifname + ", for user: " + username);
 				  	} else {
-				  		console.log("/// Approved: " + gifname + ", for user: " + username);
+				  		newGif.save(function(err) {
+				  			if (err) {
+				  				console.log(err);
+				  				// Putting back in pending folder
+				  				fs.rename(__dirname + '/../public/user/' + username + '/a/' + newgifname,
+				  						  __dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  						  function(err) {
+				  						  	  if (err) console.log('/// Failed to return to pending directory.')
+				  						  });			  						  
+				  				}
+				  			console.log("/// Approved: " + gifname + ", for user: " + username);
+				  		});
 				  	}
 				  	res.end();
 				  });

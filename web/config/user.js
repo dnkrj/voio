@@ -11,15 +11,10 @@ var userSchema = new mongoose.Schema({
         verified    : Boolean,
         vericode    : Number,
         password    : String,
-        gifs		: [mongoose.Schema.ObjectId]
+        subscribe   : [mongoose.Schema.ObjectId],
+        reblog_gifs : [mongoose.Schema.ObjectId],
+        own_gifs	: [mongoose.Schema.ObjectId]
     }
-});
-
-var gifSchema = new mongoose.Schema({
-	caption		: String,
-	tags		: [String],
-	likes		: Number,
-	op			: mongoose.Schema.ObjectId
 });
 
 // methods
