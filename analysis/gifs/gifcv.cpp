@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstdio>
+#include <cstdlib>
 
 #ifndef _OPEN_CV
 #define _OPEN_CV
@@ -45,7 +47,12 @@ std::string VideoConverter::getPath(int uid, int gid, std::string vP, const std:
 
 std::string VideoConverter::getVideoPath(int uid, int vid, std::string vP, const std::string& prepath) {
 	std::vector<std::string> sp = split(vP, '.');
-	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".mp4";
+	return prepath + "TMP" + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".avi";
+}
+
+std::string VideoConverter::getFinalPath(int uid, int vid, std::string vP, const std::string& prepath) {
+	std::vector<std::string> sp = split(vP, '.');
+	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".webm";
 }
 
 VideoConverter::VideoConverter(int sx, int sy) {
@@ -159,18 +166,19 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 }
 
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
+	std::string vp = getVideoPath(uid, gid, src, path);
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
         Mat frame;
         Mat frame_c;
         Mat frame_r;
         Mat frame_n;
+        Mat frame_f;
         double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
         double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-        cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
         cap.set(CV_CAP_PROP_POS_MSEC, start);
         double ratio = width/height;
-        VideoWriter video(getPath(uid, gid, src, path), cap.get(CV_CAP_PROP_FOURCC), cap.get(CV_CAP_PROP_POS_MSEC), Size(gifsx, gifsy), true);
+        VideoWriter video(vp, CV_FOURCC('M','J','P','G')/*cap.get(CV_CAP_PROP_FOURCC)*/, cap.get(CV_CAP_PROP_FPS), Size(gifsx, gifsy), true);
         	
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
         	if(!cap.read(frame)) throw "Error reading frames.";
@@ -181,11 +189,13 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
        		} else {
         		frame_c = frame;
         	}
-			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
-			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
-			video.write(frame_n);
+			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_CUBIC);
+			video.write(frame_r);
 		}	
 	}
+	std::string cmd = "ffmpeg -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
+	system(cmd.c_str());
+	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
 }
 

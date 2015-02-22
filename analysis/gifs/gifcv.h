@@ -40,13 +40,14 @@ class VideoConverter {
 	std::vector<frame_t> frames;
 	std::vector<int> delay;
 	bool addLoop(GifFileType *gf);
+	bool addFrame(uint8_t* data,  float dt);
 	public:
 		std::string getPath(int uid, int gid, std::string vP, const std::string& prepath);
 		std::string getVideoPath(int uid, int vid, std::string vP, const std::string& prepath);
+		std::string getFinalPath(int uid, int vid, std::string vP, const std::string& prepath);
   		VideoConverter(int sx, int sy);
   		~VideoConverter();
   		bool save(const char* filename);
-  		bool addFrame(uint8_t* data,  float dt);
 		bool clear(void);
 		bool reset(void);
 		void extractGif(const std::string& src, const std::string& path, int uid, double start, double end);
