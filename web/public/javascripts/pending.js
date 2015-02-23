@@ -18,6 +18,7 @@ function addGif() {
     var id = gif.split(".")[0];
     
     $("#container").append("<div class='gif pending' id='" + id + "'>" + "<a id='A" + id + "' href='#'><img src='" + url + "'></a><a id='D" + id + "' href='#'><div class='delete'>delete</div></a>" + "</div>");
+
     $( "#A" + id ).click(function() {
         $.get("/a/" + id);
         $("#" + id).fadeOut(500);

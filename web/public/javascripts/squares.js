@@ -1,4 +1,4 @@
-var count=0;
+    var count=0;
 
 $(document).ready(function(){
 	  while((($("#container").height() - 300) < $(window).height()) && gifAva()){
@@ -16,7 +16,9 @@ function addGif() {
     var gif = gifURL();
     var url = "/user/" + username + "/a/" + gif;
     var id = gif.split(".")[0];
+    
     $("#container").append("<a href='/u/" + username + "/" + id + "'><div class='gif' id='" + id + "'>" + "<img src='" + url + "'>" + "</div></a>");
+
     $('#' + id).css('display', 'none');
     $('#' + id).fadeIn(1000);
 }

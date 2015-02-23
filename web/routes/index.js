@@ -39,7 +39,8 @@ module.exports = function(passport) {
 				});
 			}
 			gifs.reverse();
-			if (req.user) {	
+			console.log(req.user);
+			if (typeof req.user !== 'undefined') {	
 				res.render('user', {
 		      		title    : username + '&middot; Voio',
 		      		userpage : username,
@@ -52,7 +53,8 @@ module.exports = function(passport) {
 		    	res.render('user', {
 		      		title    : username + '&middot; Voio',
 		      		userpage : username,
-		  	    	gifs     : gifs
+		  	    	gifs     : gifs,
+		  	    	message  : []
 		    	});
 		    }
 		});
@@ -123,11 +125,11 @@ module.exports = function(passport) {
         var path = __dirname + '/../bin' //Adds our bin to our path
         child = exec(bashCall,
                      {env :{PATH: path}},// adding environment
-                    function (error, stdout, stderr) {      // one easy function to capture data/errors
+                    function (err, stdout, stderr) {      // one easy function to capture data/errors
                         console.log('stdout: ' + stdout);
                         console.log('stderr: ' + stderr);
-                        if (error) {
-                          console.log('exec error: ' + error);
+                        if (err) {
+                            console.log('exec error: ' + err);
                         }
                     });
         
@@ -173,18 +175,35 @@ module.exports = function(passport) {
 				  function (err) {
 				  	if (err) {
 				  		console.log("/// FAILed to approve: " + gifname + ", for user: " + username);
+				  		console.log(err);
 				  	} else {
 				  		newGif.save(function(err) {
 				  			if (err) {
+				  				console.log("/// Failed to add " + gifname + " to gif db. Returning to initial state.");
 				  				console.log(err);
 				  				// Putting back in pending folder
-				  				fs.rename(__dirname + '/../public/user/' + username + '/a/' + newgifname,
-				  						  __dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
-				  						  function(err) {
-				  						  	  if (err) console.log('/// Failed to return to pending directory.')
-				  						  });			  						  
-				  				}
-				  			console.log("/// Approved: " + gifname + ", for user: " + username);
+				  				fs.rename(
+				  					__dirname + '/../public/user/' + username + '/a/' + newgifname,
+				  					__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  					function(err) {
+				  						if (err) {
+				  						  	console.log('/// Failed to return to pending directory.');
+				  						  	console.log(err);
+				  						}
+				  					}
+				  				);			  						  
+				  			}
+				  			User.findByIdAndUpdate(
+				  				req.user._id,
+				  				{ push: { "own_gifs" : newGif._id } },
+				  				{},
+				  				function(err) {
+				  					if (err) {
+				  						console.log("/// Failed to add reference to gif to user document. Returning to initial state.")
+				  						console.log(err);
+				  					}
+				  				});
+
 				  		});
 				  	}
 				  	res.end();
@@ -200,8 +219,7 @@ module.exports = function(passport) {
 				  function (err) {
 				  	if (err) {
 				  		console.log("/// FAILed to delete: " + gifname + ", for user: " + username);
-				  	} else {
-				  		console.log("/// Deleted: " + gifname + ", for user: " + username);
+				  		console.log(err);
 				  	}
 				  	res.end();
 				  });
@@ -226,9 +244,6 @@ module.exports = function(passport) {
 		        link="http://" + req.hostname + "/verify?email=" + req.query.to + 
 		        										"&code=" + req.query.code +
 		        										"&_id="  + user._id;
-		        console.log(req.query.code);
-		        console.log(user.code);
-		        console.log(link);
 		        mailOptions = {
 		            to      : req.query.to,
 		            from    : "no-reply@voio.io",
@@ -236,8 +251,8 @@ module.exports = function(passport) {
 		            html    : "Hello " + user.local.username + ",<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
 		        }
 		        transport.sendMail(mailOptions, function(error, response) {
-		            if (error) {
-		                console.log(error);
+		            if (err) {
+		                console.log(err);
 		                req.flash('profileMessage', "There was a problem, sending your email.\n We'll do our best to fix it soon! Maybe try again?");
 		                res.redirect('/profile');
 		            } else {
@@ -262,7 +277,10 @@ module.exports = function(passport) {
         	{ 'local.verified' : true },
         	{},
         	function(err) {
-        		if (err) console.log(err);
+        		if (err) {
+        			console.log('/// Failed to verify email address: ' + email);
+        			console.log(err);
+        		}
         		res.redirect("/login");
         	}
         );

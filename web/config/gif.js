@@ -12,8 +12,8 @@ var gifSchema = new mongoose.Schema({
 module.exports = mongoose.model('Gif' , gifSchema);
 
 
-// testing - use these to manually add elements to db
-// var User = mongoose.model('User', userSchema);
+// testing - use these to manually add gifs to db
+
 // var Gif  = mongoose.model('Gif', gifSchema);
 
 // var m = new Gif;
