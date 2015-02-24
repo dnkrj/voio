@@ -101,7 +101,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		Windows[windowIndex].numFaces += (detectedFaces.size() - facesInSample[facesIndex]);
 		Windows[windowIndex].index = windowIndex;
 		//Update sampleBuffer
-		if (detectedFace.size() > 0)
+		if (detectedFaces.size() > 0)
 		{
 			std::cout << "detected a face" << std::endl;
 		}
