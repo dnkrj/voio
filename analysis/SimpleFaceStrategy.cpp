@@ -8,11 +8,11 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 4
+#define minNeighbours 1
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 4
+#define samplesPerSecond 8
 
 
 /*
@@ -54,7 +54,6 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 {
 	std::vector<Timestamp> timestamps;
 	VideoCapture readAhead(filename);
-	
 
 	long frameCount = readAhead.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = readAhead.get(CV_CAP_PROP_FPS);
@@ -71,7 +70,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	std::vector<Rect> detectedFaces;
 	CascadeClassifier faceCascade;
 	faceCascade.load(face_cascade_name);
-
+	
 	Mat frame;
 	Mat greyFrame;
 	int * facesInSample = new int[samplesPerWindow];
