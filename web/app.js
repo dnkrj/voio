@@ -5,7 +5,6 @@ var logger         = require('morgan');
 var cookieParser   = require('cookie-parser');
 var bodyParser     = require('body-parser');
 var multer         = require('multer');
-var methodoverride = require('method-override');
 var flash          = require('connect-flash');
 
 var app = express();
@@ -54,7 +53,6 @@ app.use(multer({
         return Date.now()
     }
 }));
-app.use(methodoverride());
 
 app.use(express.static(__dirname + '/public')); //  "public" off of current directory is root
 

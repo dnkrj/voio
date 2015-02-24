@@ -41,21 +41,27 @@ std::vector<std::string> split(const std::string& s, char delim) {
 
 //VideoConverter member functions.
 std::string VideoConverter::getPath(int uid, int gid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp1 = split(vP, '/');
 	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
-	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
+	std::string pp = prepath;
+	if(prepath.length()>0) pp = pp + "/";
+	return pp + sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
 }
 
 std::string VideoConverter::getVideoPath(int uid, int vid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp1 = split(vP, '/');
 	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
-	return prepath + "TMP" + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".avi";
+	std::string pp = prepath;
+	if(prepath.length()>0) pp = pp + "/";
+	return pp + "TMP" + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".avi";
 }
 
 std::string VideoConverter::getFinalPath(int uid, int vid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp1 = split(vP, '/');
 	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
-	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".webm";
+	std::string pp = prepath;
+	if(prepath.length()>0) pp = pp + "/";
+	return pp + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".webm";
 }
 
 VideoConverter::VideoConverter(int sx, int sy) {

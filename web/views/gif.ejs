@@ -1,9 +1,17 @@
 <% include head %>
+<script type="text/javascript" src="/javascripts/gifffer.js"></script>
 <% include title %>
 		<div id="container">
 			<h1><a href="/u/<%= userpage %>"><%= userpage %></a></h1>
-			<a href="/u/<%= userpage %>"><div class="gif" id="<%= gifview %>" style=""><img src="/user/<%= userpage %>/a/<%= gifview %>.gif"></div></a>
+			<div class="gif" id="<%= gifview %>" style="">
+			<img data-gifffer="/user/<%= userpage %>/a/<%= gifview %>.gif" data-gifffer-width="300" data-gifffer-height="300" data-gifffer-link="/u/<%= userpage %>"/>
+			</div>
 			<p><a href="/u/<%= userpage %>">ALL GIFS</a></p>
 		</div>
 	</body>
+	<script>
+		window.onload = function() {
+    		Gifffer();
+		}
+	</script>
 </html>
