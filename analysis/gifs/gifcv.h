@@ -21,6 +21,7 @@
 #endif
 
 typedef std::vector<GifByteType> frame_t;
+std::vector<std::string> split(const std::string& s, char delim);
 
 /*Based on Marco Tarini's AnimatedGifSaver at
 http://sourceforge.net/p/giflib/patches/6/
