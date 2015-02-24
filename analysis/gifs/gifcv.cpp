@@ -41,17 +41,20 @@ std::vector<std::string> split(const std::string& s, char delim) {
 
 //VideoConverter member functions.
 std::string VideoConverter::getPath(int uid, int gid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp = split(vP, '.');
+	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
 	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(gid) + ".gif";
 }
 
 std::string VideoConverter::getVideoPath(int uid, int vid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp = split(vP, '.');
+	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
 	return prepath + "TMP" + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".avi";
 }
 
 std::string VideoConverter::getFinalPath(int uid, int vid, std::string vP, const std::string& prepath) {
-	std::vector<std::string> sp = split(vP, '.');
+	std::vector<std::string> sp1 = split(vp, '/');
+	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
 	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".webm";
 }
 
@@ -128,7 +131,7 @@ bool VideoConverter::addFrame(uint8_t* data, float dt) {
 
 void VideoConverter::extractGif(const std::string& src, const std::string& path, int uid, double start, double end) {
 	if(!outputPalette) throw "Error creating colour map.";
-    
+    std::cout << "Saving GIF between " << start << " and " << end << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
         Mat frame;
@@ -154,7 +157,7 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
         	}
 			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
 			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
-			if(frame_r.isContinuous()) {
+			if(frame_n.isContinuous()) {
 				if(!addFrame(frame_n.data, rate)) throw "Error writing to file.";
 			}
 		}	
@@ -218,8 +221,8 @@ bool VideoConverter::addLoop(GifFileType *gf) {
 }
 
 bool VideoConverter::save(const char* filename) {
-	if(frames.size() == 0) return false;
-  
+	if(frames.size() == 0) throw "Number of frames is zero.";
+
  	GifFileType *GifFile = EGifOpenFileName(filename, false, NULL);
   
   	if(!GifFile) return false;

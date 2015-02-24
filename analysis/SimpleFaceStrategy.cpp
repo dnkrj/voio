@@ -108,7 +108,10 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		++windowIndex;
 		//Skip frames to next sample
 		skipFrames(readAhead, numFramesToSkip);
-		std::cout << "Processed window: " <<windowIndex-1 <<  "\n";
+		if (!(windowIndex % 200))
+		{
+			std::cout << "Processed window: " << windowIndex << std::endl;
+		}
 	}
 
 	//Cleanup any non-set windows
@@ -126,6 +129,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	double indexGap = samplesPerSecond * secondsBetweenWindow;
 	std::cout << Windows[0].numFaces << std::endl;
 	std::cout << Windows[numWindows - 1].numFaces << std::endl;
+	std::cout << "Starting filter and sort" << std::endl;
 	for (int i = 0; i < numWindows; i++)
 	{
 		for (int x = i+1; x < numWindows; x++)
@@ -143,7 +147,6 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	int added = 0;
 	for (int i = 0; i < numWindows; i++)
 	{
-		std::cout << Windows[i].numFaces;
 		if (Windows[i].numFaces != 0)
 		{
 			added++;
@@ -152,7 +155,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 
 			double endTime = endFrame / fps;
 			double startTime = startFrame / fps;
-			timestamps.push_back(Timestamp(startTime, endTime));
+			timestamps.push_back(Timestamp(startTime*1000, endTime*1000));
 		}
 		if (added == numGIFs)
 		{
