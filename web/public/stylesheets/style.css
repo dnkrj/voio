@@ -110,13 +110,12 @@ body {
 }
 
 .pending {
-	height: 360px;
+	height: 400px;
 }
 
-.delete {
+.gifButton {
 	height: 50px;
 	width: 300px;
-	margin-top: -5px;
 	text-align: center;
 	line-height: 50px;
 	background-color: #000;
@@ -126,7 +125,7 @@ body {
 	transition: opacity 0.2s;
 }
 
-.delete:hover {
+.gifButton:hover {
 	opacity: 0.6;
 }
 

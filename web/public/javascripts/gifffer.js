@@ -9,10 +9,10 @@ var Gifffer = function() {
         // creating play button
         var play = d.createElement('DIV');
         play[sa]('class','gifffer-play-button');
-        play[sa]('style', 'width:60px;height:60px;border-radius:30px;background:rgba(0, 0, 0, 0.3);position:absolute;left:' + ((w/2)-30) + 'px;top:' + ((h/2)-30) + 'px;');
-        var trngl = d.createElement('DIV');
-        trngl[sa]('style', 'width:0;height: 0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:14px solid rgba(0, 0, 0, 0.5);position:absolute;left:26px;top:16px;')
-        play.appendChild(trngl);
+        //play[sa]('style', 'width:60px;height:60px;border-radius:30px;background:rgba(0, 0, 0, 0.3);position:absolute;left:' + ((w/2)-30) + 'px;top:' + ((h/2)-30) + 'px;');
+        //var trngl = d.createElement('DIV');
+        //trngl[sa]('style', 'width:0;height: 0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:14px solid rgba(0, 0, 0, 0.5);position:absolute;left:26px;top:16px;')
+        //play.appendChild(trngl);
         // dom placement
         con.appendChild(play);
         el.parentNode.replaceChild(con, el);
@@ -25,6 +25,7 @@ var Gifffer = function() {
         url = el[ga]('data-gifffer');
         w = el[ga]('data-gifffer-width');
         h = el[ga]('data-gifffer-height');
+        var l = el[ga]('data-gifffer-link');
         duration = el[ga]('data-gifffer-duration');
         el.style.display = 'block';
         c = document.createElement('canvas');
@@ -38,7 +39,8 @@ var Gifffer = function() {
                 if(!cc) cc = createContainer(w, h, el);
                 con = cc.c;
                 play = cc.p;
-                con.addEventListener('click', function() {
+
+                con.addEventListener('mouseover', function() {
                     clearTimeout(durationTimeout);
                     if(!playing) {
                         playing = true;
@@ -60,7 +62,39 @@ var Gifffer = function() {
                                 gif = null;
                             }, duration);
                         }
+                    }
+                });
+
+                con.addEventListener('click', function() {
+                    clearTimeout(durationTimeout);
+                    if(playing) {
+                        if (l != null) window.location.href = l;
                     } else {
+                        playing = true;
+                        gif = d.createElement('IMG');
+                        gif[sa]('style', 'width:' + w + 'px;height:' + h + 'px;');
+                        gif[sa]('data-uri', Math.floor(Math.random()*100000) + 1);
+                        setTimeout(function() {
+                            gif.src = url;
+                        }, 0);                        
+                        con.removeChild(play);
+                        con.removeChild(c);
+                        con.appendChild(gif);
+                        if(parseInt(duration) > 0) {
+                            durationTimeout = setTimeout(function() {
+                                playing = false;
+                                con.appendChild(play);
+                                con.removeChild(gif);
+                                con.appendChild(c);
+                                gif = null;
+                            }, duration);
+                        }
+                    }
+                });
+
+                con.addEventListener('mouseout', function() {
+                    clearTimeout(durationTimeout);
+                    if(playing) {
                         playing = false;
                         con.appendChild(play);
                         con.removeChild(gif);
@@ -68,6 +102,7 @@ var Gifffer = function() {
                         gif = null;
                     }
                 });
+
                 // canvas
                 c.width = w;
                 c.height = h;
