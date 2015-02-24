@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	try {
-		std::vector<std::string> sp = split(std::string(argv[2]), '/');
+		std::vector<std::string> sp1 = split(std::string(argv[2]), '/');
 		Filter f;
 		SimpleFaceStrategy ls;
 
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 		f.extractGifs(std::string(argv[1]), std::string(argv[2]), 0, timestamps);
 		
 		//Will move network confirmation to Entry.cpp
-		//confirm(sp[4].c_str());
+		//confirm(sp[sp.size()-2].c_str());
 	} catch(const char* s) {
 		std::cout << std::string(s) << std::endl;
 	}
