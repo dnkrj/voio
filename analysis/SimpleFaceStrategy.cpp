@@ -147,7 +147,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	int added = 0;
 	for (int i = 0; i < numWindows; i++)
 	{
-		if (Windows[i].numFaces != 0)
+		if (Windows[i].numFaces != 0 || added == 0)
 		{
 			added++;
 			double endFrame = windowSize + (framesPerSample * Windows[i].index);

@@ -45,7 +45,10 @@ int main(int argc, char ** argc)
 		std::vector<Timestamp> lazyTimestamps;
 		lazyTimestamps = ls.processVideo(filename, GifLength);
 		int missingGIFs = numGifs - timestamps.size();
-		
+		int numTS = lazyTimestamps.size();
+		for (int i = 0; i < numTS; i++)
+		{
+				
 	}
 
 	//Filter
