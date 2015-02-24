@@ -1,5 +1,6 @@
 #!/bin/sh
 #script run on every git pull, restarts server.
+git pull 
 
 forever stop 1
 forever start authbind --deep www
