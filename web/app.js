@@ -49,7 +49,7 @@ app.use(logger('dev')); // log every request to the server
 app.use(bodyParser.urlencoded({ extended: true })); // allows wider range of inputs to forms
 
 app.use(multer({
-    dest: './uploads/',
+    dest: __dirname + '/uploads/',
     rename: function (fieldname, filename) {
         return Date.now()
     }
