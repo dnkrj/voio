@@ -125,7 +125,7 @@ module.exports = function(passport) {
 		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
         var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
-                    __dirname+ '/../public/upload/'+req.user.local.username+'/p';
+                    __dirname+ '/../public/upload/'+req.user.local.username+'/p/';
         var path = __dirname + '/../bin' //Adds our bin to our path
         child = exec(bashCall,
                      {env :{PATH: path}},// adding environment
@@ -143,7 +143,7 @@ module.exports = function(passport) {
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
 		var username = req.user.local.username;
-	    fs.readdir(__dirname + '/../public/user/' + username + '/p/', function(err, files){
+	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
 	    	var gifs = [];
 			if (files !== undefined) {
 				files.forEach(function(gifDir) {
