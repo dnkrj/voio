@@ -1,3 +1,5 @@
 .DS_Store
 /web/public/user/
 /web/uploads/
+AnalysisOutput
+/web/node_modules
