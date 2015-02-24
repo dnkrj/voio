@@ -111,7 +111,6 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		if (!(windowIndex % 200))
 		{
 			std::cout << "Processed window: " << windowIndex << std::endl;
-			Windows[windowIndex-1].numFaces = 1;
 		}
 	}
 
