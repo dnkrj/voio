@@ -8,11 +8,11 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 1
+#define minNeighbours 2
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 8
+#define samplesPerSecond 8 
 
 
 /*
@@ -66,7 +66,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	windowSize += windowSize % framesPerSample; //Make window size divisible by sample rate
 	int samplesPerWindow = windowSize / framesPerSample;
 	
-	std::string face_cascade_name ="haarcascade_frontalface_alt.xml";
+	std::string face_cascade_name ="~/VideoDiary/AnalysisOutput/haarcascade_frontalface_alt.xml";
 	std::vector<Rect> detectedFaces;
 	CascadeClassifier faceCascade;
 	faceCascade.load(face_cascade_name);
@@ -101,6 +101,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		Windows[windowIndex].numFaces += (detectedFaces.size() - facesInSample[facesIndex]);
 		Windows[windowIndex].index = windowIndex;
 		//Update sampleBuffer
+		
 		facesInSample[facesIndex] = detectedFaces.size();
 		//Update indexes
 		facesIndex = (facesIndex + 1) % samplesPerWindow;
@@ -146,7 +147,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	int added = 0;
 	for (int i = 0; i < numWindows; i++)
 	{
-		if (Windows[i].numFaces != 0)
+		if (Windows[i].numFaces != 0 || added == 0)
 		{
 			added++;
 			double endFrame = windowSize + (framesPerSample * Windows[i].index);
