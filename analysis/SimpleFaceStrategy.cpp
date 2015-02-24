@@ -8,11 +8,11 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 4
+#define minNeighbours 2
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 4 
+#define samplesPerSecond 8 
 
 
 /*
