@@ -155,7 +155,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 
 			double endTime = endFrame / fps;
 			double startTime = startFrame / fps;
-			timestamps.push_back(Timestamp(startTime, endTime));
+			timestamps.push_back(Timestamp(startTime*1000, endTime*1000));
 		}
 		if (added == numGIFs)
 		{
