@@ -5,6 +5,6 @@ OUTPUT=-o simpleFaceOutput.o
 CC=g++ -std=c++0x
 
 compile: SimpleFaceStrategy.cpp 
-	$(CC) SimpleFaceMain.cpp SimpleFaceStrategy.cpp $(CFLAGS) $(LIBS) $(LINK) $(OUTPUT)
+	$(CC) SimpleFaceMain.cpp SimpleFaceStrategy.cpp $(CFLAGS) $(LIBS) $(LINK) -lgif  $(OUTPUT) 
 
 
