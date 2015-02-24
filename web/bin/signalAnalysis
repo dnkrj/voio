@@ -5,4 +5,4 @@ echo "Calling AnalysisMain.o $1 $2"
 $ LD_LIBRARY_PATH=/usr/local/lib
 $ export LD_LIBRARY_PATH
 
-../../AnalysisOutput/AnalysisMain.o $1 $2
+~/VideoDiary/AnalysisOutput/AnalysisMain.o $1 $2
