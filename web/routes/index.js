@@ -136,13 +136,14 @@ module.exports = function(passport) {
                             console.log('exec error: ' + err);
                         }
                     });
+        console.log("finally famous");
         
 	});
 
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
 		var username = req.user.local.username;
-	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
+	    fs.readdir(__dirname + '/../public/user/' + username + '/p/', function(err, files){
 	    	var gifs = [];
 			if (files !== undefined) {
 				files.forEach(function(gifDir) {
