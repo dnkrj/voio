@@ -104,6 +104,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		if (detectedFace.size() > 0)
 		{
 			std::cout << "detected a face" << std::endl;
+		}
 		facesInSample[facesIndex] = detectedFaces.size();
 		//Update indexes
 		facesIndex = (facesIndex + 1) % samplesPerWindow;
