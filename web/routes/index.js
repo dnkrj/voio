@@ -117,6 +117,8 @@ module.exports = function(passport) {
 	    });
 	});
 
+
+	/* POST upload a video */
 	router.post('/upload', function(req, res) {
 		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
@@ -256,8 +258,8 @@ module.exports = function(passport) {
 		                req.flash('profileMessage', "There was a problem, sending your email.\n We'll do our best to fix it soon! Maybe try again?");
 		                res.redirect('/profile');
 		            } else {
-		                res.redirect('/profile');
 		                req.flash('profileMessage', "Email sent! Please check your inbox.");
+		                res.redirect('/profile');
 		            }
 		        });    			
     		}
@@ -284,6 +286,35 @@ module.exports = function(passport) {
         		res.redirect("/login");
         	}
         );
+    });
+
+    router.get('/ready', function(req, res) {
+    	console.log(req.query.user);
+    	User.findOne({ 'local.username' : req.query.user }, function(err, user) {
+    		console.log(user);
+    		if (err) {
+    			console.log(err);
+    			res.send('FAILED');
+    		} else {
+	    		if (typeof user !== 'undefined') {
+			        link="http://" + req.hostname + "/login";
+			        mailOptions = {
+			            to      : user.local.email,
+			            from    : "no-reply@voio.io",
+			            subject : "Your Gifs are ready!",
+			            html    : "Hello " + user.local.username + ",<br><br> Login to voio.io to see your gifs!<br><br><a href="+link+">Click here to go to the website.</a>" 
+			        }
+			        transport.sendMail(mailOptions, function(error, response) {
+			            if (err) {
+			                console.log(err);
+			                res.send('FAILED');
+			            } else {
+			                res.send('SUCCESS');
+			            }
+			        });    			
+	    		}  	
+    		}
+    	});
     });
     
 	return router;
