@@ -8,11 +8,11 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 1
+#define minNeighbours 4
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 8
+#define samplesPerSecond 4 
 
 
 /*
@@ -101,10 +101,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		Windows[windowIndex].numFaces += (detectedFaces.size() - facesInSample[facesIndex]);
 		Windows[windowIndex].index = windowIndex;
 		//Update sampleBuffer
-		if (detectedFaces.size() > 0)
-		{
-			std::cout << "detected a face" << std::endl;
-		}
+		
 		facesInSample[facesIndex] = detectedFaces.size();
 		//Update indexes
 		facesIndex = (facesIndex + 1) % samplesPerWindow;
