@@ -36,6 +36,8 @@ body {
 	margin: 0 0 0 0;
 	font: 14px 'League Spartan', sans-serif;
 	color: black;
+	max-width: 100%;
+	overflow: hidden;
 }
 
 #title {
@@ -110,13 +112,12 @@ body {
 }
 
 .pending {
-	height: 360px;
+	height: 400px;
 }
 
-.delete {
+.gifButton {
 	height: 50px;
 	width: 300px;
-	margin-top: -5px;
 	text-align: center;
 	line-height: 50px;
 	background-color: #000;
@@ -126,7 +127,7 @@ body {
 	transition: opacity 0.2s;
 }
 
-.delete:hover {
+.gifButton:hover {
 	opacity: 0.6;
 }
 
@@ -160,6 +161,7 @@ input {
 	font: 18px 'League Spartan', sans-serif;
 	letter-spacing: 2px;
 	transition: background-color 0.5s, color 0.5s;
+	-webkit-appearance: none;
 }
 
 input:focus {

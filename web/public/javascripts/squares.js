@@ -16,11 +16,13 @@ function addGif() {
     var gif = gifURL();
     var url = "/user/" + username + "/a/" + gif;
     var id = gif.split(".")[0];
-    
-    $("#container").append("<a href='/u/" + username + "/" + id + "'><div class='gif' id='" + id + "'>" + "<img src='" + url + "'>" + "</div></a>");
+
+    $("#container").append("<div class='gif' id='" + id + "'>" + "<img data-gifffer='" + url + "'  data-gifffer-width='300' data-gifffer-height='300' data-gifffer-link='/u/" + username + "/" + id + "'/>" + "</div>");
 
     $('#' + id).css('display', 'none');
     $('#' + id).fadeIn(1000);
+
+    Gifffer();
 }
 
 function gifAva() {

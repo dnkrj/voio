@@ -63,11 +63,15 @@ module.exports = function(passport) {
 	router.get('/u/:id/:gif', function(req, res, next) {
 		var username = req.params.id;
 		var gifview = req.params.gif;
+		var userlocal;
+		if (typeof req.user !== 'undefined') {
+			userlocal = req.user.local;
+		}
 		res.render('gif', {
 	      	title      : username + '&middot; Voio',
 	      	userpage   : username,
 	  	    gifview    : gifview,
-	  	    user       : req.user.local
+	  	    user       : userlocal
 	    });
 	});
 
@@ -122,7 +126,7 @@ module.exports = function(passport) {
 	router.post('/upload', function(req, res) {
 		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
-        var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path +
+        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
                     __dirname+ '/../public/upload/'+req.user.local.username+'/p';
         var path = __dirname + '/../bin' //Adds our bin to our path
         child = exec(bashCall,
@@ -134,13 +138,14 @@ module.exports = function(passport) {
                             console.log('exec error: ' + err);
                         }
                     });
+        console.log("finally famous");
         
 	});
 
 	/* GET pending page */
 	router.get('/pending', isLoggedIn(true), function(req, res) {
 		var username = req.user.local.username;
-	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
+	    fs.readdir(__dirname + '/../public/user/' + username + '/p/', function(err, files){
 	    	var gifs = [];
 			if (files !== undefined) {
 				files.forEach(function(gifDir) {
@@ -162,7 +167,7 @@ module.exports = function(passport) {
 		var gifname    = req.params.gif;
 
 		var newGif = new Gif();
-		var newgifname = newGif._id;
+		var newgifname = newGif._id + ".gif";
 
 		newGif.caption = "";
 		newGif.tags    = "";
