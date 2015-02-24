@@ -15,8 +15,8 @@ int main(int argc, char** argv) {
 		MotionAnalyzer ls;
 		std::vector<Timestamp> p = ls.processVideo(std::string(argv[1]), 3); 
 		f.extractGifs(std::string(argv[1]), std::string(argv[2]), 0, p);
-	} catch(std::string s) {
-		std::cout << s << std::endl;
+	} catch(const char* s) {
+		std::cout << std::string(s) << std::endl;
 	}
 	return 0;
 }
