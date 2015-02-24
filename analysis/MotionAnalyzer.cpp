@@ -23,8 +23,8 @@ using namespace cv;
 /*
 Number of grid points is nX*nY.
 */
-const int nX = 25;
-const int nY = 25;
+const int nX = 27;
+const int nY = 27;
 
 MotionAnalyzer::MotionAnalyzer() {
 	std::srand(std::time(0));
@@ -64,22 +64,22 @@ static double update(std::vector<double>& values, double& sum, double value, uns
 }
 
 //Precondition: points are ordered as {{(x1,y1), (x2,y1), ...}, {(x1,y2), (x2,y2), ...}, ...}
-double MotionAnalyzer::calcRotation(std::vector<Point2f>& values, double dx, double dy) {
+double MotionAnalyzer::calcRotation(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double dx, double dy) {
 	std::vector<double> vals;
 	for(int y = 2; y<nY-2; y++) {
 		for(int x = 2; x<nX-2; x++) {
-			vals.push_back(std::abs(gx(values, dx, x, y) - fy(values, dy, x, y)));
+			vals.push_back(std::abs(gx(values, oldvalues, dx, x, y) - fy(values, oldvalues, dy, x, y)));
 		}
 	}
 	return mean(vals)[0];
 }
 
-double MotionAnalyzer::gx(std::vector<Point2f>& values, double delta, int x, int y) {
-	return (values[y*nX + x + 1].y - values[y*nX + x - 1].y)/(2*delta);
+double MotionAnalyzer::gx(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double delta, int x, int y) {
+	return ((values[y*nX + x + 1].y - oldvalues[y*nX + x + 1].y) - (values[y*nX + x - 1].y - oldvalues[y*nX + x - 1].y))/(2*delta);
 }
 
-double MotionAnalyzer::fy(std::vector<Point2f>& values, double delta, int x, int y) {
-	return (values[(y + 1)*nX + x].x - values[(y - 1)*nX + x].x)/(2*delta);
+double MotionAnalyzer::fy(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double delta, int x, int y) {
+	return ((values[(y + 1)*nX + x].x - oldvalues[(y + 1)*nX + x].x) - (values[(y - 1)*nX + x].x - oldvalues[(y - 1)*nX + x].x))/(2*delta);
 }
 
 void MotionAnalyzer::fillRandom(std::vector<Point2f>& list, int amount, double width, double height) {
@@ -165,7 +165,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 			subtract(yptsA, yptsB, diffy);	
 			magnitude(diffx, diffy, mag);
 			
-			double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], dx, dy);
+			double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], fields[0], dx, dy);
 			sum += val;
 			values.push_back(val);
 			index++;
@@ -206,7 +206,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 				magnitude(diffx, diffy, mag);
 				//std::cout << "Round: " << round << std::endl;
 				
-				double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], dx, dy);
+				double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], fields[0], dx, dy);
 				update(values, sum, val, index);
 				index++;
 				if(sum>sumr) {

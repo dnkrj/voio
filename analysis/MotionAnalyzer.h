@@ -39,17 +39,17 @@ class MotionAnalyzer : Strategy {
 	Calculates approximations to the rotations of each point between frames using vector curl and returns the mean of these values.
 	Edge points are not used as central difference numerical derivatives are calculated.
 	*/
-	double calcRotation(std::vector<cv::Point2f>& values, double dx, double dy);
+	double calcRotation(std::vector<cv::Point2f>& values, std::vector<cv::Point2f>& oldvalues, double dx, double dy);
 	
 	/*
 	Numerical partial derivative of the y component of the field with respect to x.
 	*/
-	double gx(std::vector<cv::Point2f>& values, double delta, int x, int y);
+	double gx(std::vector<cv::Point2f>& values, std::vector<cv::Point2f>& oldvalues, double delta, int x, int y);
 	
 	/*
 	Numerical partial derivative of the x component of the field with respect to y.
 	*/
-	double fy(std::vector<cv::Point2f>& values, double delta, int x, int y);
+	double fy(std::vector<cv::Point2f>& values, std::vector<cv::Point2f>& oldvalues, double delta, int x, int y);
 	
 	/*
 	Fill features-to-track array with random with values, when no good features are found.
