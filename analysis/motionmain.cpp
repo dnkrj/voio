@@ -6,15 +6,15 @@
 #include "gifs/gifcv.h"
 
 int main(int argc, char** argv) {
-	if(argc != 4) {
-		std::cout << "Usage: motionmain <filename> <uid> <gifpathprefix>" << std::endl;
+	if(argc != 3) {
+		std::cout << "Usage: motionmain <filename> <gifpathprefix>" << std::endl;
 		return 1;
 	}
 	try {
 		Filter f;
 		MotionAnalyzer ls;
 		std::vector<Timestamp> p = ls.processVideo(std::string(argv[1]), 3); 
-		f.extractVids(std::string(argv[1]), std::string(argv[3]), atoi(argv[2]), p);
+		f.extractGifs(std::string(argv[1]), std::string(0), atoi(argv[2]), p);
 	} catch(std::string s) {
 		std::cout << s << std::endl;
 	}
