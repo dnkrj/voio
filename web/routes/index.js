@@ -124,7 +124,7 @@ module.exports = function(passport) {
 	router.post('/upload', function(req, res) {
 		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
 		res.end();
-        var bashCall ='signalAnalysis '+__dirname + '/../' + req.files.upFile.path + " " +
+        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
                     __dirname+ '/../public/upload/'+req.user.local.username+'/p';
         var path = __dirname + '/../bin' //Adds our bin to our path
         child = exec(bashCall,
