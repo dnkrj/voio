@@ -301,6 +301,7 @@ module.exports = function(passport) {
     			res.send('FAILED');
     		} else {
 	    		if (typeof user !== 'undefined') {
+
 			        link="http://" + req.hostname + "/login";
 			        mailOptions = {
 			            to      : user.local.email,
