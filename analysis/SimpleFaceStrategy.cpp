@@ -8,11 +8,11 @@
 
 //Configurations for strategy
 //Config for face detection
-#define minNeighbours 2
+#define minNeighbours 3 
 #define scalingPerRun 1.1
 
 //Config for sampling
-#define samplesPerSecond 8 
+#define samplesPerSecond 6 
 
 
 /*
@@ -66,7 +66,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	windowSize += windowSize % framesPerSample; //Make window size divisible by sample rate
 	int samplesPerWindow = windowSize / framesPerSample;
 	
-	std::string face_cascade_name ="~/VideoDiary/AnalysisOutput/haarcascade_frontalface_alt.xml";
+	std::string face_cascade_name ="home/voio/VideoDiary/AnalysisOutput/haarcascade_frontalface_alt.xml";
 	std::vector<Rect> detectedFaces;
 	CascadeClassifier faceCascade;
 	faceCascade.load(face_cascade_name);
