@@ -1,0 +1,28 @@
+Requirements:
+
+TBB
+	Ubuntu: sudo apt-get install libtbb-all-dev
+	OS X:   sudo port install tbb
+Eigen /Eigen2
+	Ubuntu: 
+	OS X:	sudo port install eigen
+Full OpenCV 2.4.6+ (see documentations @ http://www.opencv.org)
+	Might require additional libraries like ffmpeg and dc1394 etc
+Boost 
+	Ubuntu:	sudo apt-get install libboost-all-dev (or similar)
+	OS X:   sudo port install boost
+
+also need Cmake
+// framework
+To install run:
+
+mkdir build
+cd build
+cmake ..
+make -j5
+
+
+To test run (continuing from previously)
+
+cd voio
+./FunctionalityTest

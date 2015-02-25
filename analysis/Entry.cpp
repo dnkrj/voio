@@ -1,15 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "opencv2/core/core"
-#include "opencv2/highgui/highgui.cpp"
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "gifs/gifcv.h"
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
 
 #define GifLength 3
 
-int main(int argc, char ** argc)
+using namespace cv;
+
+int main(int argc, char ** argv)
 {
 	if (argc != 3)
 	{
@@ -25,7 +28,7 @@ int main(int argc, char ** argc)
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vidInfo.get(CV_CAP_PROP_FPS);
 	
-	double time = frameCount / fps;
+	int time = frameCount / fps;
 	int numGifs;
 	if (time < GifLength * 4) 
 	{
@@ -41,10 +44,10 @@ int main(int argc, char ** argc)
 	SimpleFaceStrategy simpleFace;
 	simpleFaceTimestamps = simpleFace.processVideo(filename, GifLength);
 	
-	cout << "SimpleFace - found : " << simpleFaceTimestamps.size() << std::endl;
+	std::cout << "SimpleFace - found : " << simpleFaceTimestamps.size() << std::endl;
 	for (int i = 0; i < simpleFaceTimestamps.size(); i++)
 	{
-		timestamps.add(simpleFaceTimestamps.at(i));
+		timestamps.push_back(simpleFaceTimestamps.at(i));
 	}
 
 	while (timestamps.size() < numGifs)
@@ -62,13 +65,13 @@ int main(int argc, char ** argc)
 		}
 	}
 
-	cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
+	std::cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
 	Filter filter;
-	f.extractGifs(filename, outputdir, 0, timestamps);
+	filter.extractGifs(filename, outputdir, 0, timestamps);
 
-	cout << "Finished successfully" << std::endl;	
+	std::cout << "Finished successfully" << std::endl;	
 	
-	return 0
+	return 0;
 	
 }	
