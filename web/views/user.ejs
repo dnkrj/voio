@@ -1,5 +1,7 @@
 <% include head %>
 
+	<link rel="stylesheet" href="/stylesheets/user.css">
+
 	<script>
 		var gifs = [<%- gifs %>];
 		var userpage = "<%- userpage %>";
@@ -44,15 +46,13 @@
        			<div id ="upMessage" class="message"></div>
        		</div>
 
+       		<% if( pendingGifs.length > 0 ) { %>
             <div id="pending_container">
 				<h1>Pending Gifs</h1>
+                <h2>Select gifs to post publicly</h2>
+			</div>
+			<% } %>
 
-				<% if( pendingGifs.length > 0 ) { %>
-                	<h2>Select gifs to post publicly</h2>
-            	<% } else { %>        
-                	<h2>When we're done processing your videos, we'll post the clips here for approval</h2>
-            	<% } %>
-			</div>    
         <% } %>    
             
         <div id="user_container">
