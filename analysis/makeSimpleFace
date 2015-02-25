@@ -1,4 +1,4 @@
-CFLAGS=$(shell pkg-config --cflags opencv)
+CLAGS=$(shell pkg-config --cflags opencv)
 LIBS=$(shell pkg-config --libs opencv)
 LINK=gifs/gifcv.o
 OUTPUT=-o simpleFaceOutput.o

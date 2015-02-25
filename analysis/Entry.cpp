@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "opencv2/core/core"
+#include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.cpp"
 #include "gifs/gifcv.h"
 #include "LazyStrategy.h"
