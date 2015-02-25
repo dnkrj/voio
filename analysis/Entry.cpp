@@ -65,13 +65,13 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
+	std::cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
 	Filter filter;
 	filter.extractGifs(filename, outputdir, 0, timestamps);
 
 	cout << "Finished successfully" << std::endl;	
 	
-	return 0
+	return 0;
 	
 }	

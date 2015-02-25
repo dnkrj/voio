@@ -12,7 +12,7 @@
 
 using namespace cv;
 
-std::vector<Timestamps>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
+std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
 {
 	VideoCapture vidReader(filename);
 	long frameCount = vidReader.get(CV_CAP_PROP_FRAME_COUNT);
