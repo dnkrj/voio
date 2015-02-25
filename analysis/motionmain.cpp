@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv) {
 	if(argc != 3) {
-		std::cout << "Usage: motionmain <filename> <gifpathprefix>" << std::endl;
+		std::cout << "Usage: motionmain <filename> <pathprefix>" << std::endl;
 		return 1;
 	}
 	try {
