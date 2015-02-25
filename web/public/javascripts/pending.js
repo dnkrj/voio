@@ -37,9 +37,9 @@ function addGif() {
 }
 
 function gifAva() {
-    return count<gifs.length;
+    return count<pendingGifs.length;
 }
 
 function gifURL() {
-    return gifs[count++];
+    return pendingGifs[count++];
 }

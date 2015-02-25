@@ -1,0 +1,25 @@
+<% include head %>
+	<script>
+		var gifs = [<%- gifs %>];
+		var userpage = "<%- userpage %>";
+<!-- //      var username = "<%- username %>"; -->
+	</script>
+	<script type="text/javascript" src="/javascripts/gifffer.js"></script>
+	<script src="/javascripts/upload.js"></script>
+	<script type="text/javascript" src="/javascripts/squares.js"></script>	
+<% include title %>
+        <div id="container">
+            <% include upload %>
+<!--
+            //<% if (userpage === username) { %>
+                <h1>Pending Gifs</h1>
+                <h2>Select gifs to post publicly</h2>
+           // <% } %>
+-->
+            <h1><%= userpage %></h1>
+            <% if (message.length > 0) { %>
+                <div class="message"><%= message %></div> 
+            <% } %>
+		</div>
+	</body>
+</html>

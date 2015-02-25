@@ -67,36 +67,37 @@ module.exports = function(passport) {
                     newUser.local.password = newUser.generateHash(password);
                     newUser.local.verified = false;
                     newUser.local.vericode = random();
+                    var errorMessage = "There was a problem on our side.\nWe'll try and fix it soon!";
 
                     // save the user
                     fs.mkdir(__dirname + "/../public/user/" + username, function(err) {
                         if (err) { 
                             console.log(err);
-                            return done(null, false, req.flash('signupMessage', "There was a problem on our side.\nWe'll try and fix it soon!\nTrying a different username sometimes helps."));
+                            return done(null, false, req.flash('signupMessage', errorMessage + " Couldn't create user dir!"));
                         }
                         fs.mkdir(__dirname + "/../public/user/" + username + "/p", function(err) { 
                             if (err) { 
                                 console.log(err);
                                 // TODO - delete parent directories
-                                return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
+                                return done(null, false, req.flash('signupMessage', errorMessage));
                             }
                             fs.mkdir(__dirname + "/../public/user/" + username + "/a", function(err) { 
                                 if (err) { 
                                     console.log(err);
                                     // TODO - delete parent directories
-                                    return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
+                                    return done(null, false, req.flash('signupMessage', errorMessage));
                                 }
                                 fs.mkdir(__dirname + "/../public/user/" + username + "/d", function(err) { 
                                     if (err) { 
                                         console.log(err);
                                         // TODO - delete parent directories
-                                        return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
+                                        return done(null, false, req.flash('signupMessage', errorMessage));
                                     }
                                     newUser.save(function(err) {
                                         if (err) { 
                                             console.log(err);
                                             // TODO - delete parent directories
-                                            return done(null, false, req.flash('signupMessage', "There was a problem on our side. We'll try and fix it soon!"));
+                                            return done(null, false, req.flash('signupMessage', errorMessage));
                                         }
                                         return done(null, newUser);
                                     })

@@ -1,14 +1,37 @@
 <% include head %>
 	<script>
 		var gifs = [<%- gifs %>];
-		var username = "<%- userpage %>";
+		var userpage = "<%- userpage %>";
+        var isOwner = "<%- isOwner %>";
+        var pendingGifs = [];
+        if( isOwner) {
+            pendingGifs = "<%- pendingGifs %>";
+        }    
 	</script>
 	<script type="text/javascript" src="/javascripts/gifffer.js"></script>
+	<script src="/javascripts/upload.js"></script>
 	<script type="text/javascript" src="/javascripts/squares.js"></script>	
+    <% if( isOwner) { %>
+        <script type="text/javascript"  src="/javascripts/pending.js"></script>
+    <% } %>
 <% include title %>
-		<% if (message.length > 0) { %> <div class="message"><%= message %></div> <% } %>
-		<div id="container">
-			<h1><%= userpage %></h1>
+        <div id="container">
+            
+            <% if( isOwner) { %>
+                <% include upload %>
+                <h1>Pending Gifs</h1>
+                <% if( pendingGifs.length > 0 ) { %>
+                    <h2>Select gifs to post publicly</h2>
+                <% } else { %>        
+                    <h2>You have no pending gifs!</h2>
+                <% } %>    
+            <% } %>    
+            
+            <h1><%= userpage %></h1>
+            <h2> Here are your public gifs!</h2>
+            <% if (message.length > 0) { %>
+                <div class="message"><%= message %></div> 
+            <% } %>
 		</div>
 	</body>
 </html>
