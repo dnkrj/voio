@@ -7,7 +7,7 @@
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
 
-#define GifLength 5
+#define GifLength 3
 
 int main(int argc, char ** argc)
 {
@@ -26,36 +26,49 @@ int main(int argc, char ** argc)
 	double fps = vidInfo.get(CV_CAP_PROP_FPS);
 	
 	double time = frameCount / fps;
-	int numGifs = (time / 60) + 1;
-
+	int numGifs;
+	if (time < GifLength * 4) 
+	{
+		numGifs = time/GifLength;
+	}
+	else
+	{
+		numGifs = (time % 60) + 4;
+	}
 	//Run through our strategies
 	
 	std::vector<Timestamp> simpleFaceTimestamps;
 	SimpleFaceStrategy simpleFace;
 	simpleFaceTimestamps = simpleFace.processVideo(filename, GifLength);
 	
-	for (int i = 0; i < simpeFaceTimestamps.size(); i++)
+	cout << "SimpleFace - found : " << simpleFaceTimestamps.size() << std::endl;
+	for (int i = 0; i < simpleFaceTimestamps.size(); i++)
 	{
 		timestamps.add(simpleFaceTimestamps.at(i));
 	}
 
-	if (timestamps.size() < numGifs)
+	while (timestamps.size() < numGifs)
 	{
 		LazyStrategy ls;
 		std::vector<Timestamp> lazyTimestamps;
 		lazyTimestamps = ls.processVideo(filename, GifLength);
 		int missingGIFs = numGifs - timestamps.size();
-		int numTS = lazyTimestamps.size();
-		for (int i = 0; i < numTS; i++)
+		int index = 0;
+		while (missingGIFs && lazyTimestamps.size())
 		{
-				
+			timestamps.push_back(lazyTimestamps.at(0));
+			lazyTimestamps.erase(lazyTimestamps.begin());
+			numGifs++;
+		}
 	}
 
-	//Filter
-	
-	//Run through gif generation	
+	cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
+	Filter filter;
+	f.extractGifs(filename, outputdir, 0, timestamps);
+
+	cout << "Finished successfully" << std::endl;	
 	
+	return 0
 	
-	
-	
+}	

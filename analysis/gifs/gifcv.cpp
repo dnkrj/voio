@@ -143,10 +143,11 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
         cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
         cap.set(CV_CAP_PROP_POS_MSEC, start);
         double ratio = width/height;
-        	
+		double pt = cap.get(CV_CAP_PROP_POS_MSEC);
+		double dt = 0;
+        
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-			double fps = cap.get(CV_CAP_PROP_FPS);
-			float rate = (float) (1/fps);
+        	//std::cout << "Current fps: " << 1000/dt << std::endl;
         	if(!cap.read(frame)) throw "Error reading frames.";
         	if(ratio < 1) {
          		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
@@ -158,8 +159,10 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
 			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
 			if(frame_n.isContinuous()) {
-				if(!addFrame(frame_n.data, rate)) throw "Error writing to file.";
+				if(!addFrame(frame_n.data, (float) (dt/1000))) throw "Error writing to file.";
 			}
+			dt = cap.get(CV_CAP_PROP_POS_MSEC) - pt;
+			pt = cap.get(CV_CAP_PROP_POS_MSEC);
 		}	
 	}
 
@@ -170,8 +173,15 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
 	std::string vp = getVideoPath(uid, gid, src, path);
+	std::cout << "Saving video between " << start << " and " << end << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
+		Mat temp;
+		cap.set(CV_CAP_PROP_POS_MSEC, start);
+		double t0 = cap.get(CV_CAP_PROP_POS_MSEC);
+		if(!cap.read(temp)) throw "Error reading frames.";
+		double dt = cap.get(CV_CAP_PROP_POS_MSEC) - t0;
+		double fps = 1000/dt;
         Mat frame;
         Mat frame_c;
         Mat frame_r;
@@ -181,7 +191,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
         double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
         cap.set(CV_CAP_PROP_POS_MSEC, start);
         double ratio = width/height;
-        VideoWriter video(vp, CV_FOURCC('M','J','P','G')/*cap.get(CV_CAP_PROP_FOURCC)*/, cap.get(CV_CAP_PROP_FPS), Size(gifsx, gifsy), true);
+        VideoWriter video(vp, CV_FOURCC('M','J','P','G')/*cap.get(CV_CAP_PROP_FOURCC)*/, fps, Size(gifsx, gifsy), true);
         	
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
         	if(!cap.read(frame)) throw "Error reading frames.";
@@ -196,7 +206,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "ffmpeg -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
+	std::string cmd = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
 	system(cmd.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
@@ -230,7 +240,7 @@ bool VideoConverter::save(const char* filename) {
 
   	if(!addLoop(GifFile)) return false;
 
-  	for(int ni=0; ni< int(frames.size()); ni++) {      
+  	for(int ni=0; ni<int(frames.size()); ni++) {      
 
     	static uint8_t ExtStr[4] = { 0x04, 0x00, 0x00, 0xff };
     
