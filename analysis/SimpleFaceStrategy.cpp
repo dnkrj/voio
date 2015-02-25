@@ -123,15 +123,15 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	}
 	
 	std::sort(Windows, &Windows[numWindows], sortFunc);
-	int numGifs;
+	int numGIFs;
 	int time = frameCount / fps;
 	if (frameCount / fps < secondsPerClip*4)
 	{
-		numGifs = (time) / secondsPerClip;
+		numGIFs = (time) / secondsPerClip;
 	}
 	else
 	{
-		numGifs = ((time) % 60) + 4;
+		numGIFs = ((time) % 60) + 4;
 	}
 	
 	int secondsBetweenWindow = 15;

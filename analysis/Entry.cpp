@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.cpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "gifs/gifcv.h"
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
