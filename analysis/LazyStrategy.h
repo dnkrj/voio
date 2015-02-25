@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-class LazyStrategy
+class LazyStrategy : Strategy
 {
 public:
 	std::vector<double> processVideo(const std::string& filename, int secondsPerClip);

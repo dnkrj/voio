@@ -11,3 +11,15 @@ VideoName + $GifIndex$
 (EG video0 video1 video2..)
 
 
+NEW PARAMETERS
+
+Filepath
+Outputdirectrory
+Strategy:
+	"CASC" = cascade strategy - normal 
+	"CLM" = CLM approach
+
+Output:
+	"GIF" = GIFs
+	"WEBM" = WEBM
+	"MP4" = MP4

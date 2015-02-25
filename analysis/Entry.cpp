@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vidInfo.get(CV_CAP_PROP_FPS);
 	
-	double time = frameCount / fps;
+	int time = frameCount / fps;
 	int numGifs;
 	if (time < GifLength * 4) 
 	{
@@ -44,10 +44,10 @@ int main(int argc, char ** argv)
 	SimpleFaceStrategy simpleFace;
 	simpleFaceTimestamps = simpleFace.processVideo(filename, GifLength);
 	
-	cout << "SimpleFace - found : " << simpleFaceTimestamps.size() << std::endl;
+	std::cout << "SimpleFace - found : " << simpleFaceTimestamps.size() << std::endl;
 	for (int i = 0; i < simpleFaceTimestamps.size(); i++)
 	{
-		timestamps.add(simpleFaceTimestamps.at(i));
+		timestamps.push_back(simpleFaceTimestamps.at(i));
 	}
 
 	while (timestamps.size() < numGifs)
@@ -68,7 +68,7 @@ int main(int argc, char ** argv)
 	cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
 	Filter filter;
-	f.extractGifs(filename, outputdir, 0, timestamps);
+	filter.extractGifs(filename, outputdir, 0, timestamps);
 
 	cout << "Finished successfully" << std::endl;	
 	

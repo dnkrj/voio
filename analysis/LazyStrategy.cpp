@@ -1,4 +1,5 @@
 #include "LazyStrategy.h"
+#include "gifs/gifcv.h"
 #ifndef _OPEN_CV
 #define _OPEN_CV
 #include "opencv2/highgui/highgui.hpp"
@@ -11,7 +12,7 @@
 
 using namespace cv;
 
-std::vector<double>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
+std::vector<Timestamps>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
 {
 	VideoCapture vidReader(filename);
 	long frameCount = vidReader.get(CV_CAP_PROP_FRAME_COUNT);
@@ -26,8 +27,7 @@ std::vector<double>  LazyStrategy::processVideo(const std::string& filename, int
 	{
 		if (totalTimeSeconds > secondsPerClip)
 		{
-			timestamps.push_back(0.0);
-			timestamps.push_back(secondsPerClip*1000);
+			timestamps.push_back(Timestamp(0,0,secondsPerClip*1000);
 		}
 		return timestamps;
 	}
@@ -36,8 +36,8 @@ std::vector<double>  LazyStrategy::processVideo(const std::string& filename, int
 	{
 		int randomTime = rand() % (60-secondsPerClip);
 		randomTime += i * 60;
-		timestamps.push_back((randomTime)*1000);
-		timestamps.push_back((randomTime + secondsPerClip)*1000);
+		timestamps.push_back(
+		Timestamp((randomTime)*1000, (randomTime + secondsPerClip)*1000));
 	}
 
 	return timestamps;
