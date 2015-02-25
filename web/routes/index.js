@@ -7,7 +7,7 @@ var Gif       = require('../config/gif');       // gif model (db)
 
 var util      = require('util'); //Calling bash script
 var exec      = require('child_process').exec;
-var child; // ASK DAN - why is this global?
+var child;
 
 module.exports = function(passport) {
 	var router = express.Router();
@@ -53,7 +53,7 @@ module.exports = function(passport) {
                         userpage      : userpage,
                         gifs          : gifs,
                         user          : req.user.local,
-                        isOwner       : req.user.local.username==userpage, 
+                        isOwner       : true, 
                         hostname      : req.hostname,
                         message       : req.flash('profileMessage'),
                         pendingGifs   : pendingGifs
@@ -99,7 +99,7 @@ module.exports = function(passport) {
 
 	/* POST signup page */
 	router.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/upload', // redirect to the secure profile section
+		successRedirect : '/profile', // redirect to the secure profile section
 		failureRedirect : '/signup',  // redirect back to the signup page if there is an error
 	}));
 
@@ -149,25 +149,6 @@ module.exports = function(passport) {
                         }
                     });
         
-	});
-
-	/* GET pending page */
-	router.get('/pending', isLoggedIn(true), function(req, res) {
-		var username = req.user.local.username;
-	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
-	    	var gifs = [];
-			if (files !== undefined) {
-				files.forEach(function(gifDir) {
-    				gifs.push('"'+gifDir+'"');	
-				});
-			}
-			res.render('pending', {
-				title    : 'Pending &middot; Voio',
-				username : username,
-				user     : req.user.local,
-				gifs     : gifs
-			});
-		});   
 	});
 
 	/* GET Approve Gif */
