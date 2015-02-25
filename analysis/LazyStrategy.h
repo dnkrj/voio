@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "gifs/gifcv.h"
+#include "Strategy.h"
 
 class LazyStrategy : Strategy
 {
