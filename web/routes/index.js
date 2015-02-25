@@ -136,20 +136,25 @@ module.exports = function(passport) {
 
 	/* POST upload a video */
 	router.post('/upload', function(req, res) {
-		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
-		res.end();
-        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
-                    __dirname+ '/../public/user/'+req.user.local.username+'/p/';
-        var path = __dirname + '/../bin' //Adds our bin to our path
-        child = exec(bashCall,
-                     {env :{PATH: path}},// adding environment
-                    function (err, stdout, stderr) {      // one easy function to capture data/errors
-                        console.log('stdout: ' + stdout);
-                        console.log('stderr: ' + stderr);
-                        if (err) {
-                            console.log('exec error: ' + err);
-                        }
-                    });
+		if (req.user.local.verified) {
+			console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
+			res.end();
+	        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
+	                    __dirname+ '/../public/user/'+req.user.local.username+'/p/';
+	        var path = __dirname + '/../bin' //Adds our bin to our path
+	        child = exec(bashCall,
+	                     {env :{PATH: path}},// adding environment
+	                    function (err, stdout, stderr) {      // one easy function to capture data/errors
+	                        console.log('stdout: ' + stdout);
+	                        console.log('stderr: ' + stderr);
+	                        if (err) {
+	                            console.log('exec error: ' + err);
+	                        }
+	                    });
+	    } else {
+	    	req.flash('profileMessage', "Please verify email.");
+    		res.redirect('/profile');
+	    }
         
 	});
 
