@@ -3,13 +3,14 @@
 #include <string>
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "gifs/gifcv.h"
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
 
 #define GifLength 3
 
-int main(int argc, char ** argc)
+int main(int argc, char ** argv)
 {
 	if (argc != 3)
 	{
