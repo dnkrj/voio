@@ -10,6 +10,8 @@
 
 #define GifLength 3
 
+using namespace cv;
+
 int main(int argc, char ** argv)
 {
 	if (argc != 3)
