@@ -1,6 +1,6 @@
 CFLAGS = $(shell pkg-config --cflags opencv)
-LIBS = $(shell pkg-config --libs opencv) -lgif
-LINK=gifs/gifcv.o
+LIBS = $(shell pkg-config --libs opencv) 
+LINK=gifs/gifcv.o -lgif
 OUTPUT= -o mainOutput.o
 CC = g++ -std=c++0x
 
