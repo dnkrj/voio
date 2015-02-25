@@ -224,13 +224,19 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		
 		func.insert(std::pair<double, Timestamp>(1/sumr, best));
 	}
+	
 	int i = 0;
+	double minT;
+	double normi;
 	for(auto& kv : func) {
+		if(i == 0) minT = kv.first;
 		if(i>10) break;
-		std::cout << kv.first << std::endl;
-		ret.push_back(kv.second);
+		normi = minT/kv.first;
+		std::cout << normi << std::endl;
+		if(normi>0.65) ret.push_back(kv.second);
 		i++;
 	}
+	
 	std::cout << "Saving clips." << std::endl;
 	return ret;
 }

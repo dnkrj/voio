@@ -55,7 +55,7 @@ std::string VideoConverter::getVideoPath(int uid, int vid, std::string vP, const
 std::string VideoConverter::getFinalPath(int uid, int vid, std::string vP, const std::string& prepath) {
 	std::vector<std::string> sp1 = split(vP, '/');
 	std::vector<std::string> sp = split(sp1[sp1.size()-1], '.');
-	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid) + ".webm";
+	return prepath + sp.at(0) + std::to_string(uid) + std::to_string(vid);
 }
 
 VideoConverter::VideoConverter(int sx, int sy) {
@@ -191,7 +191,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
         double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
         cap.set(CV_CAP_PROP_POS_MSEC, start);
         double ratio = width/height;
-        VideoWriter video(vp, CV_FOURCC('M','J','P','G')/*cap.get(CV_CAP_PROP_FOURCC)*/, fps, Size(gifsx, gifsy), true);
+        VideoWriter video(vp, CV_FOURCC('M','J','P','G'), fps, Size(gifsx, gifsy), true);
         	
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
         	if(!cap.read(frame)) throw "Error reading frames.";
@@ -206,8 +206,10 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
+	std::string cmd = "avconv -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4";
 	system(cmd.c_str());
+	//std::string cmd2 = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path) + ".webm";
+	//system(cmd.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
 }
