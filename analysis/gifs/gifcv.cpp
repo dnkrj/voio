@@ -147,7 +147,7 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 		double dt = 0;
         
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-        	std::cout << "Current fps: " << 1000/dt << std::endl;
+        	//std::cout << "Current fps: " << 1000/dt << std::endl;
         	if(!cap.read(frame)) throw "Error reading frames.";
         	if(ratio < 1) {
          		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
@@ -173,6 +173,7 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
 	std::string vp = getVideoPath(uid, gid, src, path);
+	std::cout << "Saving video between " << start << " and " << end << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
 		Mat temp;
@@ -205,7 +206,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "ffmpeg -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
+	std::string cmd = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path);
 	system(cmd.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
