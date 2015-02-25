@@ -27,7 +27,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	{
 		if (totalTimeSeconds > secondsPerClip)
 		{
-			timestamps.push_back(Timestamp(0,0,secondsPerClip*1000);
+			timestamps.push_back(Timestamp(0.0, secondsPerClip*1000);
 		}
 		return timestamps;
 	}
