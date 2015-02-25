@@ -25,14 +25,16 @@ function addPendingGif() {
     
     $("#pending_container").append("<div class='gif pending' id='" + id + "'>" + "<a id='A" + id + "' href='#'><div class='gifButton'>approve</div></a><img data-gifffer='" + url + "'  data-gifffer-width='300' data-gifffer-height='300'/><a id='D" + id + "' href='#'><div class='gifButton'>delete</div></a></div>");
 
-    $( "#A" + id ).click(function() {
+    $( "#A" + id ).click(function(e) {
         $.get("/a/" + id);
         $("#" + id).fadeOut(500);
+        e.preventDefault();
     });
 
-    $( "#D" + id ).click(function() {
+    $( "#D" + id ).click(function(e) {
         $.get("/d/" + id);
         $("#" + id).fadeOut(500);
+        e.preventDefault();
     });
 
     $('#' + id).css('display', 'none');
