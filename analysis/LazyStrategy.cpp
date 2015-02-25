@@ -18,7 +18,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	long frameCount = vidReader.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vidReader.get(CV_CAP_PROP_FPS);
 
-	std::vector<double> timestamps;
+	std::vector<Timestamp> timestamps;
 	
 	long totalTimeSeconds = frameCount / fps;
 	int totalTimeMinutes = totalTimeSeconds / 60;
@@ -27,7 +27,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	{
 		if (totalTimeSeconds > secondsPerClip)
 		{
-			timestamps.push_back(Timestamp(0.0, secondsPerClip*1000);
+			timestamps.push_back(Timestamp(0.0, secondsPerClip*1000));
 		}
 		return timestamps;
 	}
