@@ -47,7 +47,6 @@ body {
 	left:0;
 	background-color: #fff;
 	z-index: 2;
-	border-bottom: 1px solid #ccc;
 	opacity: 0.95;
 }
 
@@ -95,11 +94,24 @@ body {
 	border-top: 0;
 }
 
-#container, #profile_container, #upload_container, #signup_form, #login_form {
+#container, #user_container, #upload_container, #pending_container, #signup_form, #login_form {
 	margin-top: 120px;
 	text-align: center;
 	width: 100%;
 	height: auto;
+}
+
+#pending_container {
+	margin-top: 0;
+}
+
+#user_container {
+	margin-top: 0px;
+}
+
+#upload_container {
+	max-width: 600px;
+	margin: 60px auto 0 auto;
 }
 
 .gif {
@@ -184,11 +196,6 @@ input:focus {
 /*
 Upload
 */
-
-#upload_container {
-	max-width: 600px;
-	margin: 120px auto 0 auto;
-}
 
 #upMessage {
 	opacity: 0;

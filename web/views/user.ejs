@@ -1,14 +1,64 @@
 <% include head %>
+
 	<script>
 		var gifs = [<%- gifs %>];
-		var username = "<%- userpage %>";
+		var userpage = "<%- userpage %>";
+        var isOwner = "<%- isOwner %>";
+        var pendingGifs = [];
+        if( isOwner) {
+            pendingGifs = [<%- pendingGifs %>];
+        }    
 	</script>
+
 	<script type="text/javascript" src="/javascripts/gifffer.js"></script>
-	<script type="text/javascript" src="/javascripts/squares.js"></script>	
+
+    <% if(isOwner) { %>
+    	<script type="text/javascript" src="/javascripts/upload.js"></script>
+        <script type="text/javascript" src="/javascripts/pending.js"></script>
+    <% } else {%>
+    	<script type="text/javascript" src="/javascripts/squares.js"></script>
+    <% } %>
+
 <% include title %>
-		<% if (message.length > 0) { %> <div class="message"><%= message %></div> <% } %>
+
 		<div id="container">
-			<h1><%= userpage %></h1>
+        	<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
+        	<% if (message.length > 0) { %>
+               	<div class="message"><%= message %></div> 
+           	<% } %>
+        </div>
+
+        <% if( isOwner) { %>
+        	
+        	<div id="upload_container">
+	
+       			<form id="upForm" action="/" method="post">
+       				<input id="upFile" name="upFile" type="file">
+       				<input id="upButton" value="Upload File" type="button">
+       			</form>
+	
+       			<div class="progress">
+       				<div class="bar" style="width: 0%"></div>
+       			</div>
+	
+       			<div id ="upMessage" class="message"></div>
+       		</div>
+
+            <div id="pending_container">
+				<h1>Pending Gifs</h1>
+
+				<% if( pendingGifs.length > 0 ) { %>
+                	<h2>Select gifs to post publicly</h2>
+            	<% } else { %>        
+                	<h2>When we're done processing your videos, we'll post the clips here for approval</h2>
+            	<% } %>
+			</div>    
+        <% } %>    
+            
+        <div id="user_container">
+            <% if( isOwner ) { %>
+                	<h1>Public Clips</h1>
+           	<% } %>
 		</div>
 	</body>
 </html>

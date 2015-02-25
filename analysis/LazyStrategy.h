@@ -1,10 +1,16 @@
-#pragma once
+
 #include <vector>
 #include <string>
+#include "gifs/gifcv.h"
+#include "Strategy.h"
 
-class LazyStrategy
+#ifndef LAZYSTRAT
+#define LAZYSTRAT
+
+class LazyStrategy : Strategy
 {
 public:
-	std::vector<double> processVideo(const std::string& filename, int secondsPerClip);
+	std::vector<Timestamp> processVideo(const std::string& filename, int secondsPerClip);
 };
 
+#endif

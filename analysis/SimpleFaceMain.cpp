@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
 		//Will move network confirmation to Entry.cpp
 		//confirm(sp[sp.size()-2].c_str());
 	} catch(const char* s) {
+		std::cout << "Error caught in catch" << std::endl;
 		std::cout << std::string(s) << std::endl;
 	}
 	return 0;

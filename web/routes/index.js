@@ -7,7 +7,7 @@ var Gif       = require('../config/gif');       // gif model (db)
 
 var util      = require('util'); //Calling bash script
 var exec      = require('child_process').exec;
-var child; // ASK DAN - why is this global?
+var child;
 
 module.exports = function(passport) {
 	var router = express.Router();
@@ -28,48 +28,60 @@ module.exports = function(passport) {
 
 	/* GET user page. */
 	router.get('/u/:id', function(req, res, next) {
-		var username = req.params.id;
-		fs.readdir(__dirname + '/../public/user/' + username + '/a', function(err, files){
-			var gifs = [];
-			if (files === undefined) {
-				username = "no gifs here."
+		var userpage = req.params.id;
+        var message = [];
+        var pendingGifs = [];
+        var gifs = [];
+		fs.readdir(__dirname + '/../public/user/' + userpage + '/a', function(err, files){
+			if (! files) {
+				message = "no gifs here."
 			} else {
-				files.forEach(function(gifDir) {
-    				gifs.push('"'+gifDir+'"');
-				});
+				gifs = files.map( function(dir) { return '"' + dir + '"'}).reverse();
 			}
-			gifs.reverse();
-			console.log(req.user);
-			if (typeof req.user !== 'undefined') {	
-				res.render('user', {
-		      		title    : username + '&middot; Voio',
-		      		userpage : username,
-		  	    	gifs     : gifs,
-		  	    	user     : req.user.local,
-		  	    	hostname : req.hostname,
-		  	    	message  : req.flash('profileMessage')
-		    	});
-		    } else {
-		    	res.render('user', {
-		      		title    : username + '&middot; Voio',
-		      		userpage : username,
-		  	    	gifs     : gifs,
-		  	    	message  : []
-		    	});
-		    }
-		});
-	});
+            
+            var isOwner = req.user && req.user.local.username == userpage;
+            
+            if(isOwner) {
+                console.log("Trying to find the gifs now! "+ userpage);
+                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
+                     if(pfiles) {
+                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
+                     }
+                    console.log(pendingGifs);
+                    res.render('user', {
+                        title         : userpage + '&middot; Voio',
+                        userpage      : userpage,
+                        gifs          : gifs,
+                        user          : req.user.local,
+                        isOwner       : true, 
+                        hostname      : req.hostname,
+                        message       : req.flash('profileMessage'),
+                        pendingGifs   : pendingGifs
+                    });
+                });
+            } else {
+                res.render('user', {
+                    title         : userpage + '&middot; Voio',
+                    userpage      : userpage,
+                    isOwner       : false,
+                    gifs          : gifs,
+                    message       : message,
+                    pendingGifs   : pendingGifs
+                });
+            }
+        });
+    });
 
 	router.get('/u/:id/:gif', function(req, res, next) {
-		var username = req.params.id;
+		var userpage = req.params.id;
 		var gifview = req.params.gif;
 		var userlocal;
-		if (typeof req.user !== 'undefined') {
+		if (req.user) {
 			userlocal = req.user.local;
 		}
 		res.render('gif', {
-	      	title      : username + '&middot; Voio',
-	      	userpage   : username,
+	      	title      : userpage + '&middot; Voio',
+	      	userpage   : userpage,
 	  	    gifview    : gifview,
 	  	    user       : userlocal
 	    });
@@ -87,7 +99,7 @@ module.exports = function(passport) {
 
 	/* POST signup page */
 	router.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/upload', // redirect to the secure profile section
+		successRedirect : '/profile', // redirect to the secure profile section
 		failureRedirect : '/signup',  // redirect back to the signup page if there is an error
 	}));
 
@@ -139,25 +151,6 @@ module.exports = function(passport) {
                         }
                     });
         
-	});
-
-	/* GET pending page */
-	router.get('/pending', isLoggedIn(true), function(req, res) {
-		var username = req.user.local.username;
-	    fs.readdir(__dirname + '/../public/user/' + username + '/p', function(err, files){
-	    	var gifs = [];
-			if (files !== undefined) {
-				files.forEach(function(gifDir) {
-    				gifs.push('"'+gifDir+'"');	
-				});
-			}
-			res.render('pending', {
-				title    : 'Pending &middot; Voio',
-				username : username,
-				user     : req.user.local,
-				gifs     : gifs
-			});
-		});   
 	});
 
 	/* GET Approve Gif */
