@@ -5,11 +5,13 @@
 	<script>
 		var gifs = [<%- gifs %>];
 		var userpage = "<%- userpage %>";
-        var isOwner = "<%- isOwner %>";
-        var pendingGifs = [];
-        if( isOwner) {
-            pendingGifs = [<%- pendingGifs %>];
-        }    
+    var isOwner = "<%- isOwner %>";
+    var pendingGifs = [];
+    var verified;
+    if( isOwner) {
+        pendingGifs = [<%- pendingGifs %>];
+        verified = "<%- isVerified %>";
+    }    
 	</script>
 
 	<script type="text/javascript" src="/javascripts/gifffer.js"></script>

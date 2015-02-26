@@ -40,6 +40,7 @@ module.exports = function(passport) {
 			}
             
             var isOwner = req.user && req.user.local.username == userpage;
+            var isVerified = isOwner && req.user.local.verified;
             
             if(isOwner) {
                 console.log("Trying to find the gifs now! "+ userpage);
@@ -54,6 +55,7 @@ module.exports = function(passport) {
                         gifs          : gifs,
                         user          : req.user.local,
                         isOwner       : true, 
+                        isVerified	  : isVerified,
                         hostname      : req.hostname,
                         message       : req.flash('profileMessage'),
                         pendingGifs   : pendingGifs
@@ -64,6 +66,7 @@ module.exports = function(passport) {
                     title         : userpage + '&middot; Voio',
                     userpage      : userpage,
                     isOwner       : false,
+                    isVerified	  : isVerified,
                     gifs          : gifs,
                     message       : message,
                     pendingGifs   : pendingGifs
@@ -136,25 +139,20 @@ module.exports = function(passport) {
 
 	/* POST upload a video */
 	router.post('/upload', function(req, res) {
-		if (req.user.local.verified) {
-			console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
-			res.end();
-	        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
-	                    __dirname+ '/../public/user/'+req.user.local.username+'/p/';
-	        var path = __dirname + '/../bin' //Adds our bin to our path
-	        child = exec(bashCall,
-	                     {env :{PATH: path}},// adding environment
-	                    function (err, stdout, stderr) {      // one easy function to capture data/errors
-	                        console.log('stdout: ' + stdout);
-	                        console.log('stderr: ' + stderr);
-	                        if (err) {
-	                            console.log('exec error: ' + err);
-	                        }
-	                    });
-	    } else {
-	    	req.flash('profileMessage', "Please verify email.");
-    		res.redirect('/profile');
-	    }
+		console.log("/// File uploaded at: " + req.files.upFile.path + ", by: " + req.user.local.username);
+		res.end();
+        var bashCall ='signalAnalysis ' + req.files.upFile.path + " " +
+                    __dirname+ '/../public/user/'+req.user.local.username+'/p/';
+        var path = __dirname + '/../bin' //Adds our bin to our path
+        child = exec(bashCall,
+                     {env :{PATH: path}},// adding environment
+                    function (err, stdout, stderr) {      // one easy function to capture data/errors
+                        console.log('stdout: ' + stdout);
+                        console.log('stderr: ' + stderr);
+                        if (err) {
+                            console.log('exec error: ' + err);
+                        }
+                    });
         
 	});
 
