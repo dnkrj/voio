@@ -26,14 +26,6 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	
 	if (totalTimeMinutes == 0)
 	{
-		std::cout <<"HI HI" << std::endl;
-		for (int i = 0; i < 10; i++)
-		{
-			int x = 5;
-			std::cout << "HELLO HELLO" << std::endl;
-			x = rand();
-			std::cout << x << std::endl;
-		}
 		int maxStart = totalTimeSeconds - secondsPerClip;
 		int start = rand() % (maxStart);
 		if (totalTimeSeconds > secondsPerClip)
