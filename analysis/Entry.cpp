@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
 	}
 	else
 	{
-		numGifs = (time % 60) + 4;
+		numGifs = (time / 60) + 4;
 	}
 	//Run through our strategies
 	
@@ -61,10 +61,11 @@ int main(int argc, char ** argv)
 		while (missingGIFs && lazyTimestamps.size())
 		{
 			std::cout << "added from LS" << std::endl;
+			std::cout << "LS size: " << lazyTimestamps.size() << std::endl;
 			timestamps.push_back(lazyTimestamps.at(0));
 			lazyTimestamps.erase(lazyTimestamps.begin());
-			numGifs++;
 			missingGIFs = numGifs - timestamps.size();
+			std::cout << "missing gifs: " << missingGIFs << std::endl;
 		}
 	}
 
