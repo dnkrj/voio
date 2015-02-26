@@ -275,7 +275,6 @@ static bool overlapsTooMuch(Timestamp t1, Timestamp t2) {
 	double Bstart = t2.getStart();
 	double Bend = t2.getEnd();
 	double delta = Aend - Astart;
-	if(Bend - Bstart < 0.5) return true;
 	if(Aend <= Bstart || Bend <= Astart) return false;
 	else {
 		if((Astart >= Bstart && Aend <= Bend) || (Bstart >= Astart && Bend <= Aend)) {
@@ -289,7 +288,6 @@ static bool overlapsTooMuch(Timestamp t1, Timestamp t2) {
 	return false;
 }
 void Filter::extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is) {
-	int size = int(is.size());
 	std::vector<Timestamp> ts;
 	for(auto t : is) {
 		bool safe = true;
@@ -299,8 +297,9 @@ void Filter::extractGifs(const std::string& filename, const std::string& path, i
 				break;
 			}
 		}
-		if(safe) ts.push_back(t);
+		if(safe && ((t.getEnd() - t.getStart()) > 0.5)) ts.push_back(t);
 	}
+	int size = int(ts.size());
 	if(size>MAX) {
 		double x = (double) (MAX);
 		double y = (double) (size);
@@ -320,15 +319,18 @@ void Filter::extractGifs(const std::string& filename, const std::string& path, i
 	if(!vc.reset()) throw "Error clearing frames.";
 }
 void Filter::extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is) {
-	int size = int(is.size());
 	std::vector<Timestamp> ts;
 	for(auto t : is) {
 		bool safe = true;
 		for(auto test : ts) {
-			safe = !overlapsTooMuch(t, test);
+			if(overlapsTooMuch(t, test)) {
+				safe = false;
+				break;
+			}
 		}
-		if(safe) ts.push_back(t);
+		if(safe && ((t.getEnd() - t.getStart()) > 0.5)) ts.push_back(t);
 	}
+	int size = int(ts.size());
 	if(size>MAX) {
 		double x = (double) (MAX);
 		double y = (double) (size);

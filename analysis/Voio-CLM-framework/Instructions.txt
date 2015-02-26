@@ -16,10 +16,16 @@ also need Cmake
 // framework
 To install run:
 
+
+
+cd <framework-directory>
 mkdir build
 cd build
 cmake ..
-make -j5
+sudo make -j5 install
+cd ..
+sudo rm -rf build
+
 
 
 To test run (continuing from previously)

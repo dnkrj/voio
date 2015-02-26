@@ -14,4 +14,4 @@ if(UNIX)
     target_link_libraries(FunctionalityTest ${OpenCV_LIBS} ${Boost_LIBRARIES} ${TBB_LIBRARIES})
 endif(UNIX)
 
-install (TARGETS FunctionalityTest DESTINATION ${CMAKE_BINARY_DIR}/Voio)
+install (TARGETS FunctionalityTest DESTINATION exe)
