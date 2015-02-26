@@ -23,8 +23,8 @@ using namespace cv;
 /*
 Number of grid points is nX*nY.
 */
-const int nX = 27;
-const int nY = 27;
+const int nX = 32;
+const int nY = 32;
 
 MotionAnalyzer::MotionAnalyzer() {
 	std::srand(std::time(0));
@@ -149,7 +149,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	
 		while(cap.get(CV_CAP_PROP_POS_MSEC)<end && cap.get(CV_CAP_PROP_POS_MSEC)<clipLength + start) {
 			cap >> f;
-			if(f.empty()) throw "Empty frames.";
+			if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
 	  
 			f.copyTo(image);
 			cvtColor(image, gray, COLOR_BGR2GRAY);
@@ -180,7 +180,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		int round = 0;
 		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
 			cap >> f;
-			if(f.empty()) throw "Empty frames.";
+			if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
 			f.copyTo(image);
 			cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
@@ -190,9 +190,11 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 						
 			while(round<4) {
 				cap >> f;
-				if(f.empty()) throw "Empty frames.";
+				if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
 				f.copyTo(image);
 				cvtColor(image, gray, COLOR_BGR2GRAY);
+				//imshow("Testing", gray);
+				//waitKey(30);
 
 				if(prevGray.empty()) gray.copyTo(prevGray);
 				calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize, 3, termcrit, 0, 0.001);
@@ -205,8 +207,13 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 				subtract(yptsA, yptsB, diffy);	
 				magnitude(diffx, diffy, mag);
 				//std::cout << "Round: " << round << std::endl;
-				
-				double val = 0.5*mean(mag)[0] + 0.5*calcRotation(fields[1], fields[0], dx, dy);
+				double L = 0.35*mean(mag)[0];
+				if(L > 30) L = 30;
+				double R = 42*calcRotation(fields[1], fields[0], dx, dy);
+				if(R > 30) R = 30;
+				std::cout << "Linear: " << L << std::endl;
+				std::cout << "Rotational: " << R << std::endl;
+				double val = L + R;
 				update(values, sum, val, index);
 				index++;
 				if(sum>sumr) {
@@ -233,7 +240,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		if(i>10) break;
 		normi = minT/kv.first;
 		std::cout << normi << std::endl;
-		if(normi>0.65) ret.push_back(kv.second);
+		if(normi>0.67) ret.push_back(kv.second);
 		i++;
 	}
 	
