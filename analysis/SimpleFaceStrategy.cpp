@@ -134,7 +134,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 		numGIFs = ((time) / 60) + 4;
 	}
 	
-	int secondsBetweenWindow = 15;
+	int secondsBetweenWindow = 5;
 	double indexGap = samplesPerSecond * secondsBetweenWindow;
 	std::cout << Windows[0].numFaces << std::endl;
 	std::cout << Windows[numWindows - 1].numFaces << std::endl;
