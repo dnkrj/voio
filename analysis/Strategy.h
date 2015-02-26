@@ -1,6 +1,6 @@
 #include <vector>
 #include <iostream>
-#include "gifs/gifcv.h"
+#include "gifs/timestamp.h"
 
 #ifndef STRAT
 #define STRAT

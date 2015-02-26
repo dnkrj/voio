@@ -22,6 +22,7 @@
 
 typedef std::vector<GifByteType> frame_t;
 std::vector<std::string> split(const std::string& s, char delim);
+#include "timestamp.h"
 
 /*Based on Marco Tarini's AnimatedGifSaver at
 http://sourceforge.net/p/giflib/patches/6/
@@ -53,21 +54,6 @@ class VideoConverter {
 		bool reset(void);
 		void extractGif(const std::string& src, const std::string& path, int uid, double start, double end);
 		void extractVid(const std::string& src, const std::string& path, int uid, double start, double end);
-};
-
-/*
-Timestamp class with integer variables defining start and end of video segment in milliseconds.
-*/
-class Timestamp {
-	double start;
-	double end;
-	public:
-		Timestamp();
-		Timestamp(double a, double b);
-		void create(double a, double b);
-		~Timestamp();
-		double getStart(void);
-		double getEnd(void);
 };
 
 /*

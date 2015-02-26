@@ -20,6 +20,7 @@
 #endif
 
 #include "gifcv.h"
+#include "timestamp.h"
 
 using namespace cv;
 
@@ -264,17 +265,6 @@ bool VideoConverter::save(const char* filename) {
 
   	return true;       
 }
-
-//Timestamp member functions.
-Timestamp::Timestamp(double a, double b) : start(a), end(b) {}
-Timestamp::Timestamp(void) {}
-void Timestamp::create(double a, double b) {
-	start = a;
-	end = b;
-}
-Timestamp::~Timestamp(void) {}
-double Timestamp::getStart(void) {return start;}
-double Timestamp::getEnd(void) {return end;}
 
 //Filter member functions.
 Filter::Filter(void) : vc(300, 300) {
