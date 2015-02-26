@@ -20,7 +20,7 @@ int main(int argc, char ** argv)
 		std::cout << "Usage : this <VideoName> <OutputPath> " << std::endl;
 	}
 	
-
+	srand(time(0));
 	std::vector<Timestamp> timestamps;
 	std::string filename = std::string(argv[1]);
 	std::string outputdir = std::string(argv[2]);
