@@ -14,6 +14,7 @@ using namespace cv;
 
 std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, int secondsPerClip)
 {
+
 	VideoCapture vidReader(filename);
 	long frameCount = vidReader.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vidReader.get(CV_CAP_PROP_FPS);
@@ -25,9 +26,11 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	
 	if (totalTimeMinutes == 0)
 	{
+		int maxStart = totalTimeSeconds - secondsPerClip;
+		int start = rand() % (maxStart);
 		if (totalTimeSeconds > secondsPerClip)
 		{
-			timestamps.push_back(Timestamp(0.0, secondsPerClip*1000));
+			timestamps.push_back(Timestamp(maxStart*1000, (maxStart+secondsPerClip)*1000));
 		}
 		return timestamps;
 	}
@@ -35,6 +38,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	for (int i = 0; i < totalTimeMinutes; i++)
 	{
 		int randomTime = rand() % (60-secondsPerClip);
+		std::cout << "Random: " << rand() << " " << randomTime << std::endl;
 		randomTime += i * 60;
 		timestamps.push_back(
 		Timestamp((randomTime)*1000, (randomTime + secondsPerClip)*1000));

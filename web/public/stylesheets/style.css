@@ -52,12 +52,12 @@ body {
 
 #logo {
 	float:left;
-	padding-left: 0px;
-	margin-right: -270px;
 	z-index: 4;
-	width: 230px;
-	height: 84px;
+	width: 150px;
+	height: 80px;
+	padding-left: 20px;
 	background: transparent url('/images/voio.png') no-repeat center scroll;
+	background-size: 150px 80px;
 }
 
 #menubutton {
@@ -115,6 +115,10 @@ body {
 
 .pending {
 	height: 400px;
+}
+
+.pending video {
+	margin-bottom: -5px;
 }
 
 .gifButton {
