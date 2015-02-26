@@ -86,49 +86,6 @@ module.exports = function(passport) {
 
 			}
 		);
-
-
-		// fs.readdir(__dirname + '/../public/user/' + userpage + '/a', function(err, files){
-		// 	if (! files) {
-		// 		message = "no gifs here."
-		// 	} else {
-		// 		gifs = files.map( function(dir) { return '"' + dir + '"'}).reverse();
-		// 	}
-            
-  //           var isOwner = req.user && req.user.local.username == userpage;
-  //           var isVerified = isOwner && req.user.local.verified;
-            
-  //           if(isOwner) {
-  //               //console.log("Trying to find the gifs now! "+ userpage);
-  //               fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
-  //                    if(pfiles) {
-  //                       pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
-  //                    }
-  //                   //console.log(pendingGifs);
-  //                   res.render('user', {
-  //                       title         : userpage + '&middot; Voio',
-  //                       userpage      : userpage,
-  //                       gifs          : DBgifs,
-  //                       user          : req.user.local,
-  //                       isOwner       : true, 
-  //                       isVerified	  : isVerified,
-  //                       hostname      : req.hostname,
-  //                       message       : req.flash('profileMessage'),
-  //                       pendingGifs   : pendingGifs
-  //                   });
-  //               });
-  //           } else {
-  //               res.render('user', {
-  //                   title         : userpage + '&middot; Voio',
-  //                   userpage      : userpage,
-  //                   isOwner       : false,
-  //                   isVerified	  : isVerified,
-  //                   gifs          : dbgifs,
-  //                   message       : message,
-  //                   pendingGifs   : pendingGifs
-  //               });
-  //           }
-  //       });
     });
 
 	router.get('/u/:id/:gif', function(req, res, next) {

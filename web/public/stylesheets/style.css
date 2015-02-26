@@ -117,6 +117,10 @@ body {
 	height: 400px;
 }
 
+.pending video {
+	margin-bottom: -5px;
+}
+
 .gifButton {
 	height: 50px;
 	width: 300px;
