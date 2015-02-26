@@ -30,7 +30,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 		int start = rand() % (maxStart);
 		if (totalTimeSeconds > secondsPerClip)
 		{
-			timestamps.push_back(Timestamp(maxStart*1000, (maxStart+secondsPerClip)*1000));
+			timestamps.push_back(Timestamp(start*1000, (start+secondsPerClip)*1000));
 		}
 		return timestamps;
 	}
