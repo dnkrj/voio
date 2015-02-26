@@ -22,6 +22,12 @@ function addUserGif() {
 
     $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + userpage + "/" + id + "'/><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video></a></div>");
 
+    $('#' + id + ' video').hover(function(){
+        this.play();
+    },function(){
+        this.pause()
+    });
+    
     $('#' + id).css('display', 'none');
     $('#' + id).fadeIn(1000);
 

@@ -1,17 +1,18 @@
 <% include head %>
-<script type="text/javascript" src="/javascripts/gifffer.js"></script>
 <% include title %>
 		<div id="container">
 			<h1><a href="/u/<%= userpage %>"><%= userpage %></a></h1>
-			<div class="gif" id="<%= gifview %>" style="">
-			<img data-gifffer="/user/<%= userpage %>/a/<%= gifview %>.gif" data-gifffer-width="300" data-gifffer-height="300" data-gifffer-link="/u/<%= userpage %>"/>
-			</div>
-			<p><a href="/u/<%= userpage %>">ALL GIFS</a></p>
+			<div class="gif" id="<%= gifview %>" style=""><a href="/u/<%= userpage %>">
+			<video width='300' height='300' loop webkit-playsinline><source src="/user/<%= userpage %>/a/<%= gifview %>.mp4" type='video/mp4'></video>
+			</a></div>
+			<p><a href="/u/<%= userpage %>">all clips uploaded by <%= userpage %></a></p>
 		</div>
 	</body>
-	<script>
-		window.onload = function() {
-    		Gifffer();
-		}
+	<script type="text/javascript">
+		$('video').hover(function(){
+        	this.play();
+    	},function(){
+    	    this.pause()
+    	});
 	</script>
 </html>
