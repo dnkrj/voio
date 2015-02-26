@@ -32,47 +32,103 @@ module.exports = function(passport) {
         var message = [];
         var pendingGifs = [];
         var gifs = [];
-		fs.readdir(__dirname + '/../public/user/' + userpage + '/a', function(err, files){
-			if (! files) {
-				message = "no gifs here."
-			} else {
-				gifs = files.map( function(dir) { return '"' + dir + '"'}).reverse();
+
+
+		var DBgifs = [];
+		User.findOne( { 'local.username' : userpage}, 
+			"posted _id op",
+			{ sort:{ posted: -1 } }, //Sort by Date posted DESC
+			function(err, user) {
+				console.log('query complete');
+				if (err) {
+					console.log(err);
+				}
+	        	var stream = Gif.find({ op: user._id }).stream();
+	        	stream.on('data', function(gif) {	        		
+	        		DBgifs.push('"' + gif._id + '.gif"');
+	        	}).on('close', function() {
+		        	var isOwner = req.user && req.user.local.username == userpage;
+	            	var isVerified = isOwner && req.user.local.verified;
+	            	console.log(DBgifs);
+		            if(isOwner) {
+		                //console.log("Trying to find the gifs now! "+ userpage);
+		                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
+		                     if(pfiles) {
+		                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
+		                     }
+		                    //console.log(pendingGifs);
+		                    res.render('user', {
+		                        title         : userpage + '&middot; Voio',
+		                        userpage      : userpage,
+		                        gifs          : DBgifs,
+		                        user          : req.user.local,
+		                        isOwner       : true, 
+		                        isVerified	  : isVerified,
+		                        hostname      : req.hostname,
+		                        message       : req.flash('profileMessage'),
+		                        pendingGifs   : pendingGifs
+		                    });
+		                });
+		            } else {
+		                res.render('user', {
+		                    title         : userpage + '&middot; Voio',
+		                    userpage      : userpage,
+		                    isOwner       : false,
+		                    isVerified	  : isVerified,
+		                    gifs          : DBgifs,
+		                    message       : message,
+		                    pendingGifs   : pendingGifs
+		                });
+		            }
+	        		
+	        	})
+
+
 			}
+		);
+
+
+		// fs.readdir(__dirname + '/../public/user/' + userpage + '/a', function(err, files){
+		// 	if (! files) {
+		// 		message = "no gifs here."
+		// 	} else {
+		// 		gifs = files.map( function(dir) { return '"' + dir + '"'}).reverse();
+		// 	}
             
-            var isOwner = req.user && req.user.local.username == userpage;
-            var isVerified = isOwner && req.user.local.verified;
+  //           var isOwner = req.user && req.user.local.username == userpage;
+  //           var isVerified = isOwner && req.user.local.verified;
             
-            if(isOwner) {
-                console.log("Trying to find the gifs now! "+ userpage);
-                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
-                     if(pfiles) {
-                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
-                     }
-                    console.log(pendingGifs);
-                    res.render('user', {
-                        title         : userpage + '&middot; Voio',
-                        userpage      : userpage,
-                        gifs          : gifs,
-                        user          : req.user.local,
-                        isOwner       : true, 
-                        isVerified	  : isVerified,
-                        hostname      : req.hostname,
-                        message       : req.flash('profileMessage'),
-                        pendingGifs   : pendingGifs
-                    });
-                });
-            } else {
-                res.render('user', {
-                    title         : userpage + '&middot; Voio',
-                    userpage      : userpage,
-                    isOwner       : false,
-                    isVerified	  : isVerified,
-                    gifs          : gifs,
-                    message       : message,
-                    pendingGifs   : pendingGifs
-                });
-            }
-        });
+  //           if(isOwner) {
+  //               //console.log("Trying to find the gifs now! "+ userpage);
+  //               fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
+  //                    if(pfiles) {
+  //                       pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
+  //                    }
+  //                   //console.log(pendingGifs);
+  //                   res.render('user', {
+  //                       title         : userpage + '&middot; Voio',
+  //                       userpage      : userpage,
+  //                       gifs          : DBgifs,
+  //                       user          : req.user.local,
+  //                       isOwner       : true, 
+  //                       isVerified	  : isVerified,
+  //                       hostname      : req.hostname,
+  //                       message       : req.flash('profileMessage'),
+  //                       pendingGifs   : pendingGifs
+  //                   });
+  //               });
+  //           } else {
+  //               res.render('user', {
+  //                   title         : userpage + '&middot; Voio',
+  //                   userpage      : userpage,
+  //                   isOwner       : false,
+  //                   isVerified	  : isVerified,
+  //                   gifs          : dbgifs,
+  //                   message       : message,
+  //                   pendingGifs   : pendingGifs
+  //               });
+  //           }
+  //       });
     });
 
 	router.get('/u/:id/:gif', function(req, res, next) {
@@ -168,7 +224,7 @@ module.exports = function(passport) {
 		newGif.tags    = "";
 		newGif.likes   = 0;
 		newGif.posted  = new Date();
-		newGif.url     = username + '/u/' + newgifname;
+		newGif.url     = username + '/a/' + newgifname;
 		newGif.op      = req.user._id;
 
 
