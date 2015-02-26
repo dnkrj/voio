@@ -67,6 +67,7 @@ module.exports = function(passport) {
                     newUser.local.password = newUser.generateHash(password);
                     newUser.local.verified = false;
                     newUser.local.vericode = random();
+                    newUser.local.subscribe.push(newUser._id);
                     var errorMessage = "There was a problem on our side.\nWe'll try and fix it soon!";
 
                     // save the user
