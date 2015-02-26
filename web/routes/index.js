@@ -18,9 +18,9 @@ module.exports = function(passport) {
 		var gifOps = [];
 		if (req.user) {
 	    	var stream = Gif.find({ op : { $in : req.user.local.subscribe } }).stream();
-	    	stream.on('data', function(gif) {	
-					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.mp4"');		
+	    	stream.on('data', function(gif) {
+				gifOps.push('"' + gif.opUsername + '"');
+				DBgifs.push('"' + gif._id + '.mp4"');		
 	    	}).on('close', function() {
 				res.render('index', {
 					user : req.user.local,
@@ -235,10 +235,9 @@ module.exports = function(passport) {
 				  					}
 				  				);			  						  
 				  			}
-				  			User.findByIdAndUpdate(
-				  				req.user._id,
-				  				{ push: { "local.own_gifs" : newGif._id } },
-				  				{},
+				  			User.update(
+				  				{ '_id' : req.user._id },
+				  				{ $push: { "local.own_gifs" : newGif._id } },
 				  				function(err) {
 				  					if (err) {
 				  						console.log("/// Failed to add reference to gif to user document. Returning to initial state.")
@@ -271,21 +270,24 @@ module.exports = function(passport) {
 	/* GET subscribe to a user */
 	router.get('/subscribe', function(req, res) {
 		var subscribeTo = req.query.user;
-		console.log("Subscribing to: " + subscribeTo);
-	  	User.findByIdAndUpdate(
-			req.user._id,
-			{ push: { "local.subscribe" : subscribeTo } },
-			{},
-			function(err) {
-				if (err) {
-					console.log(err);
-				}
-			}
-		);
 
-		User.findOne({ '_id' : req.user._id }, function(err, user) {
-			console.log(user);
-		})
+		User.findOne({ "local.username" : subscribeTo }, function(err, user) {
+			if (err) {
+				console.log(err);
+			} else {
+			  	User.update(
+					{ '_id' : req.user._id },
+					{ $push: { "local.subscribe" : user._id } },
+					function(err) {
+						if (err) {
+							console.log("/// Failed to subscribe.")
+							console.log(err);
+						}
+					}
+				);
+			}
+		});
+
 		res.redirect('/profile');
 	});
 

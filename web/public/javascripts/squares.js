@@ -13,14 +13,17 @@ $(window).scroll(function() {
 });
 
 function addUserGif() {
-    if (typeof ops !== 'undefined') {
-        userpage = ops[userCount];
+    var loc;
+    if (typeof userpage === 'undefined') {
+        loc = ops[userCount];
+    } else {
+        loc = userpage;
     }
     var gif = userGifURL();
-    var url = "/user/" + userpage + "/a/" + gif;
+    var url = "/user/" + loc + "/a/" + gif;
     var id = gif.split(".")[0];
 
-    $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + userpage + "/" + id + "'/><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video></a></div>");
+    $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + loc + "/" + id + "'/><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video></a></div>");
 
     $('#' + id + ' video').hover(function(){
         this.play();
@@ -30,8 +33,6 @@ function addUserGif() {
     
     $('#' + id).css('display', 'none');
     $('#' + id).fadeIn(1000);
-
-    Gifffer();
 }
 
 function userGifAvailable() {
