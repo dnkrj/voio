@@ -27,7 +27,7 @@
 			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
             <% if(isOwner) { %> <a href="/logout"><span>Log Out</span></a> 
             <% } else if(typeof user !== 'undefined') { %>
-            	<a href="/subscribe?user=" + userpage ><span>Subscribe</span></a>
+            	<a href="/subscribe?user=<%- userpage %>"><span>Subscribe</span></a>
             <% } %>
 		</div>
 
