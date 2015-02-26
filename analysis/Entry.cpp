@@ -28,9 +28,14 @@ int main(int argc, char ** argv)
 	VideoCapture vidInfo(filename);
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = vidInfo.get(CV_CAP_PROP_FPS);
+
+
 	
 	int time = frameCount / fps;
 	int numGifs;
+
+	std::cout << frameCount << " " << fps;
+	std::cout << " " << time << std::endl;
 	if (time < GifLength * 4) 
 	{
 		numGifs = time/GifLength;
@@ -73,7 +78,7 @@ int main(int argc, char ** argv)
 	std::cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
 	Filter filter;
-	filter.extractGifs(filename, outputdir, 0, timestamps);
+	filter.extractVids(filename, outputdir, 0, timestamps);
 
 	std::cout << "Pinging website for E-mail" << std::endl;
 	std::vector<std::string> sp = split(outputdir,'/' );
