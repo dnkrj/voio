@@ -275,6 +275,7 @@ static bool overlapsTooMuch(Timestamp t1, Timestamp t2) {
 	double Bstart = t2.getStart();
 	double Bend = t2.getEnd();
 	double delta = Aend - Astart;
+	if(Bend - Bstart < 0.5) return true;
 	if(Aend <= Bstart || Bend <= Astart) return false;
 	else {
 		if((Astart >= Bstart && Aend <= Bend) || (Bstart >= Astart && Bend <= Aend)) {
@@ -293,7 +294,10 @@ void Filter::extractGifs(const std::string& filename, const std::string& path, i
 	for(auto t : is) {
 		bool safe = true;
 		for(auto test : ts) {
-			safe = !overlapsTooMuch(t, test);
+			if(overlapsTooMuch(t, test)) {
+				safe = false;
+				break;
+			}
 		}
 		if(safe) ts.push_back(t);
 	}
@@ -321,7 +325,7 @@ void Filter::extractVids(const std::string& filename, const std::string& path, i
 	for(auto t : is) {
 		bool safe = true;
 		for(auto test : ts) {
-			safe = overlapsTooMuch(t, test);
+			safe = !overlapsTooMuch(t, test);
 		}
 		if(safe) ts.push_back(t);
 	}
