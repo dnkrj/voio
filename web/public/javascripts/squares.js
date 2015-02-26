@@ -13,6 +13,9 @@ $(window).scroll(function() {
 });
 
 function addUserGif() {
+    if (typeof ops !== 'undefined') {
+        userpage = ops[userCount];
+    }
     var gif = userGifURL();
     var url = "/user/" + userpage + "/a/" + gif;
     var id = gif.split(".")[0];
