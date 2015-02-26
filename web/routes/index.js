@@ -18,9 +18,9 @@ module.exports = function(passport) {
 		var gifOps = [];
 		if (req.user) {
 	    	var stream = Gif.find({ op : { $in : req.user.local.subscribe } }).stream();
-	    	stream.on('data', function(gif) {	
-					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.gif"');		
+	    	stream.on('data', function(gif) {
+				gifOps.push('"' + gif.opUsername + '"');
+				DBgifs.push('"' + gif._id + '.mp4"');		
 	    	}).on('close', function() {
 				res.render('index', {
 					user : req.user.local,
@@ -33,7 +33,7 @@ module.exports = function(passport) {
 	    	var stream = Gif.find().stream();
 	    	stream.on('data', function(gif) {	
 					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.gif"');	
+					DBgifs.push('"' + gif._id + '.mp4"');	
 	    	}).on('close', function() {
 				res.render('index', {
 			      	title: 'Voio',
@@ -62,7 +62,7 @@ module.exports = function(passport) {
 				}
 	        	var stream = Gif.find({ op: user._id }).stream();
 	        	stream.on('data', function(gif) {	        		
-	        		DBgifs.push('"' + gif._id + '.gif"');
+	        		DBgifs.push('"' + gif._id + '.mp4"');
 	        	}).on('close', function() {
 		        	var isOwner = req.user && req.user.local.username == userpage;
 	            	var isVerified = isOwner && req.user.local.verified;
@@ -84,6 +84,7 @@ module.exports = function(passport) {
 		                    });
 		                });
 		            } else if (req.user) {
+		            	console.log('');
 		                res.render('user', {
 		                    title         : userpage + '&middot; Voio',
 		                    userpage      : userpage,
@@ -92,7 +93,8 @@ module.exports = function(passport) {
 		                    gifs          : DBgifs,
 		                    message       : message,
 		                    pendingGifs   : pendingGifs,
-		                    user          : req.user.local
+		                    user          : req.user.local,
+		                    subscribed	  : req.user.local.subscribe.indexOf(user._id)
 		                });
 		            } else {
 		                res.render('user', {
@@ -200,7 +202,7 @@ module.exports = function(passport) {
 		var gifname    = req.params.gif;
 
 		var newGif = new Gif();
-		var newgifname = newGif._id + ".gif";
+		var newgifname = newGif._id + ".mp4";
 
 		newGif.caption    = "";
 		newGif.tags       = "";
@@ -212,7 +214,7 @@ module.exports = function(passport) {
 
 
 
-		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
 				  __dirname + '/../public/user/' + username + '/a/' + newgifname,
 				  function (err) {
 				  	if (err) {
@@ -226,7 +228,7 @@ module.exports = function(passport) {
 				  				// Putting back in pending folder
 				  				fs.rename(
 				  					__dirname + '/../public/user/' + username + '/a/' + newgifname,
-				  					__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  					__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
 				  					function(err) {
 				  						if (err) {
 				  						  	console.log('/// Failed to return to pending directory.');
@@ -235,10 +237,9 @@ module.exports = function(passport) {
 				  					}
 				  				);			  						  
 				  			}
-				  			User.findByIdAndUpdate(
-				  				req.user._id,
-				  				{ push: { "local.own_gifs" : newGif._id } },
-				  				{},
+				  			User.update(
+				  				{ '_id' : req.user._id },
+				  				{ $push: { "local.own_gifs" : newGif._id } },
 				  				function(err) {
 				  					if (err) {
 				  						console.log("/// Failed to add reference to gif to user document. Returning to initial state.")
@@ -257,8 +258,8 @@ module.exports = function(passport) {
 	router.get('/d/:gif', isLoggedIn(true), function(req, res) {
 		var username = req.user.local.username;
 		var gifname = req.params.gif;
-		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
-				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.gif',
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
+				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.mp4',
 				  function (err) {
 				  	if (err) {
 				  		console.log("/// FAILed to delete: " + gifname + ", for user: " + username);
@@ -271,17 +272,52 @@ module.exports = function(passport) {
 	/* GET subscribe to a user */
 	router.get('/subscribe', function(req, res) {
 		var subscribeTo = req.query.user;
-	  	User.findByIdAndUpdate(
-			req.user._id,
-			{ push: { "local.subscribe" : subscribeTo } },
-			{},
-			function(err) {
-				if (err) {
-					console.log(err);
-				}
+
+		User.findOne({ "local.username" : subscribeTo }, function(err, user) {
+			if (err) {
+				console.log(err);
+			} else {
+			  	User.update(
+					{ '_id' : req.user._id },
+					{ $push: { "local.subscribe" : user._id } },
+					function(err) {
+						if (err) {
+							console.log("/// Failed to subscribe.")
+							console.log(err);
+						}
+					}
+				);
 			}
-		);
+		});
+
+		res.redirect('/profile');
 	});
+
+	/* get unsubscribe form a user */
+	router.get('/unsubscribe', function(req, res) {
+		var unsubscribeFrom = req.query.user;
+
+		User.findOne({ "local.username" : unsubscribeFrom }, function(err, user) {
+			if (err) {
+				console.log(err);
+			} else {
+			  	User.update(
+					{ '_id' : req.user._id },
+					{ $pull: { "local.subscribe" : user._id } },
+					function(err) {
+						if (err) {
+							console.log("/// Failed to unsubscribe.")
+							console.log(err);
+						}
+					}
+				);
+			}
+		});
+
+		res.redirect('/profile');
+	});	
+
+
 
     /* GET logout page */
     // logs the user out and then redirects to the home page

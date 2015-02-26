@@ -113,6 +113,10 @@ body {
 	display: inline-block;
 }
 
+.gif a:hover {
+	opacity: 1;
+}
+
 .pending {
 	height: 400px;
 }
