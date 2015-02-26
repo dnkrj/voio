@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
-project (VOIO_analysis)
+
+project (VOIO-CLM-framework)
+
 if(UNIX)
 	MESSAGE(“UNIX    detected“)
 else()
@@ -18,7 +20,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 set(CMAKE_BUILD_TYPE “Release”)
 
+set(CMAKE_EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/exe/)
 
+set(CMAKE_LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib/)
+
+set(CMAKE_INSTALL_PREFIX ../../CLM/)
 
 # OpenCV
 
@@ -120,6 +126,13 @@ endif ()
 	find_package(Eigen2 REQUIRED)  
 	INCLUDE_DIRECTORIES(${EIGEN2_INCLUDE_DIR})	
 
+# GIFLIB
+
+	find_package(GIFLIB REQUIRED)
+	INCLUDE_DIRECTORIES(${GIFLIB_INCLUDE_DIR})
+	LINK_DIRECTORIES(${GIF_LIBRARY})
+
+
 # dlib
 include_directories(lib/3rdParty/dlib/include)
 
@@ -134,4 +147,6 @@ add_subdirectory(lib/local/FaceAnalyser)
 add_subdirectory(Voio/FunctionalityTest)
 add_subdirectory(Voio/Analysis)
 
-
+file(COPY "lib/3rdParty/dlib/include/dlib" DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+file(COPY "lib/3rdParty/OpenCV/classifiers" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)
+file(COPY "lib/local/CLM/model" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)

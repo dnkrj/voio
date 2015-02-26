@@ -5,28 +5,31 @@
 //  Created by Laurynas Karazija on 18/02/15.
 //
 
+//CLM
 #include <CLM.h>
 #include <CLMTracker.h>
 #include <CLMParameters.h>
 #include <CLM_utils.h>
 
+//standard CPP
 #include <fstream>
 #include <sstream>
 #include <array>
 #include <cmath>
 
+//openCV
 #include <cv.h>
 
+//TBB
 #include<tbb/tbb.h>
 
-#define GIF_L 2
+#include "analysis.h"
+
 #define NUM_Faces 8
+#define SEARCH_FREQ 8
+#define MAX_NUMBER_SEGMENTS 60
 using namespace std;
 using namespace cv;
-
-bool verbose = false;
-bool output_to_file = false;
-
 
 
 
@@ -90,45 +93,40 @@ void NonOverlapingDetections(const vector<CLMTracker::CLM>& clm_models, vector<R
     }
 }
 
-bool runCLManalysis (vector<double> &result, double &framerate,string filename)
+struct FrameInfo{
+    double frametime;
+    double weight;
+    int facecount;
+    vector<array<double, 4>> fv;
+};
+
+//Function to walk the video and use CLM to extract and track faces
+bool runCLManalysisFile (vector<FrameInfo> &result, double &framerate,string filename, bool verbose = false, bool output_to_file=false, bool debug= false)
 {
-    vector<string> arguments;
-    // Some initial parameters that can be overriden from command line
-    // By default try webcam 0
-    int device = 0;
-    CLMTracker::CLMParameters clm_params(arguments);
-    clm_params.use_face_template = true;
+    CLMTracker::CLMParameters params;
+    params.use_face_template = true;
+    params.quiet_mode = !verbose;
     // This is so that the model would not try re-initialising itself
-    clm_params.reinit_video_every = -1;
-    //very slow
-    //clm_params.curr_face_detector = CLMTracker::CLMParameters::HOG_SVM_DETECTOR;
-    //use instead
-    clm_params.curr_face_detector = CLMTracker::CLMParameters::HAAR_DETECTOR;
+    params.reinit_video_every = -1;
+    //params.curr_face_detector = CLMTracker::CLMParameters::HOG_SVM_DETECTOR;  -->slow
+    params.curr_face_detector = CLMTracker::CLMParameters::HAAR_DETECTOR;     //-->try insteads
     vector<CLMTracker::CLMParameters> clm_parameters;
-    clm_parameters.push_back(clm_params);
-    
+    clm_parameters.push_back(params);
     // The modules that are being used for tracking
-    vector<CLMTracker::CLM> clm_models;
+    vector<CLMTracker::CLM> models;
     vector<bool> active_models;
-    
-    
     //How MANY faces we track... SIGNIFICANT IMPACT ON PERFORMACE
     int num_faces_max = NUM_Faces;
     
-    CLMTracker::CLM clm_model(clm_parameters[0].model_location);
-    clm_model.face_detector_HAAR.load(clm_parameters[0].face_detector_location);
-    clm_model.face_detector_location = clm_parameters[0].face_detector_location;
-    
-    clm_models.reserve(num_faces_max);
-    
-    clm_models.push_back(clm_model);
-    active_models.push_back(false);
-    
-    for (int i = 1; i < num_faces_max; ++i)
+    CLMTracker::CLM model(clm_parameters[0].model_location);
+    model.face_detector_HAAR.load(clm_parameters[0].face_detector_location);
+    model.face_detector_location = clm_parameters[0].face_detector_location;
+    models.reserve(num_faces_max);
+    for (int i = 0; i < num_faces_max; i++)
     {
-        clm_models.push_back(clm_model);
+        models.push_back(model);
         active_models.push_back(false);
-        clm_parameters.push_back(clm_params);
+        clm_parameters.push_back(params);
     }
     
     int frame_count = 0;
@@ -137,68 +135,64 @@ bool runCLManalysis (vector<double> &result, double &framerate,string filename)
     VideoCapture video_capture(filename);
     if(!video_capture.isOpened())  // check if we succeeded
         return false;
-    Mat captured_image;
-    video_capture >> captured_image;
+    Mat frame;
+    video_capture >> frame;
     frame_count++;
     //Some Constants:
-    float cx = captured_image.cols / 2.0f;
-    float cy = captured_image.rows / 2.0f;
+    float cx = frame.cols / 2.0f;
+    float cy = frame.rows / 2.0f;
     float fx = 600, fy = 600;
     int vidFC = video_capture.get(CV_CAP_PROP_FRAME_COUNT);
     framerate = video_capture.get(CV_CAP_PROP_FPS);
     
-    ofstream out;
-    out.open(filename + "_wav.txt");
-    
-    
     //Visualisations --------------
-    int w =video_capture.get(CV_CAP_PROP_FRAME_WIDTH);
-    int h =video_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-    Size vidSize(w,h);
-    //output file
     VideoWriter writerFace;
-    writerFace = VideoWriter(filename+"_out.avi", video_capture.get(CV_CAP_PROP_FOURCC), 23.59, vidSize);
-    if(!writerFace.isOpened())
-    {
-        cout<<"The output file is bad"<<endl;
-    }
-    namedWindow("tracking_result",1);
+    int w, h;
     Mat disp_image;
-    //Mat waveform;
-    //waveform = Mat::zeros( num_faces_max *3 *10,vidFC, CV_32S);
+    if(verbose){
+        if(debug){
+            w =video_capture.get(CV_CAP_PROP_FRAME_WIDTH);
+            h =video_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+            Size vidSize(w,h);
+            //output file
+            writerFace = VideoWriter(filename+"_out.avi", CV_FOURCC('D', 'V', 'I', 'X'), 25, vidSize);
+            if(!writerFace.isOpened()){
+                cout<<"The output file is bad"<<endl;
+                return false;
+            }
+        }
+        namedWindow(filename,1);
+    }
     //Visualisations --------------
     
-    
-    out<<num_faces_max<<endl;
-    out<<vidFC<<endl;
-    out<<framerate<<endl;
+    //prepare result vector;
     result.clear();
     result.reserve(vidFC);
+    
     Mat_<float> depth_image;
     Mat_<uchar> grayscale_image;
-   // Starting tracking
-    while(!captured_image.empty())
+    // Starting tracking
+    while(!frame.empty())
     {
+        FrameInfo frameFeatures;
         
         // Reading the images
-       
+        disp_image = frame.clone();
         
-        disp_image = captured_image.clone();
-        
-        if(captured_image.channels() == 3)
+        if(frame.channels() == 3)
         {
-            cvtColor(captured_image, grayscale_image, CV_BGR2GRAY);
+            cvtColor(frame, grayscale_image, CV_BGR2GRAY);
         }
         else
         {
-            grayscale_image = captured_image.clone();
+            grayscale_image = frame.clone();
         }
         
         
         vector<Rect_<double> > face_detections;
         
         bool all_models_active = true;
-        for(unsigned int model = 0; model < clm_models.size(); ++model)
+        for(unsigned int model = 0; model < models.size(); ++model)
         {
             if(!active_models[model])
             {
@@ -206,36 +200,28 @@ bool runCLManalysis (vector<double> &result, double &framerate,string filename)
             }
         }
         //SIGNIFICANT IMPACT ON PERFORMACE ---- when do we run facedetection?
-        // Get the detections (every 8th frame and when there are free models available for tracking)
-        if(frame_count % 8 == 0 && !all_models_active)
+        if(frame_count % SEARCH_FREQ == 0 && !all_models_active)
         {
-            if(clm_parameters[0].curr_face_detector == CLMTracker::CLMParameters::HOG_SVM_DETECTOR)
-            {
-                vector<double> confidences;
-                CLMTracker::DetectFacesHOG(face_detections, grayscale_image, clm_models[0].face_detector_HOG, confidences);
-            }
-            else
-            {
-                CLMTracker::DetectFaces(face_detections, grayscale_image, clm_models[0].face_detector_HAAR);
-            }
+    
+            CLMTracker::DetectFaces(face_detections, grayscale_image, models[0].face_detector_HAAR);
             
         }
         
         // Keep only non overlapping detections (also convert to a concurrent vector
-        NonOverlapingDetections(clm_models, face_detections);
+        NonOverlapingDetections(models, face_detections);
         
         
         vector<tbb::atomic<bool> > face_detections_used(face_detections.size());
         
         // Go through every model and update the trackingpull out as a separate parallel/non-parallel method
-        tbb::parallel_for(0, (int)clm_models.size(), [&](int model){
+        tbb::parallel_for(0, (int)models.size(), [&](int model){
             bool detection_success = false;
             
             // If the current model has failed more than 4 times in a row, remove it
-            if(clm_models[model].failures_in_a_row > 4)
+            if(models[model].failures_in_a_row > 4)
             {
                 active_models[model] = false;
-                clm_models[model].Reset();
+                models[model].Reset();
                 
             }
             
@@ -250,11 +236,11 @@ bool runCLManalysis (vector<double> &result, double &framerate,string filename)
                     {
                         
                         // Reinitialise the model
-                        clm_models[model].Reset();
+                        models[model].Reset();
                         
                         // This ensures that a wider window is used for the initial landmark localisation
-                        clm_models[model].detection_success = false;
-                        detection_success = CLMTracker::DetectLandmarksInVideo(grayscale_image, depth_image, face_detections[detection_ind], clm_models[model], clm_parameters[model]);
+                        models[model].detection_success = false;
+                        detection_success = CLMTracker::DetectLandmarksInVideo(grayscale_image, depth_image, face_detections[detection_ind], models[model], clm_parameters[model]);
                         
                         // This activates the model
                         active_models[model] = true;
@@ -268,109 +254,104 @@ bool runCLManalysis (vector<double> &result, double &framerate,string filename)
             else
             {
                 // The actual facial landmark detection / tracking
-                detection_success = CLMTracker::DetectLandmarksInVideo(grayscale_image, depth_image, clm_models[model], clm_parameters[model]);
+                detection_success = CLMTracker::DetectLandmarksInVideo(grayscale_image, depth_image, models[model], clm_parameters[model]);
             }
         });
         
-        // STEP OF MAGIC ------------------------------------------ STEP OF MAGIC
         // Going through every model and visualising the results
         
         int num_active_models = 0;
         vector<std::array<double, 3> > frameFV;
         
-        for(size_t model = 0; model < clm_models.size(); ++model)
+        for(size_t model = 0; model < models.size(); ++model)
         {
             // Visualising the results
             // Drawing the facial landmarks on the face and the bounding box around it if tracking is successful and initialised
-            double detection_certainty = clm_models[model].detection_certainty;
+            double certainty = models[model].detection_certainty;
             
             double visualisation_boundary = -0.1;
             
             // Only draw if the reliability is reasonable, the value is slightly ad-hoc
-            if(detection_certainty < visualisation_boundary)
+            if(certainty < visualisation_boundary)
             {
-                CLMTracker::Draw(disp_image, clm_models[model]);
+                CLMTracker::Draw(disp_image, models[model]);
                 
-                if(detection_certainty > 1)
-                    detection_certainty = 1;
-                if(detection_certainty < -1)
-                    detection_certainty = -1;
+                if(certainty > 1)
+                    certainty = 1;
+                if(certainty < -1)
+                    certainty = -1;
                 
-                detection_certainty = (detection_certainty + 1)/(visualisation_boundary +1);
+                certainty = (certainty + 1)/(visualisation_boundary +1);
                 
                 // Work out the pose of the head from the tracked model
-                Vec6d pose_estimate_CLM = CLMTracker::GetCorrectedPoseCameraPlane(clm_models[model], fx, fy, cx, cy, clm_parameters[model]);
+                Vec6d estimatedPose = CLMTracker::GetCorrectedPoseCameraPlane(models[model], fx, fy, cx, cy, clm_parameters[model]);
                 
-                //double orientation = abs((1.0 - abs(pose_estimate_CLM[3]))*(1.0 - abs(pose_estimate_CLM[4])));
-                double orientation = get_orientation_weight(pose_estimate_CLM[3], pose_estimate_CLM[4], pose_estimate_CLM[5]);
+                double orientation = get_orientation_weight(estimatedPose[3], estimatedPose[4], estimatedPose[5]);
                 
-//
-//                if(abs(pose_estimate_CLM[3]) <0.4 //Up and down looking
-//                   && abs(pose_estimate_CLM[4] < 0.5)) //Left and right looking
-//                   orientation =1;
+                double face_size = models[model].GetBoundingBox().area()/ (frame.cols * frame.rows);
                 
-                double face_size = clm_models[model].GetBoundingBox().area()/ (w * h);
-                //cout<< model << " " <<orientation <<endl;
-                array<double, 3> arr({{detection_certainty, face_size, orientation}});
+                array<double, 3> arr({{certainty, face_size, orientation}});
                 frameFV.push_back(arr);
                 
                 //Visualisations -------------- Begin
-                int thickness = (int)std::ceil(2.0* ((double)captured_image.cols) / 640.0);
-                // Draw it in reddish if uncertain, blueish if certain
-                CLMTracker::DrawBox(disp_image, pose_estimate_CLM, Scalar(face_size*20 *255,orientation*255, detection_certainty *2 *255), thickness, fx, fy, cx, cy);
+                if(verbose){
+                    int thickness = (int)std::ceil(2.0* ((double)frame.cols) / 640.0);
+                    // Draw it in reddish if uncertain, blueish if certain
+                    CLMTracker::DrawBox(disp_image, estimatedPose, Scalar(face_size*20 *255,orientation*255, certainty *2 *255), thickness, fx, fy, cx, cy);
+                }
                 //Visualisations -------------- End
-
+                
                 num_active_models++;
             }
         }
         double frameWeight = 0;
         for(int i =0; i<frameFV.size(); i++){
-            frameWeight += wF(frameFV[i]);
+            double single_weight =wF(frameFV[i]);
+            frameWeight += single_weight;
+            array<double, 4> arr({{single_weight, frameFV[i][0], frameFV[i][1], frameFV[i][2]}});
+            frameFeatures.fv.push_back(arr);
         }
-        out<<frameWeight<<endl;
-        result.push_back(frameWeight);
-    
-        // STEP OF MAGIC ------------------END--------------------- STEP OF MAGIC
-        
-        
+        //result.push_back(frameWeight);
+        frameFeatures.facecount = num_active_models;
+        frameFeatures.frametime = video_capture.get(CV_CAP_PROP_POS_MSEC);
+        frameFeatures.weight = frameWeight;
         //Visualisations -------------- BEGIN
-        //waveform.at<int>(waveform.rows - (int(frameWeight*20) - 1), frame_count) = 255;
-        //cout<<frameWeight*20<<endl;
-        
-        char progress[255];
-        sprintf(progress, "%d // %d", frame_count, vidFC);
-        string progress_s("Progress: ");
-        progress_s += progress;
-        putText(disp_image, progress_s, cv::Point(10,20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255,0,0));
-        char active_models_char[255];
-        sprintf(active_models_char, "%d", num_active_models);
-        string active_models_string("Active models:");
-        active_models_string += active_models_char;
-        cv::putText(disp_image, active_models_string, cv::Point(10,40), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(0,0,255));
-        for(int i = 0; i<frameFV.size(); i++){
-            stringstream label;
-            label<<"#"<<i<< " CERT: "<< int(frameFV[i][0]*100) <<"% SIZE: "<<frameFV[i][1]<<" ORTN: "<< frameFV[i][2];
-            putText(disp_image, label.str(), cv::Point(10, h - 20 - i*20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(125,125,255));
-        }
-        stringstream wei;
-        wei<<"Weight: "<<frameWeight;
-        cv::putText(disp_image, wei.str(), cv::Point(10,60), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(125,0,255));
-        imshow("tracking_result", disp_image);
-        writerFace << disp_image;
-        if(waitKey(30) >= 0){
-            while (true) {
-                if(waitKey(30) >= 0) break;
+        if(verbose){
+            stringstream prep;
+            prep<<"Progress: "<<frame_count<<" // "<<vidFC<<"  T-"<<frameFeatures.frametime;
+            putText(disp_image, prep.str(), Point(10,20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255,0,0));
+            prep.str("");
+            prep<<"Active models: "<<num_active_models<<" // "<<num_faces_max;
+            putText(disp_image, prep.str(), Point(10,40), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(0,0,255));
+            prep.str("");
+            prep<<"Weight: "<<frameWeight;
+            putText(disp_image, prep.str(), Point(10,60), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(125,0,255));
+            //cout<<frameFeatures.fv.size()<<endl;
+            for(int i = 0; i<frameFeatures.fv.size(); i++){
+                prep.str("");
+                prep<<"#"<<i<< " CERT: "<< int(frameFeatures.fv[i][1]*100) <<"% SIZE: "<<frameFeatures.fv[i][2]<<" ORTN: "<< frameFeatures.fv[i][3] << " W: "<< frameFeatures.fv[i][0];
+                //cout<<prep.str()<<endl;
+                putText(disp_image, prep.str(), Point(10, frame.rows - 20 - i*20), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(125,125,255));
+            }
+            imshow(filename, disp_image);
+            if(debug){
+                writerFace << disp_image;
+            }
+            if(waitKey(30) >= 0){
+                while (true) {
+                    if(waitKey(30) >= 0) break;
+                }
             }
         }
-        //imwrite(filename+"_waveform.png", waveform);
         //Visualisations -------------- END
-        video_capture >> captured_image;
+        result.push_back(frameFeatures);
+        video_capture >> frame;
         frame_count++;
     }
-    out.close();
-    //imwrite(filename+"_waveform.png", waveform);
     return true;
 }
+
+
 void smooth(const vector<double> &f, vector<double> &f_prime, int smooth_size=3){
     f_prime.clear();
     f_prime.reserve(f.size());
@@ -382,11 +363,25 @@ void smooth(const vector<double> &f, vector<double> &f_prime, int smooth_size=3)
         f_prime.push_back(value/smooth_size);
     }
 }
+
 struct Segment{
+    double framestart;
+    double frameend;
     int start;
     double sum;
+    //vector<FrameInfo> fv;
 };
-bool getSegmentVector(const vector<double> &in, vector<Segment> &out, int segLen){
+
+void printVectorToFile(const vector<double> &in, string file){
+    ofstream out;
+    out.open(file);
+    out<<in.size();
+    for(int i =0; i<in.size(); i++){
+        out<<in[i]<<endl;
+    }
+}
+
+bool getSegmentVector(const vector<FrameInfo> &in, vector<Segment> &out, int segLen){
     //retuns sums of segments
     if (segLen > in.size()) return false;
     out.clear();
@@ -394,21 +389,26 @@ bool getSegmentVector(const vector<double> &in, vector<Segment> &out, int segLen
     double sum =0;
     Segment s;
     for(int i = 0; i <segLen; i++){
-        sum+=in[i];
+        sum+=in[i].weight;
     }
     s.start = 0;
     s.sum = sum;
+    s.framestart = in[0].frametime;
+    s.frameend = in[segLen-1].frametime;
     out.push_back(s);
     for(int i = segLen; i <in.size(); i++){
         Segment a;
-        sum = sum + in[i] - in[i-segLen];
+        sum = sum + in[i].weight - in[i-segLen].weight;
         a.start =i-segLen +1;
         a.sum = sum;
+        a.frameend=in[i].frametime;
+        a.framestart = in[i-segLen-1].frametime;
         out.push_back(a);
     }
     return true;
 }
-bool getMaxSeg(int &to_rtn, vector<Segment> &in, double sumTolerance,int segLen, int padding){
+
+bool getMaxSeg(Segment &to_rtn, vector<Segment> &in, double sumTolerance,int segLen, int padding){
     //cout<<in.size()<<" ";
     auto first= in.begin();
     auto max = first;
@@ -424,8 +424,8 @@ bool getMaxSeg(int &to_rtn, vector<Segment> &in, double sumTolerance,int segLen,
         first++;
     }
     
-    to_rtn = max->start;
-    if(to_rtn < sumTolerance){
+    to_rtn = *max;
+    if(to_rtn.sum < sumTolerance){
         return false;
         //ran out of options;
     }
@@ -444,23 +444,17 @@ bool getMaxSeg(int &to_rtn, vector<Segment> &in, double sumTolerance,int segLen,
         }
         erend++;
     }
-//    int i =1;
-//    cout<<"start erase : ";
-//    while(erstart!=erend){
-//        cout<<i++<<" ";
-//        in.erase(erstart++);
-//    }
-//    cout<<" size ";
     in.erase(erstart, erend);
-    //cout<<in.size()<<endl;
     return true;
 }
+
 void FtoMat(const vector<double> &in, Mat &out){
     out = Mat::zeros( NUM_Faces *3 *10,in.size(), CV_32S);
     for(int frame_count = 0; frame_count < in.size(); frame_count++){
         out.at<double>(out.rows - (int)in[frame_count]*20 -1, frame_count) = 255;
     }
 }
+
 void derivative(const vector<double> &f, vector<double> &f_prime){
     f_prime.clear();
     f_prime.reserve(f.size()-1);
@@ -468,61 +462,29 @@ void derivative(const vector<double> &f, vector<double> &f_prime){
         f_prime.push_back(f[i]-f[i-1]);
     }
 }
-int main (int argc, char **argv){
-    string filename = "/Users/laurynaskarazija/Documents/TestVid.mp4";
-    //string filename = "/Users/laurynaskarazija/videos/0217_03_006_alanis_morissette.avi";
-    vector<double> clm_results;
+
+
+std::vector<Timestamp> CLMstatery::processVideoComp(const std::string& filename, int secondsPerClip, bool verbose, bool output_to_file){
+    vector<FrameInfo> clm_results;
     double fps =30;
-    runCLManalysis(clm_results,fps, filename);
-    int segLen = (int) fps * GIF_L;
-//    int numFace, size;
-//    ifstream in;
-//    in.open(filename+"_wav.txt");
-//    in>>numFace;
-//    in>>size;
-//    in>>fps;
-//    //cout<<size<<endl;
-//    for(int i = 0; i < size; i++){
-//        double inp;
-//        in>>inp;
-//        //cout<<inp<<endl;
-//        clm_results.push_back(inp);
-//    }
-//    in.close();
+    runCLManalysisFile(clm_results,fps, filename, verbose);
+    //cout<<clm_results.size()<<endl;
+    int segLen = (int) fps * secondsPerClip;
     cout<<"Analysis Complete"<<endl;
-//    vector<double> clm_results_smoothed;
-//    smooth(clm_results, clm_results_smoothed, 5);
-//    int giflength_in_frames = (int) GIF_L*fps;
-//    Mat displ;
-//    FtoMat(clm_results_smoothed, displ);
-//    namedWindow("smoothed", 1);
-//    imshow("smoothed", displ);
-//    imwrite(filename+"_waveform.png_smoothed.png", displ);
     vector<Segment> segmentVec;
     getSegmentVector(clm_results, segmentVec, segLen);
-//    cout<<segmentVec.size()<<endl;
-//    for(int i= 0; i < segmentVec.size(); i++){
-//        cout<<i<<" "<< segmentVec[i].sum<<endl;
-//    }
-    ofstream output;
-    output.open(filename+"_timestamps");
-    int i=0;
-    int start= 0;
-    while(getMaxSeg(start, segmentVec, 0.95,segLen, segLen*3)){
-        output<<start<<" "<<start+segLen<<endl;
-        //cout<<start<<" "<<start+segLen<<endl;
-        if(++i > 50){
+    Segment s;
+    int i =0;
+    vector<Timestamp> result;
+    while(getMaxSeg(s, segmentVec, 0.95,segLen, segLen*3)){
+        Timestamp t(s.framestart, s.frameend);
+        result.push_back(t);
+        if(++i > MAX_NUMBER_SEGMENTS){
             break;
         }
     }
-    output.close();
-//
-//    
-    
-    //waitKey(0);
-    return 0;
+    return result;
 }
-
-
-
-bool proccess(vector<pair<int, int> > )
+std::vector<Timestamp> CLMstatery::processVideo(const std::string& filename, int secondsPerClip){
+    return CLMstatery::processVideoComp(filename, secondsPerClip);
+}

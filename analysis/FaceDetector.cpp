@@ -13,10 +13,11 @@
 #include <opencv2/highgui/highgui.hpp>
 
 
-FaceDetector::FaceDetector(string file1, string file2) : face_cascade(file1), eye_cascade(file2){
+FaceDetector::FaceDetector(string face, string eyes, string nose, string mouth)
+: face_cascade(face), eye_cascade(eyes), nose_cascade(nose), mouth_cascade(mouth)
+{
 };
 FaceDetector::~FaceDetector(){
-    //empty for now
 };
 
 void FaceDetector::populateWithRectangles(const vector<Rect> &vkt, Mat &img, const Scalar &clr, const Point &tl ){
@@ -38,20 +39,23 @@ void FaceDetector::detectAndMark(Mat &im){
     face_cascade.detectMultiScale(grey, faces);
     auto first = faces.begin();
     auto last = faces.end();
-    //cvtColor(edges, edges, COLOR_GRAY2RGB);
-    //im+=edges;
     while (first!=last) {
         Mat reducedFace;
         reducedFace = grey.rowRange(first->y, first->y + first->height).colRange(first->x, first->x + first->width);
-        //Mat reducedFace2(reducedFace);
-        vector<Rect> eyes;
-        eye_cascade.detectMultiScale(reducedFace, eyes);
-        Scalar clr = CLR_blue;
-        if (eyes.size() >= 2){
-            clr = CLR_green;
+        vector<Rect> eyeV;
+        vector<Rect> noseV;
+        vector<Rect> mouthV;
+        eye_cascade.detectMultiScale(reducedFace, eyeV);
+        nose_cascade.detectMultiScale(reducedFace, noseV);
+        mouth_cascade.detectMultiScale(reducedFace,mouthV);
+        if (eyeV.size() >= 2, noseV.size() >0, mouthV.size()>0){
+            //proper face
+            rectangle(im, *first, CLR_green);
+            populateWithRectangles(eyeV, im, CLR_red, first->tl());
+            populateWithRectangles(noseV, im, CLR_red, first->tl());
+            populateWithRectangles(mouthV, im, CLR_red, first->tl());
         }
-        rectangle(im, *first, clr);
-        populateWithRectangles(eyes, im, CLR_red, first->tl());
+        rectangle(im, *first, CLR_blue);
         first++;
     }
     

@@ -20,16 +20,17 @@ private:
     Scalar CLR_red = Scalar(0,0,255,1);
     Scalar CLR_blue = Scalar(255,0,0,1);
     Scalar CLR_green = Scalar(0,255,0,1);
-    
-    
-    
-    
     CascadeClassifier face_cascade;
     CascadeClassifier eye_cascade;
+    CascadeClassifier nose_cascade;
+    CascadeClassifier mouth_cascade;
     void populateWithRectangles(const vector<Rect> &vkt, Mat &img, const Scalar &clr, const Point &tl );
 public:
-    FaceDetector(string file1="/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml",
-                 string file2="/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml");
+    FaceDetector(string face="haarcascade_frontalface_default.xml",
+                 string eyes="haarcascade_eye.xml"
+                 string nose="haarcascade_nose.xml"
+                 string mouth="haarcascade_mouth.xml");
     ~FaceDetector();
+    //actural work done here
     void detectAndMark(Mat &im);
 };
