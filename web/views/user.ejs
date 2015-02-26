@@ -22,7 +22,7 @@
 
 		<div id="container">
 			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
-            <a href="/logout"><span>Log Out</span></a>
+            <% if(isOwner){%><a href="/logout"><span>Log Out</span></a><%}%>
 			<% if (message.length > 0) { %>
 			   	<div class="message"><%= message %></div> 
             <% } %>

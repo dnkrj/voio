@@ -20,7 +20,7 @@ module.exports = function(passport) {
 	    	var stream = Gif.find({ op : { $in : req.user.local.subscribe } }).stream();
 	    	stream.on('data', function(gif) {	
 					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.gif"');		
+					DBgifs.push('"' + gif._id + '.mp4"');		
 	    	}).on('close', function() {
 				res.render('index', {
 					user : req.user.local,
@@ -33,7 +33,7 @@ module.exports = function(passport) {
 	    	var stream = Gif.find().stream();
 	    	stream.on('data', function(gif) {	
 					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.gif"');	
+					DBgifs.push('"' + gif._id + '.mp4"');	
 	    	}).on('close', function() {
 				res.render('index', {
 			      	title: 'Voio',
@@ -62,7 +62,7 @@ module.exports = function(passport) {
 				}
 	        	var stream = Gif.find({ op: user._id }).stream();
 	        	stream.on('data', function(gif) {	        		
-	        		DBgifs.push('"' + gif._id + '.gif"');
+	        		DBgifs.push('"' + gif._id + '.mp4"');
 	        	}).on('close', function() {
 		        	var isOwner = req.user && req.user.local.username == userpage;
 	            	var isVerified = isOwner && req.user.local.verified;
@@ -189,7 +189,7 @@ module.exports = function(passport) {
 		var gifname    = req.params.gif;
 
 		var newGif = new Gif();
-		var newgifname = newGif._id + ".gif";
+		var newgifname = newGif._id + ".mp4";
 
 		newGif.caption    = "";
 		newGif.tags       = "";
@@ -201,7 +201,7 @@ module.exports = function(passport) {
 
 
 
-		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
 				  __dirname + '/../public/user/' + username + '/a/' + newgifname,
 				  function (err) {
 				  	if (err) {
@@ -215,7 +215,7 @@ module.exports = function(passport) {
 				  				// Putting back in pending folder
 				  				fs.rename(
 				  					__dirname + '/../public/user/' + username + '/a/' + newgifname,
-				  					__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
+				  					__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
 				  					function(err) {
 				  						if (err) {
 				  						  	console.log('/// Failed to return to pending directory.');
@@ -245,8 +245,8 @@ module.exports = function(passport) {
 	router.get('/d/:gif', isLoggedIn(true), function(req, res) {
 		var username = req.user.local.username;
 		var gifname = req.params.gif;
-		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',
-				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.gif',
+		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.mp4',
+				  __dirname + '/../public/user/' + username + '/d/' + Date.now() + '.mp4',
 				  function (err) {
 				  	if (err) {
 				  		console.log("/// FAILed to delete: " + gifname + ", for user: " + username);
