@@ -83,6 +83,17 @@ module.exports = function(passport) {
 		                        pendingGifs   : pendingGifs
 		                    });
 		                });
+		            } else if (req.user) {
+		                res.render('user', {
+		                    title         : userpage + '&middot; Voio',
+		                    userpage      : userpage,
+		                    isOwner       : false,
+		                    isVerified	  : isVerified,
+		                    gifs          : DBgifs,
+		                    message       : message,
+		                    pendingGifs   : pendingGifs,
+		                    user          : req.user.local
+		                });
 		            } else {
 		                res.render('user', {
 		                    title         : userpage + '&middot; Voio',
@@ -92,7 +103,7 @@ module.exports = function(passport) {
 		                    gifs          : DBgifs,
 		                    message       : message,
 		                    pendingGifs   : pendingGifs
-		                });
+		                });		            	
 		            }
 	        		
 	        	})
@@ -226,14 +237,15 @@ module.exports = function(passport) {
 				  			}
 				  			User.findByIdAndUpdate(
 				  				req.user._id,
-				  				{ push: { "own_gifs" : newGif._id } },
+				  				{ push: { "local.own_gifs" : newGif._id } },
 				  				{},
 				  				function(err) {
 				  					if (err) {
 				  						console.log("/// Failed to add reference to gif to user document. Returning to initial state.")
 				  						console.log(err);
 				  					}
-				  				});
+				  				}
+				  			);
 
 				  		});
 				  	}
@@ -254,6 +266,21 @@ module.exports = function(passport) {
 				  	}
 				  	res.end();
 				  });
+	});
+
+	/* GET subscribe to a user */
+	router.get('/subscribe', function(req, res) {
+		var subscribeTo = req.query.user;
+	  	User.findByIdAndUpdate(
+			req.user._id,
+			{ push: { "local.subscribe" : subscribeTo } },
+			{},
+			function(err) {
+				if (err) {
+					console.log(err);
+				}
+			}
+		);
 	});
 
     /* GET logout page */

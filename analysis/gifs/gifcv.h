@@ -66,7 +66,7 @@ class Filter {
 	public:
 		Filter();
 		~Filter();
-		void extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts);
-		void extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts);
+		void extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is);
+		void extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is);
 };
 #endif

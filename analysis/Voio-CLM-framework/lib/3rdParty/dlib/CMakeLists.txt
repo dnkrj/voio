@@ -427,3 +427,7 @@ if (NOT TARGET dlib)
 
 
 endif()
+
+#file(GLOB dlibfiles "include/dlib/*")
+install (TARGETS dlib DESTINATION lib)
+#file(COPY "include/dlib" DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
