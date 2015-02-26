@@ -16,31 +16,32 @@ module.exports = function(passport) {
 	router.get('/', function(req, res, next) {
 		var DBgifs = [];
 		var gifOps = [];
-    	var stream = Gif.find().stream();
-    	stream.on('data', function(gif) {	
-				gifOps.push('"' + gif.opUsername + '"');
-				DBgifs.push('"' + gif._id + '.gif"');
-				console.log(DBgifs);		
-    	}).on('close', function() {
-    		console.log(DBgifs);
-
-			if (req.user) {
+		if (req.user) {
+	    	var stream = Gif.find({ op : { $in : req.user.local.subscribe } }).stream();
+	    	stream.on('data', function(gif) {	
+					gifOps.push('"' + gif.opUsername + '"');
+					DBgifs.push('"' + gif._id + '.gif"');		
+	    	}).on('close', function() {
 				res.render('index', {
 					user : req.user.local,
 			      	title: 'Voio',
 			      	gifs : DBgifs,
 			      	ops  : gifOps
-			    });
-			} else {
+			    });  		
+	    	});
+	    } else {
+	    	var stream = Gif.find().stream();
+	    	stream.on('data', function(gif) {	
+					gifOps.push('"' + gif.opUsername + '"');
+					DBgifs.push('"' + gif._id + '.gif"');	
+	    	}).on('close', function() {
 				res.render('index', {
 			      	title: 'Voio',
 			      	gifs : DBgifs,
 			      	ops  : gifOps
 			    });			
-			}    		
-    	});
-
-
+	    	});	    	
+	    }
 
 	});
 
