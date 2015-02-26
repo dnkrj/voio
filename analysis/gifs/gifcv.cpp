@@ -267,11 +267,36 @@ bool VideoConverter::save(const char* filename) {
 }
 
 //Filter member functions.
-Filter::Filter(void) : vc(300, 300) {
-}
+Filter::Filter(void) : vc(300, 300) {}
 Filter::~Filter(void) {}
-void Filter::extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts) {
-	int size = int(ts.size());
+static bool overlapsTooMuch(Timestamp t1, Timestamp t2) {
+	double Astart = t1.getStart();
+	double Aend = t1.getEnd();
+	double Bstart = t2.getStart();
+	double Bend = t2.getEnd();
+	double delta = Aend - Astart;
+	if(Aend <= Bstart || Bend <= Astart) return false;
+	else {
+		if((Astart >= Bstart && Aend <= Bend) || (Bstart >= Astart && Bend <= Aend)) {
+			return true;
+		} else if(Astart > Bstart) {
+			return ((Bend - Astart)/delta) > 0.4;
+		} else if(Bstart > Astart) {
+			return ((Aend - Bstart)/delta) > 0.4;
+		}
+	}
+	return false;
+}
+void Filter::extractGifs(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is) {
+	int size = int(is.size());
+	std::vector<Timestamp> ts;
+	for(auto t : is) {
+		bool safe = true;
+		for(auto test : ts) {
+			safe = !overlapsTooMuch(t, test);
+		}
+		if(safe) ts.push_back(t);
+	}
 	if(size>MAX) {
 		double x = (double) (MAX);
 		double y = (double) (size);
@@ -290,8 +315,16 @@ void Filter::extractGifs(const std::string& filename, const std::string& path, i
 	}
 	if(!vc.reset()) throw "Error clearing frames.";
 }
-void Filter::extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& ts) {
-	int size = int(ts.size());
+void Filter::extractVids(const std::string& filename, const std::string& path, int uid, std::vector<Timestamp>& is) {
+	int size = int(is.size());
+	std::vector<Timestamp> ts;
+	for(auto t : is) {
+		bool safe = true;
+		for(auto test : ts) {
+			safe = overlapsTooMuch(t, test);
+		}
+		if(safe) ts.push_back(t);
+	}
 	if(size>MAX) {
 		double x = (double) (MAX);
 		double y = (double) (size);
