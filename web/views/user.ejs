@@ -1,9 +1,9 @@
 <% include head %>
 
 	<script>
-		var gifs = [<%- gifs %>];
-		var userpage = "<%- userpage %>";
-		var isOwner = "<%- isOwner %>";
+		var gifs        = [<%- gifs %>];
+		var userpage    = "<%- userpage %>";
+		var isOwner     = "<%- isOwner %>";
 		var pendingGifs = [];
 		if( isOwner ) {
 			pendingGifs = [<%- pendingGifs %>];
@@ -27,7 +27,11 @@
 			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
             <% if(isOwner) { %> <a href="/logout"><span>Log Out</span></a> 
             <% } else if(typeof user !== 'undefined') { %>
-            	<a href="/subscribe?user=<%- userpage %>"><span>Subscribe</span></a>
+            	<% if (subscribed < 0) {%>
+            		<a href="/subscribe?user=<%- userpage %>"><span>Subscribe</span></a>
+            	<% } else {%>
+            		<a href="/unsubscribe?user=<%- userpage %>"><span>Unsubscribe</span></a>
+            	<% } %>
             <% } %>
 		</div>
 

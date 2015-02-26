@@ -84,6 +84,7 @@ module.exports = function(passport) {
 		                    });
 		                });
 		            } else if (req.user) {
+		            	console.log('');
 		                res.render('user', {
 		                    title         : userpage + '&middot; Voio',
 		                    userpage      : userpage,
@@ -92,7 +93,8 @@ module.exports = function(passport) {
 		                    gifs          : DBgifs,
 		                    message       : message,
 		                    pendingGifs   : pendingGifs,
-		                    user          : req.user.local
+		                    user          : req.user.local,
+		                    subscribed	  : req.user.local.subscribe.indexOf(user._id)
 		                });
 		            } else {
 		                res.render('user', {
@@ -290,6 +292,32 @@ module.exports = function(passport) {
 
 		res.redirect('/profile');
 	});
+
+	/* get unsubscribe form a user */
+	router.get('/unsubscribe', function(req, res) {
+		var unsubscribeFrom = req.query.user;
+
+		User.findOne({ "local.username" : unsubscribeFrom }, function(err, user) {
+			if (err) {
+				console.log(err);
+			} else {
+			  	User.update(
+					{ '_id' : req.user._id },
+					{ $pull: { "local.subscribe" : user._id } },
+					function(err) {
+						if (err) {
+							console.log("/// Failed to unsubscribe.")
+							console.log(err);
+						}
+					}
+				);
+			}
+		});
+
+		res.redirect('/profile');
+	});	
+
+
 
     /* GET logout page */
     // logs the user out and then redirects to the home page
