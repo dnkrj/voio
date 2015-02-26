@@ -9,4 +9,6 @@ compile: SimpleFaceStrategy.cpp LazyStrategy.cpp Entry.cpp
 	$(CC) Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp $(CFLAGS) $(LIBS) $(LINK) $(OUTPUT)
 
 compile-local: SimpleFaceStrategy.cpp LazyStrategy.cpp Entry.cpp
-	$(CC) Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp $(CFLAGS) $(LIBS) $(LINK-LOCAL) $(OUTPUT)
+	$(CC) Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp $(CFLAGS) $(LINKLOCAL) $(LIBS) $(OUTPUT)
+	
+	cp mainOutput.o ~/Development/mainOutput.o

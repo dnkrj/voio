@@ -49,7 +49,8 @@ int main(int argc, char ** argv)
 	{
 		timestamps.push_back(simpleFaceTimestamps.at(i));
 	}
-
+	std::cout << "Now generating Lazy TS" << std::endl;
+	
 	while (timestamps.size() < numGifs)
 	{
 		LazyStrategy ls;
@@ -59,9 +60,11 @@ int main(int argc, char ** argv)
 		int index = 0;
 		while (missingGIFs && lazyTimestamps.size())
 		{
+			std::cout << "added from LS" << std::endl;
 			timestamps.push_back(lazyTimestamps.at(0));
 			lazyTimestamps.erase(lazyTimestamps.begin());
 			numGifs++;
+			missingGIFs = numGifs - timestamps.size();
 		}
 	}
 
