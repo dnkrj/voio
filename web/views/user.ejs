@@ -3,16 +3,16 @@
 	<script>
 		var gifs = [<%- gifs %>];
 		var userpage = "<%- userpage %>";
-	var isOwner = "<%- isOwner %>";
-	var pendingGifs = [];
-	if( isOwner ) {
-		pendingGifs = [<%- pendingGifs %>];
-	}	
+		var isOwner = "<%- isOwner %>";
+		var pendingGifs = [];
+		if( isOwner ) {
+			pendingGifs = [<%- pendingGifs %>];
+		}	
 	</script>
 
 	<% if(isOwner) { %>
 	  <link rel="stylesheet" href="/stylesheets/user.css">
-		<script type="text/javascript" src="/javascripts/upload.js"></script>
+	  <script type="text/javascript" src="/javascripts/upload.js"></script>
 	  <script type="text/javascript" src="/javascripts/pending.js"></script>
 	<% } else {%>
 		<script type="text/javascript" src="/javascripts/squares.js"></script>
@@ -21,10 +21,13 @@
 <% include title %>
 
 		<div id="container">
-			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
-            <a href="/logout"><span>Log Out</span></a>
 			<% if (message.length > 0) { %>
 			   	<div class="message"><%= message %></div> 
+            <% } %>
+			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
+            <% if(isOwner) { %> <a href="/logout"><span>Log Out</span></a> 
+            <% } else if(typeof user !== 'undefined') { %>
+            	<a href="/subscribe?user=" + userpage ><span>Subscribe</span></a>
             <% } %>
 		</div>
 
@@ -63,6 +66,8 @@
 		<div id="user_container">
 			<% if( isOwner ) { %>
 					<h1>Public Clips</h1>
+		   	<% } else {%>
+		   		<h1>Public Clips</h1>
 		   	<% } %>
 		</div>
 
