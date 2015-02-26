@@ -1,6 +1,6 @@
 #include "MotionAnalyzer.h"
 
-#include "gifs/gifcv.h"
+#include "gifs/timestamp.h"
 
 #ifndef _OPEN_CV
 #define _OPEN_CV
@@ -211,8 +211,8 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 				if(L > 30) L = 30;
 				double R = 42*calcRotation(fields[1], fields[0], dx, dy);
 				if(R > 30) R = 30;
-				std::cout << "Linear: " << L << std::endl;
-				std::cout << "Rotational: " << R << std::endl;
+				//std::cout << "Linear: " << L << std::endl;
+				//std::cout << "Rotational: " << R << std::endl;
 				double val = L + R;
 				update(values, sum, val, index);
 				index++;

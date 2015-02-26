@@ -1,7 +1,7 @@
 #ifndef _MOTION_ANALYZER
 #define _MOTION_ANALYZER
 
-#include "gifs/gifcv.h"
+#include "gifs/timestamp.h"
 
 #ifndef _OPEN_CV
 #define _OPEN_CV

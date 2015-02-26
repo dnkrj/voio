@@ -14,16 +14,34 @@ module.exports = function(passport) {
 	
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
-		if (req.user) {
-			res.render('index', {
-				user: req.user.local,
-		      	title: 'Voio'
-		    });
-		} else {
-			res.render('index', {
-		      	title: 'Voio'
-		    });			
-		}
+		var DBgifs = [];
+		var gifOps = [];
+    	var stream = Gif.find().stream();
+    	stream.on('data', function(gif) {	
+				gifOps.push('"' + gif.opUsername + '"');
+				DBgifs.push('"' + gif._id + '.gif"');
+				console.log(DBgifs);		
+    	}).on('close', function() {
+    		console.log(DBgifs);
+
+			if (req.user) {
+				res.render('index', {
+					user : req.user.local,
+			      	title: 'Voio',
+			      	gifs : DBgifs,
+			      	ops  : gifOps
+			    });
+			} else {
+				res.render('index', {
+			      	title: 'Voio',
+			      	gifs : DBgifs,
+			      	ops  : gifOps
+			    });			
+			}    		
+    	});
+
+
+
 	});
 
 	/* GET user page. */
@@ -31,15 +49,13 @@ module.exports = function(passport) {
 		var userpage = req.params.id;
         var message = [];
         var pendingGifs = [];
-        var gifs = [];
 
 
 		var DBgifs = [];
 		User.findOne( { 'local.username' : userpage}, 
-			"posted _id op",
+			"_id",
 			{ sort:{ posted: -1 } }, //Sort by Date posted DESC
 			function(err, user) {
-				console.log('query complete');
 				if (err) {
 					console.log(err);
 				}
@@ -177,12 +193,14 @@ module.exports = function(passport) {
 		var newGif = new Gif();
 		var newgifname = newGif._id + ".gif";
 
-		newGif.caption = "";
-		newGif.tags    = "";
-		newGif.likes   = 0;
-		newGif.posted  = new Date();
-		newGif.url     = username + '/a/' + newgifname;
-		newGif.op      = req.user._id;
+		newGif.caption    = "";
+		newGif.tags       = "";
+		newGif.likes      = 0;
+		newGif.posted     = new Date();
+		newGif.url        = username + '/a/' + newgifname;
+		newGif.op         = req.user._id;
+		newGif.opUsername = username;
+
 
 
 		fs.rename(__dirname + '/../public/user/' + username + '/p/' + gifname + '.gif',

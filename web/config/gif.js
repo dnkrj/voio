@@ -6,7 +6,8 @@ var gifSchema = new mongoose.Schema({
 	likes		: Number,
     posted      : Date,
     url         : String,
-	op			: mongoose.Schema.ObjectId
+	op       	: mongoose.Schema.ObjectId,
+	opUsername  : String
 });
 
 module.exports = mongoose.model('Gif' , gifSchema);
