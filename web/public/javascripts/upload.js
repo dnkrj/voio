@@ -1,6 +1,6 @@
 $(function() {
   $('#upFile').change( function() {
-    if (isOwner && verified) {
+    if (isOwner) {
       var formData = new FormData();
       var file = document.getElementById('upFile').files[0];
 
@@ -33,12 +33,6 @@ $(function() {
       };
       
       xhr.send(formData);
-    } else {
-      $('#upButton').fadeOut(1000);
-      $('#upFile').hide();
-      $('div.message').text("Please verify email before uploading a video.");
-      $('#upMessage').css('opacity', '1');
-      $('div.progress').slideUp(500);
     }
 
     
