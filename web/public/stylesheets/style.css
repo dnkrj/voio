@@ -60,38 +60,22 @@ body {
 	background: transparent url('/images/voio.png') no-repeat center scroll;
 }
 
-#menu {
+#menubutton {
 	float: right;
-	height: 80px;
-	overflow: hidden;
-	margin: 0;
-	text-align: right;
+	height: 40px;
+	margin: 17px 30px 17px 0;
+	padding: 0 20px 0 20px;
+	border: 3px solid #000;
+	line-height: 40px;
+	text-transform: uppercase;
+	letter-spacing: 2px;
 	z-index: 2;
+	transition: opacity 0.5s, letter-spacing 0.5s;
 }
 
-#menu:hover {
-	height: auto;
-}
-
-#menu li {
-	list-style: none;
-	font-size: 24px;
-	line-height: 80px;
-	height:80px;
-	padding: 0 40px 0 40px;
-	background-color: #fff;
-	border-top: 1px solid #ccc;
-	transition: opacity 0.2s;
-}
-
-#menu li:hover {
-	opacity: 0.8;
-}
-
-#menu #open {
-	font-size: 32px;
-	background-color: transparent;
-	border-top: 0;
+#menubutton:hover {
+	opacity: 0.6;
+	letter-spacing: 5px;
 }
 
 #container, #user_container, #upload_container, #pending_container, #signup_form, #login_form {
@@ -112,6 +96,14 @@ body {
 #upload_container {
 	max-width: 600px;
 	margin: 60px auto 0 auto;
+}
+
+#home_container {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 200px 0 200px 0;
+	text-align: center;
+	background-color: #a0f;
 }
 
 .gif {

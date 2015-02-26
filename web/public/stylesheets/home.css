@@ -4,12 +4,11 @@ body {
 }
 
 a {
-	color: white;
+	color: #fff;
 }
 
-#menu li {
-	background: transparent;
-	border:none;
+#menubutton {
+	border-color: #fff;
 }
 
 #title {
@@ -19,4 +18,8 @@ a {
 
 #logo {
 	background-image: url('/images/voiow.png');
+}
+
+#user_container {
+	padding-top: 30px;
 }
