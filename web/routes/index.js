@@ -66,14 +66,11 @@ module.exports = function(passport) {
 	        	}).on('close', function() {
 		        	var isOwner = req.user && req.user.local.username == userpage;
 	            	var isVerified = isOwner && req.user.local.verified;
-	            	console.log(DBgifs);
 		            if(isOwner) {
-		                //console.log("Trying to find the gifs now! "+ userpage);
 		                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
 		                     if(pfiles) {
 		                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
 		                     }
-		                    //console.log(pendingGifs);
 		                    res.render('user', {
 		                        title         : userpage + '&middot; Voio',
 		                        userpage      : userpage,
@@ -302,7 +299,6 @@ module.exports = function(passport) {
     	var id    = req.query._id;
         var email = req.query.email;
         var code  = req.query.code;
-        console.log("verifying");
         User.findOneAndUpdate( 
         	{ 
         		'_id'            : id,
@@ -321,9 +317,7 @@ module.exports = function(passport) {
     });
 
     router.get('/ready', function(req, res) {
-    	console.log(req.query.user);
     	User.findOne({ 'local.username' : req.query.user }, function(err, user) {
-    		console.log(user);
     		if (err) {
     			console.log(err);
     			res.send('FAILED');
