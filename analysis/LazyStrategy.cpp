@@ -36,6 +36,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 	for (int i = 0; i < totalTimeMinutes; i++)
 	{
 		int randomTime = rand() % (60-secondsPerClip);
+		std::cout << "Random: " << rand() << " " << randomTime << std::endl;
 		randomTime += i * 60;
 		timestamps.push_back(
 		Timestamp((randomTime)*1000, (randomTime + secondsPerClip)*1000));
