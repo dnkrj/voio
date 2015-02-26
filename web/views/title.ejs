@@ -2,17 +2,9 @@
 <body>
 	<div id="title">
 		<a id="logo" href="/"></a>
-		<ul id="menu">
-			<a class="button" href="#"><li id="open">&#9776;</li></a>
-			<% if (typeof user !== 'undefined') { %>
-				<% if (!user.verified) { %> 
-					<a class="button" href="/send?to=<%- user.email %>&code=<%- user.vericode %>"><li>verify email</li></a>
-				<% } %>
-				<a class="button" href="/profile"><li>my profile</li></a>
-				<a class="button" href="/logout"><li>log out</li></a>
-			<% } else { %>
-				<a class="button" href="/login"><li>log in</li></a>
-				<a class="button" href="/signup"><li>sign up</li></a>
-			<% } %>
-		</ul>
+		<% if (typeof user !== 'undefined') { %>
+			<a href="/profile"><div id="menubutton">create</div></a>
+		<% } else { %>
+			<a href="/login"><div id="menubutton">sign in</div></a>
+		<% } %>
 	</div>
