@@ -14,7 +14,11 @@
 			</div>
 		<% } %>
 		<div id="user_container">
-			<h1 id="pageExplore">explore <a href="/feed" class="hLink">feed</a></h1>
+			<% if (user) { %>
+				<h1 id="pageExplore">explore <a href="/feed" class="hLink">feed</a></h1>
+			<% } else { %>
+				<h1>explore</h1>
+			<% } %>
 		</div>
 	</body>
 </html>
