@@ -5,9 +5,10 @@
 #ifndef _OPEN_CV
 #define _OPEN_CV
 #include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/video.hpp"
 #endif
 
@@ -55,12 +56,11 @@ void MotionAnalyzer::getWindows(double length, std::vector<Timestamp>& ts) {
 	}
 }
 
-static double update(std::vector<double>& values, double& sum, double value, unsigned int& index) {	
+static void update(std::vector<double>& values, double& sum, double value, unsigned int& index) {	
 	if(index>=values.size()) index = 0;
 	sum -= values[index];
 	values[index] = value;
 	sum += value;
-	return sum;
 }
 
 //Precondition: points are ordered as {{(x1,y1), (x2,y1), ...}, {(x1,y2), (x2,y2), ...}, ...}

@@ -5,7 +5,8 @@
 		var userpage    = "<%- userpage %>";
 		var isOwner     = "<%- isOwner %>";
 		var pendingGifs = [];
-		if( isOwner ) {
+
+		if( isOwner === 'true' ) {
 			pendingGifs = [<%- pendingGifs %>];
 		}	
 	</script>
