@@ -16,12 +16,31 @@ module.exports = function(passport) {
 	router.get('/', function(req, res, next) {
 		var DBgifs = [];
 		var gifOps = [];
+
 		if (req.user) {
-	    	var stream = Gif.find({ op : { $in : req.user.local.subscribe } }).stream();
-	    	stream.on('data', function(gif) {
-				gifOps.push('"' + gif.opUsername + '"');
-				DBgifs.push('"' + gif._id + '.mp4"');		
-	    	}).on('close', function() {
+
+			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
+			stream.on('data', function(user) {
+				var i;
+				for (i=0; i < user.local.own_gifs.length; i++) {
+					gifOps.push('"' + user.local.username + '"');
+					DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
+					//console.log(DBgifs);
+				}
+
+				for (i=0; i < user.local.reblog_gifs.length; i++) {
+					Gif.findOneById( user.local.reblog_gifs[i], function(err, gif) {
+						if (err) {
+							console.log(err);
+						} else if (gif) {
+							gifOps.push('"' + gif.opUsername + '"');
+							DBgifs.push('"' + gif._id + '.mp4"');	
+						}
+					} );
+				}
+			}).on('close', function() {
+				console.log(DBgifs);
+				console.log(gifOps);
 				res.render('index', {
 					user : req.user.local,
 			      	title: 'Voio',
@@ -29,6 +48,8 @@ module.exports = function(passport) {
 			      	ops  : gifOps
 			    });  		
 	    	});
+
+
 	    } else {
 	    	var stream = Gif.find().stream();
 	    	stream.on('data', function(gif) {	
