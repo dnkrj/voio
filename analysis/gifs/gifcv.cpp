@@ -132,7 +132,7 @@ bool VideoConverter::addFrame(uint8_t* data, float dt) {
 
 void VideoConverter::extractGif(const std::string& src, const std::string& path, int uid, double start, double end) {
 	if(!outputPalette) throw "Error creating colour map.";
-    std::cout << "Saving GIF between " << start << " and " << end << std::endl;
+	std::cout << "Saving GIF between " << start << " and " << end << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
         Mat frame;
@@ -183,34 +183,34 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		if(!cap.read(temp)) throw "Error reading frames.";
 		double dt = cap.get(CV_CAP_PROP_POS_MSEC) - t0;
 		double fps = 1000/dt;
-        Mat frame;
-        Mat frame_c;
-        Mat frame_r;
-        Mat frame_n;
-        Mat frame_f;
-        double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
-        double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-        cap.set(CV_CAP_PROP_POS_MSEC, start);
-        double ratio = width/height;
-        VideoWriter video(vp, CV_FOURCC('M','J','P','G'), fps, Size(gifsx, gifsy), true);
+		Mat frame;
+		Mat frame_c;
+		Mat frame_r;
+		Mat frame_n;
+		Mat frame_f;
+		double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+		double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+		cap.set(CV_CAP_PROP_POS_MSEC, start);
+		double ratio = width/height;
+		VideoWriter video(vp, CV_FOURCC('M','J','P','G'), fps, Size(gifsx, gifsy), true);
         	
-        while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-        	if(!cap.read(frame)) throw "Error reading frames.";
-        	if(ratio < 1) {
-         		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
-	       	} else if(ratio > 1) {
-                getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
-       		} else {
-        		frame_c = frame;
-        	}
+		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
+			if(!cap.read(frame)) throw "Error reading frames.";
+			if(ratio < 1) {
+				getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
+			} else if(ratio > 1) {
+				getRectSubPix(frame, Size((int) height, (int) height), Point2f((float) width/2, (float) height/2), frame_c, -1);
+			} else {
+				frame_c = frame;
+			}
 			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_CUBIC);
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "avconv -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4";
+	std::string cmd = "/usr/bin/avconv -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4";
 	system(cmd.c_str());
 	//std::string cmd2 = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path) + ".webm";
-	//system(cmd.c_str());
+	//system(cmd2.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
 }
