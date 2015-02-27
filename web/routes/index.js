@@ -21,15 +21,16 @@ module.exports = function(passport) {
 
 			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
 			stream.on('data', function(user) {
-				var i;
+				var i, j;
 				for (i=0; i < user.local.own_gifs.length; i++) {
 					gifOps.push('"' + user.local.username + '"');
 					DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
 					//console.log(DBgifs);
 				}
 
-				for (i=0; i < user.local.reblog_gifs.length; i++) {
-					Gif.findOneById( user.local.reblog_gifs[i], function(err, gif) {
+				for (j=0; j < user.local.reblog_gifs.length; j++) {
+					Gif.findById( user.local.reblog_gifs[j], function(err, gif) {
+						console.log("Adding gif: " + gif._id);
 						if (err) {
 							console.log(err);
 						} else if (gif) {
@@ -39,8 +40,8 @@ module.exports = function(passport) {
 					} );
 				}
 			}).on('close', function() {
-				console.log(DBgifs);
-				console.log(gifOps);
+				console.log("CLOSE: " + DBgifs);
+				console.log("CLOSE: " + gifOps);
 				res.render('index', {
 					user : req.user.local,
 			      	title: 'Voio',
@@ -141,6 +142,7 @@ module.exports = function(passport) {
 	router.get('/u/:id/:gif', function(req, res, next) {
 		var userpage = req.params.id;
 		var gifview = req.params.gif;
+		var isOwner = req.user && req.user.local.username == userpage;
 		var userlocal;
 		if (req.user) {
 			userlocal = req.user.local;
@@ -149,6 +151,7 @@ module.exports = function(passport) {
 	      	title      : userpage + '&middot; Voio',
 	      	userpage   : userpage,
 	  	    gifview    : gifview,
+	  	    isOwner    : isOwner,
 	  	    user       : userlocal
 	    });
 	});
@@ -316,7 +319,24 @@ module.exports = function(passport) {
 		res.redirect('/profile');
 	});
 
-	/* get unsubscribe form a user */
+	/* GET reblog a gif */
+	router.get('/reblog', function(req, res) {
+		var gif = req.query.gif;
+		console.log("reblogging: " + gif);
+	    User.update(
+				{ '_id' : req.user._id },
+				{ $push: { "local.reblog_gifs" : gif} },
+				function(err) {
+					if (err) {
+						console.log("/// Failed to reblog gif.")
+						console.log(err);
+					}
+					res.redirect('/');
+				}
+		);
+	})
+
+	/* GET unsubscribe form a user */
 	router.get('/unsubscribe', function(req, res) {
 		var unsubscribeFrom = req.query.user;
 
