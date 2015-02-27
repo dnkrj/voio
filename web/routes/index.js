@@ -59,57 +59,59 @@ module.exports = function(passport) {
 			function(err, user) {
 				if (err) {
 					console.log(err);
+				} else if (user) {
+		        	var stream = Gif.find({ op: user._id }).stream();
+		        	stream.on('data', function(gif) {	        		
+		        		DBgifs.push('"' + gif._id + '.mp4"');
+		        	}).on('close', function() {
+			        	var isOwner = req.user && req.user.local.username == userpage;
+		            	var isVerified = isOwner && req.user.local.verified;
+			            if(isOwner) {
+			                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
+			                     if(pfiles) {
+			                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
+			                     }
+			                    res.render('user', {
+			                        title         : userpage + '&middot; Voio',
+			                        userpage      : userpage,
+			                        gifs          : DBgifs,
+			                        user          : req.user.local,
+			                        isOwner       : true, 
+			                        isVerified	  : isVerified,
+			                        hostname      : req.hostname,
+			                        message       : req.flash('profileMessage'),
+			                        pendingGifs   : pendingGifs
+			                    });
+			                });
+			            } else if (req.user) {
+			            	console.log('');
+			                res.render('user', {
+			                    title         : userpage + '&middot; Voio',
+			                    userpage      : userpage,
+			                    isOwner       : false,
+			                    isVerified	  : isVerified,
+			                    gifs          : DBgifs,
+			                    message       : message,
+			                    pendingGifs   : pendingGifs,
+			                    user          : req.user.local,
+			                    subscribed	  : req.user.local.subscribe.indexOf(user._id)
+			                });
+			            } else {
+			                res.render('user', {
+			                    title         : userpage + '&middot; Voio',
+			                    userpage      : userpage,
+			                    isOwner       : false,
+			                    isVerified	  : isVerified,
+			                    gifs          : DBgifs,
+			                    message       : message,
+			                    pendingGifs   : pendingGifs
+			                });		            	
+			            }
+		        		
+		        	})
+				} else {
+    				res.redirect('/profile');
 				}
-	        	var stream = Gif.find({ op: user._id }).stream();
-	        	stream.on('data', function(gif) {	        		
-	        		DBgifs.push('"' + gif._id + '.mp4"');
-	        	}).on('close', function() {
-		        	var isOwner = req.user && req.user.local.username == userpage;
-	            	var isVerified = isOwner && req.user.local.verified;
-		            if(isOwner) {
-		                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
-		                     if(pfiles) {
-		                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
-		                     }
-		                    res.render('user', {
-		                        title         : userpage + '&middot; Voio',
-		                        userpage      : userpage,
-		                        gifs          : DBgifs,
-		                        user          : req.user.local,
-		                        isOwner       : true, 
-		                        isVerified	  : isVerified,
-		                        hostname      : req.hostname,
-		                        message       : req.flash('profileMessage'),
-		                        pendingGifs   : pendingGifs
-		                    });
-		                });
-		            } else if (req.user) {
-		            	console.log('');
-		                res.render('user', {
-		                    title         : userpage + '&middot; Voio',
-		                    userpage      : userpage,
-		                    isOwner       : false,
-		                    isVerified	  : isVerified,
-		                    gifs          : DBgifs,
-		                    message       : message,
-		                    pendingGifs   : pendingGifs,
-		                    user          : req.user.local,
-		                    subscribed	  : req.user.local.subscribe.indexOf(user._id)
-		                });
-		            } else {
-		                res.render('user', {
-		                    title         : userpage + '&middot; Voio',
-		                    userpage      : userpage,
-		                    isOwner       : false,
-		                    isVerified	  : isVerified,
-		                    gifs          : DBgifs,
-		                    message       : message,
-		                    pendingGifs   : pendingGifs
-		                });		            	
-		            }
-	        		
-	        	})
-
 
 			}
 		);
