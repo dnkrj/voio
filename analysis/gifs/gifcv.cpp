@@ -148,7 +148,7 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 		double dt = 0;
         
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-        	//std::cout << "Current fps: " << 1000/dt << std::endl;
+        	std::cout << "Current fps: " << 1000/dt << std::endl;
         	if(!cap.read(frame)) throw "Error reading frames.";
         	if(ratio < 1) {
          		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
