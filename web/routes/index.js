@@ -23,21 +23,27 @@ module.exports = function(passport) {
 			stream.on('data', function(user) {
 				var i, j;
 				for (i=0; i < user.local.own_gifs.length; i++) {
-					gifOps.push('"' + user.local.username + '"');
-					DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
-					//console.log(DBgifs);
+					if (DBgifs.indexOf('"' + user.local.own_gifs[i] + '.mp4"') === -1) {
+						gifOps.push('"' + user.local.username + '"');
+						DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
+					}
 				}
-
 				for (j=0; j < user.local.reblog_gifs.length; j++) {
+					stream.pause();
 					Gif.findById( user.local.reblog_gifs[j], function(err, gif) {
-						console.log("Adding gif: " + gif._id);
 						if (err) {
 							console.log(err);
 						} else if (gif) {
-							gifOps.push('"' + gif.opUsername + '"');
-							DBgifs.push('"' + gif._id + '.mp4"');	
+							console.log(DBgifs);
+							console.log('"' + gif._id + '.mp4"');
+							console.log(DBgifs.indexOf('"' + gif._id + '.mp4"'));
+							if (DBgifs.indexOf('"' + gif._id + '.mp4"') === -1) {
+								gifOps.push('"' + gif.opUsername + '"');
+								DBgifs.push('"' + gif._id + '.mp4"');	
+							}
 						}
-					} );
+						stream.resume();
+					});
 				}
 			}).on('close', function() {
 				console.log("CLOSE: " + DBgifs);
