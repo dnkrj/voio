@@ -28,12 +28,18 @@ $(function() {
       };
       
       xhr.onload = function() {
-        $('div.progress').slideUp(500);
+        $('div.progress div.bar').css('width', '0%');
+        $('#upButton').fadeIn(100);
+        $('#upFile').show();  
+//        $('#upMessage').css('opacity', '0');
         $('div.message').text("Upload Complete.");
+          
       };
       
       xhr.send(formData);
     }
+      
+      
 
     
   });

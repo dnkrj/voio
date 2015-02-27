@@ -1,4 +1,5 @@
-var userCount=0;
+var userCount = 0;
+var opCount   = 0;
 
 $(document).ready(function(){
 	while((($("#user_container").height() - 300) < $(window).height()) && userGifAvailable()){
@@ -13,12 +14,17 @@ $(window).scroll(function() {
 });
 
 function addUserGif() {
+    console.log(ops);
+    console.log(gifs);
+
     var loc;
+
     if (typeof userpage === 'undefined') {
-        loc = ops[userCount];
+        loc = ops[opCount++];
     } else {
         loc = userpage;
     }
+
     var gif = userGifURL();
     var url = "/user/" + loc + "/a/" + gif;
     var id = gif.split(".")[0];

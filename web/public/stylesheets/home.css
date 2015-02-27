@@ -12,7 +12,7 @@ a {
 }
 
 #title {
-	background: transparent;
+	background: none;
 	border: none;
 }
 
@@ -21,5 +21,21 @@ a {
 }
 
 #user_container {
-	padding-top: 30px;
+	padding-top: 60px;
+}
+
+#pageFeed {
+	margin-left: -215px;
+}
+
+#pageExplore {
+	margin-left: 140px;
+}
+
+.hLink {
+	opacity: 0.4;
+}
+
+.hLink:hover {
+	opacity: 0.8;
 }

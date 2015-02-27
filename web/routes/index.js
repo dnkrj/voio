@@ -16,61 +16,20 @@ module.exports = function(passport) {
 	router.get('/', function(req, res, next) {
 		var DBgifs = [];
 		var gifOps = [];
-
-		if (req.user) {
-
-			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
-			stream.on('data', function(user) {
-				var i, j;
-				for (i=0; i < user.local.own_gifs.length; i++) {
-					if (DBgifs.indexOf('"' + user.local.own_gifs[i] + '.mp4"') === -1) {
-						gifOps.push('"' + user.local.username + '"');
-						DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
-					}
-				}
-				for (j=0; j < user.local.reblog_gifs.length; j++) {
-					stream.pause();
-					Gif.findById( user.local.reblog_gifs[j], function(err, gif) {
-						if (err) {
-							console.log(err);
-						} else if (gif) {
-							console.log(DBgifs);
-							console.log('"' + gif._id + '.mp4"');
-							console.log(DBgifs.indexOf('"' + gif._id + '.mp4"'));
-							if (DBgifs.indexOf('"' + gif._id + '.mp4"') === -1) {
-								gifOps.push('"' + gif.opUsername + '"');
-								DBgifs.push('"' + gif._id + '.mp4"');	
-							}
-						}
-						stream.resume();
-					});
-				}
-			}).on('close', function() {
-				console.log("CLOSE: " + DBgifs);
-				console.log("CLOSE: " + gifOps);
-				res.render('index', {
-					user : req.user.local,
-			      	title: 'Voio',
-			      	gifs : DBgifs,
-			      	ops  : gifOps
-			    });  		
-	    	});
-
-
-	    } else {
-	    	var stream = Gif.find().stream();
-	    	stream.on('data', function(gif) {	
-					gifOps.push('"' + gif.opUsername + '"');
-					DBgifs.push('"' + gif._id + '.mp4"');	
-	    	}).on('close', function() {
-				res.render('index', {
-			      	title: 'Voio',
-			      	gifs : DBgifs,
-			      	ops  : gifOps
-			    });			
-	    	});	    	
-	    }
-
+	    var stream = Gif.find().stream();
+	    stream.on('data', function(gif) {	
+				gifOps.push('"' + gif.opUsername + '"');
+				DBgifs.push('"' + gif._id + '.mp4"');	
+	    }).on('close', function() {
+	    	console.log(DBgifs);
+	    	console.log(gifOps);
+			res.render('index', {
+				user : req.user ? req.user.local : undefined,
+		      	title: 'Voio',
+		      	gifs : DBgifs.reverse(),
+		      	ops  : gifOps.reverse()
+		    });			
+	    });
 	});
 
 	/* GET user page. */
@@ -302,7 +261,7 @@ module.exports = function(passport) {
 	});
 
 	/* GET subscribe to a user */
-	router.get('/subscribe', function(req, res) {
+	router.get('/subscribe', isLoggedIn(true), function(req, res) {
 		var subscribeTo = req.query.user;
 
 		User.findOne({ "local.username" : subscribeTo }, function(err, user) {
@@ -326,7 +285,7 @@ module.exports = function(passport) {
 	});
 
 	/* GET reblog a gif */
-	router.get('/reblog', function(req, res) {
+	router.get('/reblog', isLoggedIn(true), function(req, res) {
 		var gif = req.query.gif;
 		console.log("reblogging: " + gif);
 	    User.update(
@@ -343,7 +302,7 @@ module.exports = function(passport) {
 	})
 
 	/* GET unsubscribe form a user */
-	router.get('/unsubscribe', function(req, res) {
+	router.get('/unsubscribe', isLoggedIn(true), function(req, res) {
 		var unsubscribeFrom = req.query.user;
 
 		User.findOne({ "local.username" : unsubscribeFrom }, function(err, user) {
@@ -366,7 +325,61 @@ module.exports = function(passport) {
 		res.redirect('/profile');
 	});	
 
+	/* GET feed page. */
+	router.get('/feed', isLoggedIn(true), function(req, res, next) {
+		if (req.user) {
+			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
+			stream.on('data', function(user) {
+				var i, j;
+				for (i=0; i < user.local.own_gifs.length; i++) {
+					if (DBgifs.indexOf('"' + user.local.own_gifs[i] + '.mp4"') === -1) {
+						gifOps.push('"' + user.local.username + '"');
+						DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
+					}
+				}
+				for (j=0; j < user.local.reblog_gifs.length; j++) {
+					stream.pause();
+					Gif.findById( user.local.reblog_gifs[j], function(err, gif) {
+						if (err) {
+							console.log(err);
+						} else if (gif) {
+							console.log(DBgifs);
+							console.log('"' + gif._id + '.mp4"');
+							console.log(DBgifs.indexOf('"' + gif._id + '.mp4"'));
+							if (DBgifs.indexOf('"' + gif._id + '.mp4"') === -1) {
+								gifOps.push('"' + gif.opUsername + '"');
+								DBgifs.push('"' + gif._id + '.mp4"');	
+							}
+						}
+						stream.resume();
+					});
+				}
+			}).on('close', function() {
+				console.log("CLOSE: " + DBgifs);
+				console.log("CLOSE: " + gifOps);
+				res.render('index', {
+					user : req.user.local,
+			      	title: 'Voio',
+			      	gifs : DBgifs,
+			      	ops  : gifOps
+			    });  		
+	    	});
 
+
+	    } else {
+	    	var stream = Gif.find().stream();
+	    	stream.on('data', function(gif) {	
+					gifOps.push('"' + gif.opUsername + '"');
+					DBgifs.push('"' + gif._id + '.mp4"');	
+	    	}).on('close', function() {
+				res.render('index', {
+			      	title: 'Voio',
+			      	gifs : DBgifs,
+			      	ops  : gifOps
+			    });			
+	    	});	    	
+	    }
+	});
 
     /* GET logout page */
     // logs the user out and then redirects to the home page
