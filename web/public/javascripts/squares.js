@@ -14,9 +14,6 @@ $(window).scroll(function() {
 });
 
 function addUserGif() {
-    console.log(ops);
-    console.log(gifs);
-
     var loc;
 
     if (typeof userpage === 'undefined') {

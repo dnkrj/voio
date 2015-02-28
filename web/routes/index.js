@@ -21,8 +21,6 @@ module.exports = function(passport) {
 				gifOps.push('"' + gif.opUsername + '"');
 				DBgifs.push('"' + gif._id + '.mp4"');	
 	    }).on('close', function() {
-	    	console.log(DBgifs);
-	    	console.log(gifOps);
 			res.render('index', {
 				user : req.user ? req.user.local : undefined,
 		      	title: 'Voio',
@@ -71,7 +69,6 @@ module.exports = function(passport) {
 			                    });
 			                });
 			            } else if (req.user) {
-			            	console.log('');
 			                res.render('user', {
 			                    title         : userpage + '&middot; Voio',
 			                    userpage      : userpage,
@@ -287,7 +284,6 @@ module.exports = function(passport) {
 	/* GET reblog a gif */
 	router.get('/reblog', isLoggedIn(true), function(req, res) {
 		var gif = req.query.gif;
-		console.log("reblogging: " + gif);
 	    User.update(
 				{ '_id' : req.user._id },
 				{ $push: { "local.reblog_gifs" : gif} },
@@ -328,6 +324,8 @@ module.exports = function(passport) {
 	/* GET feed page. */
 	router.get('/feed', isLoggedIn(true), function(req, res, next) {
 		if (req.user) {
+			var DBgifs = [];
+			var gifOps = [];
 			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
 			stream.on('data', function(user) {
 				var i, j;
@@ -343,9 +341,6 @@ module.exports = function(passport) {
 						if (err) {
 							console.log(err);
 						} else if (gif) {
-							console.log(DBgifs);
-							console.log('"' + gif._id + '.mp4"');
-							console.log(DBgifs.indexOf('"' + gif._id + '.mp4"'));
 							if (DBgifs.indexOf('"' + gif._id + '.mp4"') === -1) {
 								gifOps.push('"' + gif.opUsername + '"');
 								DBgifs.push('"' + gif._id + '.mp4"');	
@@ -355,9 +350,7 @@ module.exports = function(passport) {
 					});
 				}
 			}).on('close', function() {
-				console.log("CLOSE: " + DBgifs);
-				console.log("CLOSE: " + gifOps);
-				res.render('index', {
+				res.render('feed', {
 					user : req.user.local,
 			      	title: 'Voio',
 			      	gifs : DBgifs,
