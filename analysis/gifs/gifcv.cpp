@@ -22,6 +22,7 @@
 
 #include "gifcv.h"
 #include "timestamp.h"
+#include "fps.c"
 
 using namespace cv;
 
@@ -145,11 +146,13 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
         cap.set(CV_CAP_PROP_CONVERT_RGB, double(true));
         cap.set(CV_CAP_PROP_POS_MSEC, start);
         double ratio = width/height;
-		double pt = cap.get(CV_CAP_PROP_POS_MSEC);
-		double dt = 0;
+		//double pt = cap.get(CV_CAP_PROP_POS_MSEC);
+		double fps = getFPS(src);
+		std::cout << "FPS: " << fps << std::endl;
+		float dt = float(1/fps);
         
         while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-        	std::cout << "Current fps: " << 1000/dt << std::endl;
+        	//std::cout << "Current fps: " << 1000/dt << std::endl;
         	if(!cap.read(frame)) throw "Error reading frames.";
         	if(ratio < 1) {
          		getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
@@ -161,10 +164,10 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 			resize(frame_c, frame_r, Size(gifsx, gifsy), 1.0, 1.0, INTER_LINEAR);
 			frame_r.convertTo(frame_n, CV_8UC3, 1.0, 0);
 			if(frame_n.isContinuous()) {
-				if(!addFrame(frame_n.data, (float) (dt/1000))) throw "Error writing to file.";
+				if(!addFrame(frame_n.data, dt)) throw "Error writing to file.";
 			}
-			dt = cap.get(CV_CAP_PROP_POS_MSEC) - pt;
-			pt = cap.get(CV_CAP_PROP_POS_MSEC);
+			//dt = cap.get(CV_CAP_PROP_POS_MSEC) - pt;
+			//pt = cap.get(CV_CAP_PROP_POS_MSEC);
 		}	
 	}
 
@@ -176,14 +179,17 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
 	std::string vp = getVideoPath(uid, gid, src, path);
 	std::cout << "Saving video between " << start << " and " << end << std::endl;
+	double fps = getFPS(src);
+	std::cout << "FPS: " << fps << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
 		Mat temp;
-		cap.set(CV_CAP_PROP_POS_MSEC, start);
+		/*cap.set(CV_CAP_PROP_POS_MSEC, start);
 		double t0 = cap.get(CV_CAP_PROP_POS_MSEC);
 		if(!cap.read(temp)) throw "Error reading frames.";
 		double dt = cap.get(CV_CAP_PROP_POS_MSEC) - t0;
 		double fps = 1000/dt;
+		std::cout << "Current fps: " << fps << std::endl;*/
 		Mat frame;
 		Mat frame_c;
 		Mat frame_r;
@@ -208,9 +214,9 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "/usr/bin/avconv -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4";
+	std::string cmd = "/usr/bin/avconv -y -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 	system(cmd.c_str());
-	//std::string cmd2 = "avconv -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path) + ".webm";
+	//std::string cmd2 = "/usr/bin/avconv -y -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path) + ".webm > /dev/null 2>&1";
 	//system(cmd2.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
