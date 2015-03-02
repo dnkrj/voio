@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 
 project (VOIO-CLM-framework)
 
@@ -29,96 +29,16 @@ set(CMAKE_INSTALL_PREFIX ../../CLM/)
 # OpenCV
 
 	find_package( OpenCV 2.4.6 REQUIRED )
-	find_package( Boost REQUIRED COMPONENTS filesystem system)
-	MESSAGE("Boost information:") 
-	MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
-	MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}") 
-	MESSAGE("  Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}") 
-
-	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}/boost)
-	LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})	
+	
 
 # TBB
 	find_package(TBB REQUIRED)
 
-
-# Move CLM model
-file(GLOB files "lib/local/CLM/model/*.txt")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/model)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/model)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/model)
-	endif(MSVC)
-endforeach()
-
-file(GLOB files "lib/local/CLM/model/detection_validation/*.txt")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/model/detection_validation)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/model/detection_validation)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/model/detection_validation)
-	endif(MSVC)
-endforeach()
-
-file(GLOB files "lib/local/CLM/model/patch_experts/*.txt")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/model/patch_experts)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/model/patch_experts)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/model/patch_experts)
-	endif(MSVC)
-endforeach()
-
-file(GLOB files "lib/local/CLM/model/pdms/*.txt")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/model/pdms)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/model/pdms)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/model/pdms)
-	endif(MSVC)
-endforeach()
-
-# Move sample videos and images classifiers
-file(GLOB files "lib/3rdParty/OpenCV/classifiers/*.xml")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/classifiers)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/classifiers)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/classifiers)
-	endif(MSVC)
-endforeach()
-
-# Move OpenCV classifiers
-file(GLOB files "lib/3rdParty/OpenCV/classifiers/*.xml")
-foreach(file ${files})
-	if (MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug/classifiers)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/Release/classifiers)
-	else(MSVC)
-		file(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR}/bin/classifiers)
-	endif(MSVC)
-endforeach()
-
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (GCC_VERSION VERSION_LESS 4.7)
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -msse -msse2 -msse3")
-    else ()
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -msse -msse2 -msse3")
-    endif ()
-else ()
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -msse -msse2 -msse3")
-endif ()
-
 # Boost
-
+	find_package( Boost REQUIRED COMPONENTS filesystem system)
+	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}/boost)
+	LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})	
 	INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR})
 
 
@@ -132,21 +52,51 @@ endif ()
 	INCLUDE_DIRECTORIES(${GIFLIB_INCLUDE_DIR})
 	LINK_DIRECTORIES(${GIF_LIBRARY})
 
+# Compiler flags
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (GCC_VERSION VERSION_LESS 4.7)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -msse -msse2 -msse3")
+    else ()
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -msse -msse2 -msse3")
+    endif ()
+else ()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -msse -msse2 -msse3")
+endif ()
+
 
 # dlib
-include_directories(lib/3rdParty/dlib/include)
+include_directories(lib/dlib/include)
 
 # dlib library
-add_subdirectory(lib/3rdParty/dlib)
+add_subdirectory(lib/dlib)
 
-# CLM library (ordering matters)
-add_subdirectory(lib/local/CLM)
-add_subdirectory(lib/local/FaceAnalyser)
+# CLM library 
+add_subdirectory(lib/CLM)
 
 # VOIO
-add_subdirectory(Voio/FunctionalityTest)
-add_subdirectory(Voio/Analysis)
+add_subdirectory(Analysis)
 
-file(COPY "lib/3rdParty/dlib/include/dlib" DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-file(COPY "lib/3rdParty/OpenCV/classifiers" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)
-file(COPY "lib/local/CLM/model" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)
+# move required files
+file(COPY "lib/CLM/classifiers" DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY "lib/CLM/model" DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY "lib/CLM/classifiers" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)
+file(COPY "lib/CLM/model" DESTINATION ${CMAKE_INSTALL_PREFIX}/exe)
+
+#file(GLOB filesa "lib/CLM/model/*.txt")
+#file(GLOB filesb "lib/CLM/model/detection_validation/*.txt")
+#file(GLOB filesc "lib/CLM/model/patch_experts/*.txt")
+#file(GLOB filesd "lib/CLM/model/pdms/*.txt")
+#file(GLOB filese "lib/CLM/classifiers/*.xml")
+
+#install(FILES &{filesa} DESTINATION exe/model)
+#install(FILES &{filesb} DESTINATION exe/model/detection_validation)
+#install(FILES &{filesc} DESTINATION exe/model/patch_experts)
+#install(FILES &{filesd} DESTINATION exe/model/pdms)
+#install(FILES &{filese} DESTINATION exe/classifiers)
+
+#file(COPY "lib/CLM/classifiers" DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug)
+#file(COPY "lib/CLM/classifiers" DESTINATION ${CMAKE_BINARY_DIR}/bin/Release)
+#file(COPY "lib/CLM/model" DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug)
+#file(COPY "lib/CLM/model" DESTINATION ${CMAKE_BINARY_DIR}/bin/Release)
