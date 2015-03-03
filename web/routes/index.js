@@ -238,7 +238,8 @@ module.exports = function(passport) {
 
 				  		});
 				  	}
-				  	res.end();
+				  	res.writeHead(200, {'Content-Type': 'text/plain'});
+  					res.end(newgifname.split(".")[0]);
 				  });
 	});
 

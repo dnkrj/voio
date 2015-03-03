@@ -25,7 +25,16 @@ function addPendingGif() {
     $("#pending_container").append("<div class='gif pending' id='" + id + "'>" + "<a id='A" + id + "' href='#'><div class='gifButton'>approve</div></a><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video><a id='D" + id + "' href='#'><div class='gifButton'>delete</div></a></div>");
 
     $( "#A" + id ).click(function(e) {
-        $.get("/a/" + id);
+        $.get( "/a/" + id, function( data ) {
+            $("#user_container h1").after("<div class='gif' id='" + data + "'><a href='/u/" + userpage + "/" + data + "'><video width='300' height='300' loop><source src='/user/" + userpage + "/a/" + data + ".mp4' type='video/mp4'></video></a></div>");
+            $('#' + data).css('display', 'none');
+            $('#' + data).fadeIn(1000);
+            $('#' + data + ' video').hover(function(){
+                this.play();
+            },function(){
+                this.pause()
+            });
+        });
         $("#" + id).fadeOut(500);
         e.preventDefault();
     });
@@ -53,11 +62,11 @@ function addUserGif() {
 
     $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + userpage + "/" + id + "'><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video></a></div>");
 
-        $('#' + id + ' video').hover(function(){
-            this.play();
-        },function(){
-            this.pause()
-        });
+    $('#' + id + ' video').hover(function(){
+        this.play();
+    },function(){
+        this.pause()
+    });
 
     $('#' + id).css('display', 'none');
     $('#' + id).fadeIn(1000);
