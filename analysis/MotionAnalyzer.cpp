@@ -253,6 +253,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	int i = 0;
 	double minT;
 	double normi;
+	std::cout << '\r' << "Processing: 100%" << std::flush << std::endl;
 	for(auto& kv : func) {
 		if(i == 0) minT = kv.first;
 		if(i>10) break;
