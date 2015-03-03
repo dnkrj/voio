@@ -46,13 +46,14 @@ a {
 	padding-top: 60px;
 }
 
+@media only screen and (min-width:960px){
+    #pageFeed {
+		margin-left: -215px;
+	}
 
-#pageFeed {
-	margin-left: -215px;
-}
-
-#pageExplore {
-	margin-left: 140px;
+	#pageExplore {
+		margin-left: 140px;
+	}
 }
 
 .hLink {
