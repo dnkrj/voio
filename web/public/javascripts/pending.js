@@ -22,7 +22,7 @@ function addPendingGif() {
     var gif = pendingGifURL();
     var url = "/user/" + userpage + "/p/" + gif;
     var id = gif.split(".")[0];
-    $("#pending_container").append("<div class='gif pending' id='" + id + "'>" + "<a id='A" + id + "' href='#'><div class='gifButton'>approve</div></a><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video><a id='D" + id + "' href='#'><div class='gifButton'>delete</div></a></div>");
+    $("#pending_container").append("<div class='gif pending' id='" + id + "'>" + "<a id='A" + id + "' href='#'><div class='gifButton'>Post</div></a><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video><a id='D" + id + "' href='#'><div class='gifButton'>delete</div></a></div>");
 
     $( "#A" + id ).click(function(e) {
         $.get( "/a/" + id, function( data ) {
