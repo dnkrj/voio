@@ -228,10 +228,11 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 }*/
 
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
-
 	std::cout << "Saving video between " << start << " and " << end << std::endl;
-	if(!cap.open(src)) throw "Error opening file.";
-	else {
+	if(!cap.open(src)) {
+		std::cerr << "Couldn't save video at " + getFinalPath(uid, gid, src, path) + ".mp4" << std::endl;
+		return;
+	} else {
 		double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
 		double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 		double ratio = width/height;
@@ -307,14 +308,20 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		+ " -ss " + starth + ":" + startm + ":" + starts + startd
 		+ " -t " + endh + ":" + endm + ":" + ends + endd
 		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
-		+ " -acodec copy -vcodec libx264 "
+		+ " -acodec copy -vcodec libx264"
 		+ " -s 300x300 "
 		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
 		system(cmd.c_str());
+		Mat ft;
+		VideoCapture thumbVid;
+		if(!thumbVid.open(getFinalPath(uid, gid, src, path) + ".mp4")) std::cerr << "Couldn't create thumbnail." << std::endl;
+		else if(!thumbVid.read(ft)) std::cerr << "Couldn't create thumbnail." << std::endl;
+		else imwrite(getFinalPath(uid, gid, src, path) + ".png", ft);
 		gid++;
 	}
 }
+
 bool VideoConverter::addLoop(GifFileType *gf) {
 	int loop_count = 0;
 	char nsle[12] = "NETSCAPE2.0";
