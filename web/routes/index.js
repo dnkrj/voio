@@ -56,9 +56,12 @@ module.exports = function(passport) {
 		            	var isVerified = isOwner && req.user.local.verified;
 			            if(isOwner) {
 			                fs.readdir(__dirname + '/../public/user/' + userpage + '/p', function(err, pfiles){ 
-			                     if(pfiles) {
-			                        pendingGifs = pfiles.map( function(dir) { return '"' + dir + '"'}).reverse();
-			                     }
+			                    for(file in pfiles) {
+			                     	if (pfiles[file].split(".")[1] === "mp4") {
+			                        	pendingGifs.push('"' + pfiles[file] + '"');
+			                     	}
+			                    }
+			                    pendingGifs.reverse();
 			                    res.render('user', {
 			                        title         : userpage + '&middot; Voio',
 			                        userpage      : userpage,
@@ -227,10 +230,15 @@ module.exports = function(passport) {
 				  						}
 				  					}
 				  				);			  						  
+				  			};
+				  			var userGifObject = {
+				  				id : 	 newGif._id,
+				  				posted : newGif.posted
 				  			}
+
 				  			User.update(
 				  				{ '_id' : req.user._id },
-				  				{ $push: { "local.own_gifs" : newGif._id } },
+				  				{ $push: { "local.own_gifs" : newGif._id, "local.own_gifs_posted" : userGifObject } },
 				  				function(err) {
 				  					if (err) {
 				  						console.log("/// Failed to add reference to gif to user document. Returning to initial state.")
@@ -292,6 +300,7 @@ module.exports = function(passport) {
 		var gifObject = {};
 		gifObject['gif'] = gif;
 		gifObject['op']  = op;
+		gifObject['reblogged'] = new Date();
 	    User.update(
 				{ '_id' : req.user._id },
 				{ $push: { "local.reblog_gifs_ops" : gifObject } },
