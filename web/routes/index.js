@@ -62,7 +62,7 @@ module.exports = function(passport) {
 			                    }
 			                    pendingGifs.reverse();
 			                    res.render('user', {
-			                        title         : userpage + '&middot; Voio',
+			                        title         : userpage + ' &middot; Voio',
 			                        userpage      : userpage,
 			                        gifs          : DBgifs.reverse(),
 			                        user          : req.user.local,
