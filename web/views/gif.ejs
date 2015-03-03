@@ -22,7 +22,8 @@
     	    this.pause()
     	});
     	$('#reblog').click(function(e){
-    		jQuery.get('/reblog?gif=<%= gifview %>');
+    		$.get('/reblog?gif=<%= gifview %>&op=<%= userpage %>');
+    		//$.get('/reblog?gif=<%= gifview %>');
     		$("#reblog").replaceWith("<div class='gifButton'>reblogged</div>");
     		e.preventDefault();
     	});
