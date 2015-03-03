@@ -44,13 +44,23 @@ app.set('view engine', 'ejs');
 
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev')); // log every request to the server
+app.use(logger('dev', {
+  skip: function (req, res) { return res.statusCode === 206 } //Don't log partial content (video streaming)
+}));
 app.use(bodyParser.urlencoded({ extended: true })); // allows wider range of inputs to forms
 
 app.use(multer({
     dest: __dirname + '/uploads/',
     rename: function (fieldname, filename) {
         return Date.now()
+    },
+    onFileUploadStart: function (file) {
+        console.log(file.mimetype);
+        if (file.mimetype.substring(0, 5) !== 'video') {
+          return false;
+        } else {
+          console.log(file.fieldname + ' is starting ...');
+        }
     }
 }));
 
