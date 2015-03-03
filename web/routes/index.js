@@ -16,11 +16,14 @@ module.exports = function(passport) {
 	router.get('/', function(req, res, next) {
 		var DBgifs = [];
 		var gifOps = [];
+		var timeStamps = [];
 	    var stream = Gif.find().stream();
 	    stream.on('data', function(gif) {	
 				gifOps.push('"' + gif.opUsername + '"');
 				DBgifs.push('"' + gif._id + '.mp4"');	
-	    }).on('close', function() {
+				timeStamps.push(gif.posted);
+	    }).on('end', function() {
+	    	console.log(timeStamps);
 			res.render('index', {
 				user : req.user ? req.user.local : undefined,
 		      	title: 'Voio',
