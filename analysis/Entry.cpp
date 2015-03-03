@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
 
 	VideoCapture vidInfo(filename);
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
-	double fps = getFPS();
+	double fps = getFPS(filename);
 
 
 	
