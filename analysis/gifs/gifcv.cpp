@@ -335,7 +335,7 @@ void Filter::extractVids(const std::string& filename, const std::string& path, i
 				break;
 			}
 		}
-		if(safe && ((t.getEnd() - t.getStart()) > 0.5)) ts.push_back(t);
+		if(safe && ((t.getEnd() - t.getStart()) > 1.5)) ts.push_back(t);
 	}
 	int size = int(ts.size());
 	if(size>MAX) {
