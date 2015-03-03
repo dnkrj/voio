@@ -176,6 +176,7 @@ void VideoConverter::extractGif(const std::string& src, const std::string& path,
 	if(!clear()) throw "Error clearing frames.";
 }
 
+/*
 void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
 	std::string vp = getVideoPath(uid, gid, src, path);
 	std::cout << "Saving video between " << start << " and " << end << std::endl;
@@ -188,12 +189,12 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		if(end>length || start<0) return;
 		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
 		Mat temp;
-		/*cap.set(CV_CAP_PROP_POS_MSEC, start);
+		cap.set(CV_CAP_PROP_POS_MSEC, start);
 		double t0 = cap.get(CV_CAP_PROP_POS_MSEC);
 		if(!cap.read(temp)) throw "Error reading frames.";
 		double dt = cap.get(CV_CAP_PROP_POS_MSEC) - t0;
 		double fps = 1000/dt;
-		std::cout << "Current fps: " << fps << std::endl;*/
+		std::cout << "Current fps: " << fps << std::endl;
 		Mat frame;
 		Mat frame_c;
 		Mat frame_r;
@@ -206,7 +207,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		VideoWriter video(vp, CV_FOURCC('M','J','P','G'), fps, Size(gifsx, gifsy), true);
         	
 		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
-			if(!cap.read(frame)) throw "Error reading frames.";
+			if(!cap.read(frame)) break;
 			if(ratio < 1) {
 				getRectSubPix(frame, Size((int) width, (int) width), Point2f((float) width/2, (float) height/2), frame_c, -1);
 			} else if(ratio > 1) {
@@ -218,14 +219,102 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 			video.write(frame_r);
 		}	
 	}
-	std::string cmd = "/usr/bin/avconv -y -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
+	std::string cmd = "/usr/bin/avconv -y -i " + vp + " -vcodec libx264 " + getFinalPath(uid, gid, src, path) + ".mp4";
 	system(cmd.c_str());
 	//std::string cmd2 = "/usr/bin/avconv -y -i " + vp + " -vcodec libvpx " + getFinalPath(uid, gid, src, path) + ".webm > /dev/null 2>&1";
 	//system(cmd2.c_str());
 	if(remove(vp.c_str()) != 0) throw "Could not delete temporary AVI file.";
 	gid++;
-}
+}*/
 
+void VideoConverter::extractVid(const std::string& src, const std::string& path, int uid, double start, double end) {
+
+	std::cout << "Saving video between " << start << " and " << end << std::endl;
+	if(!cap.open(src)) throw "Error opening file.";
+	else {
+		double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+		double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+		double ratio = width/height;
+		int x;
+		int y;
+		double size;
+		if(ratio < 1) {
+			x = 0;
+			y = (int) ((height - width)/2);
+			size = width;
+		} else if(ratio > 1) {
+			x = (int) ((width - height)/2);
+			y = 0;
+			size = height;
+		} else {
+			x = 0;
+			y = 0;
+			size = width;
+		}
+		
+		std::string sx = std::string(std::to_string(x));
+		std::string sy = std::string(std::to_string(y));
+		std::string strw = std::string(std::to_string((int) size));
+		std::string strh = std::string(std::to_string((int) size));
+		
+		int sm = (int) (start/60000);
+		int sh = sm/60;
+		sm = sm%60;
+		double sst1 = (double) (((long) start) % 60000);
+		double sst2 = sst1/1000;
+		int ss = (int) sst2;
+		double ssst = sst2 - ((double) ss);
+		int sss = (int) (ssst*1000);
+		
+		int em = (int) ((end-start)/60000);
+		int eh = em/60;
+		em = em%60;
+		double est1 = (double) (((long) (end-start))%60000);
+		double est2 = est1/1000;
+		int es = (int) est2;
+		double esst = est2 - ((double) es);
+		int ess = (int) (esst*1000);
+		
+		std::string starth;
+		std::string startm;
+		std::string starts;
+		std::string startd;
+		if(sh<10) starth = "0" + std::string(std::to_string(sh));
+		else starth = std::string(std::to_string(sh));
+		if(sm<10) startm = "0" + std::string(std::to_string(sm));
+		else startm = std::string(std::to_string(sm));
+		if(ss<10) starts = "0" + std::string(std::to_string(ss));
+		else starts = std::string(std::to_string(ss));
+		if(sss<10) startd = ".00" + std::string(std::to_string(sss));
+		else if(sss<100) startd = ".0" + std::string(std::to_string(sss));
+		else startd = "." + std::string(std::to_string(sss));
+		
+		std::string endh;
+		std::string endm;
+		std::string ends;
+		std::string endd;
+		if(eh<10) endh = "0" + std::string(std::to_string(eh));
+		else endh = std::string(std::to_string(eh));
+		if(em<10) endm = "0" + std::string(std::to_string(em));
+		else endm = std::string(std::to_string(em));
+		if(es<10) ends = "0" + std::string(std::to_string(es));
+		else ends = std::string(std::to_string(es));
+		if(ess<10) endd = ".00" + std::string(std::to_string(ess));
+		else if(ess<100) endd = ".0" + std::string(std::to_string(ess));
+		else endd = "." + std::string(std::to_string(ess));
+		
+		std::string cmd = "/usr/bin/avconv -y -i " + src
+		+ " -ss " + starth + ":" + startm + ":" + starts + startd
+		+ " -t " + endh + ":" + endm + ":" + ends + endd
+		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
+		+ " -acodec copy -vcodec libx264 "
+		+ " -s 300x300 "
+		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
+		//std::cout << cmd << std::endl;
+		system(cmd.c_str());
+		gid++;
+	}
+}
 bool VideoConverter::addLoop(GifFileType *gf) {
 	int loop_count = 0;
 	char nsle[12] = "NETSCAPE2.0";
