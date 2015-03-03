@@ -32,7 +32,7 @@ $(function() {
         $('#upButton').fadeIn(100);
         $('#upFile').show();  
 //        $('#upMessage').css('opacity', '0');
-        $('div.message').text("Upload Complete.");
+        $('div.message').text("Upload Complete. Check back soon to see your clips!");
           
       };
       

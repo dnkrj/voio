@@ -12,7 +12,7 @@ var userSchema = new mongoose.Schema({
         vericode    : Number,
         password    : String,
         subscribe   : [mongoose.Schema.ObjectId],
-        reblog_gifs : [mongoose.Schema.ObjectId],
+        reblog_gifs_ops : [{ gif : mongoose.Schema.ObjectId, op : String }],
         own_gifs	: [mongoose.Schema.ObjectId]
     }
 });

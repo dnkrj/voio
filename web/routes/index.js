@@ -285,12 +285,16 @@ module.exports = function(passport) {
 	/* GET reblog a gif */
 	router.get('/reblog', isLoggedIn(true), function(req, res) {
 		var gif = req.query.gif;
+		var op  = req.query.op;
+		var gifObject = {};
+		gifObject['gif'] = gif;
+		gifObject['op']  = op;
 	    User.update(
 				{ '_id' : req.user._id },
-				{ $push: { "local.reblog_gifs" : gif} },
+				{ $push: { "local.reblog_gifs_ops" : gifObject } },
 				function(err) {
 					if (err) {
-						console.log("/// Failed to reblog gif.")
+						console.log("/// Failed to reblog gif.");
 						console.log(err);
 					}
 					res.end();
@@ -329,6 +333,7 @@ module.exports = function(passport) {
 			var gifOps = [];
 			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
 			stream.on('data', function(user) {
+				stream.pause();
 				var i, j;
 				for (i=0; i < user.local.own_gifs.length; i++) {
 					if (DBgifs.indexOf('"' + user.local.own_gifs[i] + '.mp4"') === -1) {
@@ -336,21 +341,16 @@ module.exports = function(passport) {
 						DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
 					}
 				}
-				for (j=0; j < user.local.reblog_gifs.length; j++) {
-					stream.pause();
-					Gif.findById( user.local.reblog_gifs[j], function(err, gif) {
-						if (err) {
-							console.log(err);
-						} else if (gif) {
-							if (DBgifs.indexOf('"' + gif._id + '.mp4"') === -1) {
-								gifOps.push('"' + gif.opUsername + '"');
-								DBgifs.push('"' + gif._id + '.mp4"');	
-							}
-						}
-						stream.resume();
-					});
+
+				for (j=0; j < user.local.reblog_gifs_ops.length; j++) {
+					gifObject = user.local.reblog_gifs_ops[j];
+					if (DBgifs.indexOf('"' + gifObject.gif + '.mp4"') === -1) {
+						gifOps.push('"' + gifObject.op + '"');
+						DBgifs.push('"' + gifObject.gif + '.mp4"');	
+					}
 				}
-			}).on('close', function() {
+				stream.resume();
+			}).on('end', function() {
 				res.render('feed', {
 					user : req.user.local,
 			      	title: 'Voio',
