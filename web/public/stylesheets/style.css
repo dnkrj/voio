@@ -164,9 +164,10 @@ body {
 }
 
 .message {
+	box-sizing: border-box;
 	width: 100%;
 	max-width: 600px;
-	min-height: 60px;
+	min-height: 68px;
 	background-color: #fff;
 	color: #84a;
 	border: 3px solid #84a;
@@ -182,13 +183,15 @@ Log In
 */
 
 input {
+	box-sizing: border-box;
 	width: 100%;
-	max-width: 600px;
+	max-width: 608px;
 	height: 60px;
 	background-color: #000;
 	color: #fff;
 	border: 3px solid #000;
-	margin: 30px 0 30px 0;
+	border-radius: 0;
+	margin: 30px auto 30px auto;
 	text-align: center;
 	font: 18px 'League Spartan', sans-serif;
 	letter-spacing: 2px;

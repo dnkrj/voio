@@ -26,7 +26,7 @@ function addUserGif() {
     var url = "/user/" + loc + "/a/" + gif;
     var id = gif.split(".")[0];
 
-    $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + loc + "/" + id + "'><video width='300' height='300' loop webkit-playsinline><source src='" + url + "' type='video/mp4'></video></a></div>");
+    $("#user_container").append("<div class='gif' id='" + id + "'><a href='/u/" + loc + "/" + id + "'><video width='300' height='300' loop><source src='" + url + "' type='video/mp4'></video></a></div>");
 
     $('#' + id + ' video').hover(function(){
         this.play();

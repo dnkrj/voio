@@ -6,7 +6,7 @@
 				<a href="/u/<%= userpage %>">
 					<video width='300' height='300' loop webkit-playsinline><source src="/user/<%= userpage %>/a/<%= gifview %>.mp4" type='video/mp4'></video>
 				</a>
-				<% if(!isOwner){%>
+				<% if(!isOwner && typeof user !== 'undefined'){%>
 					<a id="reblog" href="#">
 						<div class='gifButton'>Reblog Gif</div>
 					</a>
