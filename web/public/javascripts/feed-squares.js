@@ -1,5 +1,7 @@
 var userCount = 0;
-var opCount   = 0;
+var noOfGifs  = gifs.length;
+var tsIndex   = 0;
+var loc;
 
 
 $(document).ready(function(){
@@ -15,13 +17,6 @@ $(window).scroll(function() {
 });
 
 function addUserGif() {
-    var loc;
-
-    if (typeof userpage === 'undefined') {
-        loc = ops[opCount++];
-    } else {
-        loc = userpage;
-    }
 
     var gif = userGifURL();
     var url = "/user/" + loc + "/a/" + gif;
@@ -40,10 +35,27 @@ function addUserGif() {
 }
 
 function userGifAvailable() {
-    return userCount < gifs.length;
+    return userCount<noOfGifs;
 }
 
 function userGifURL() {
 
-    return gifs[userCount++];
+    max = ts[0];
+    tsIndex = 0;
+    for (var i = 1; i < ts.length; i++) {
+        if (ts[i] > max) {
+            tsIndex = i;
+            max = ts[i];
+        }
+    }
+
+    var gif = gifs[tsIndex];
+    loc = ops[tsIndex];
+    opCount = tsIndex + userCount;
+    ts.splice(tsIndex, 1);
+    gifs.splice(tsIndex, 1);
+    ops.splice(tsIndex, 1);
+    userCount++;
+
+    return gif;
 }

@@ -23,7 +23,6 @@ module.exports = function(passport) {
 				DBgifs.push('"' + gif._id + '.mp4"');	
 				timeStamps.push(gif.posted);
 	    }).on('end', function() {
-	    	console.log(timeStamps);
 			res.render('index', {
 				user : req.user ? req.user.local : undefined,
 		      	title: 'Voio',
@@ -65,7 +64,7 @@ module.exports = function(passport) {
 			                    res.render('user', {
 			                        title         : userpage + '&middot; Voio',
 			                        userpage      : userpage,
-			                        gifs          : DBgifs,
+			                        gifs          : DBgifs.reverse(),
 			                        user          : req.user.local,
 			                        isOwner       : true, 
 			                        isVerified	  : isVerified,
@@ -235,7 +234,6 @@ module.exports = function(passport) {
 				  				id : 	 newGif._id,
 				  				posted : newGif.posted
 				  			}
-
 				  			User.update(
 				  				{ '_id' : req.user._id },
 				  				{ $push: { "local.own_gifs" : newGif._id, "local.own_gifs_posted" : userGifObject } },
@@ -343,14 +341,16 @@ module.exports = function(passport) {
 		if (req.user) {
 			var DBgifs = [];
 			var gifOps = [];
+			var timeStamps = [];
 			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
 			stream.on('data', function(user) {
 				stream.pause();
 				var i, j;
-				for (i=0; i < user.local.own_gifs.length; i++) {
-					if (DBgifs.indexOf('"' + user.local.own_gifs[i] + '.mp4"') === -1) {
+				for (i=0; i < user.local.own_gifs_posted.length; i++) {
+					if (DBgifs.indexOf('"' + user.local.own_gifs_posted[i].id + '.mp4"') === -1) {
 						gifOps.push('"' + user.local.username + '"');
-						DBgifs.push('"' + user.local.own_gifs[i] + '.mp4"');
+						DBgifs.push('"' + user.local.own_gifs_posted[i].id + '.mp4"');
+						timeStamps.push(user.local.own_gifs_posted[i].posted.getTime());
 					}
 				}
 
@@ -359,15 +359,18 @@ module.exports = function(passport) {
 					if (DBgifs.indexOf('"' + gifObject.gif + '.mp4"') === -1) {
 						gifOps.push('"' + gifObject.op + '"');
 						DBgifs.push('"' + gifObject.gif + '.mp4"');	
+						timeStamps.push(gifObject.reblogged.getTime());
 					}
 				}
 				stream.resume();
 			}).on('end', function() {
+				console.log(timeStamps);
 				res.render('feed', {
 					user : req.user.local,
 			      	title: 'Voio',
 			      	gifs : DBgifs,
-			      	ops  : gifOps
+			      	ops  : gifOps,
+			      	ts   : timeStamps
 			    });  		
 	    	});
 
@@ -455,7 +458,7 @@ module.exports = function(passport) {
     		} else {
 	    		if (typeof user !== 'undefined') {
 
-			        link="http://" + req.hostname + "/login";
+			        link="http://voio.io/profile";
 			        mailOptions = {
 			            to      : user.local.email,
 			            from    : "no-reply@voio.io",
