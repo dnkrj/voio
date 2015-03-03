@@ -62,7 +62,7 @@ module.exports = function(passport) {
 			                    }
 			                    pendingGifs.reverse();
 			                    res.render('user', {
-			                        title         : userpage + '&middot; Voio',
+			                        title         : userpage + ' &middot; Voio',
 			                        userpage      : userpage,
 			                        gifs          : DBgifs.reverse(),
 			                        user          : req.user.local,
@@ -79,7 +79,7 @@ module.exports = function(passport) {
 			                    userpage      : userpage,
 			                    isOwner       : false,
 			                    isVerified	  : isVerified,
-			                    gifs          : DBgifs,
+			                    gifs          : DBgifs.reverse(),
 			                    message       : message,
 			                    pendingGifs   : pendingGifs,
 			                    user          : req.user.local,
@@ -91,7 +91,7 @@ module.exports = function(passport) {
 			                    userpage      : userpage,
 			                    isOwner       : false,
 			                    isVerified	  : isVerified,
-			                    gifs          : DBgifs,
+			                    gifs          : DBgifs.reverse(),
 			                    message       : message,
 			                    pendingGifs   : pendingGifs
 			                });		            	
@@ -364,7 +364,6 @@ module.exports = function(passport) {
 				}
 				stream.resume();
 			}).on('end', function() {
-				console.log(timeStamps);
 				res.render('feed', {
 					user : req.user.local,
 			      	title: 'Voio',
