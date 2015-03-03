@@ -1,16 +1,21 @@
 <% include head %>
+
+<link rel="stylesheet" href="/stylesheets/home.css">
+
 <script>
 		var ops  = [<%- ops %>];
 		var gifs = [<%- gifs %>];
+		$( document ).ready(function() {$("#home_container").css("background-image", "url(/images/bg" + Math.floor((Math.random() * 6) + 1) + ".jpg)")}); 
 </script>
 
 <script type="text/javascript" src="/javascripts/squares.js"></script>
-<link rel="stylesheet" href="/stylesheets/home.css">
 
 <% include title %>
 		<% if (typeof user == 'undefined') { %>
 			<div id="home_container">
-				<h1><a href="/signup">Get Started</a></h1>
+				<h1>welcome to voio</h1>
+				<h3>We find the moments, you make them.</h3>
+				<a href="/signup">Get Started</a>
 			</div>
 		<% } %>
 		<div id="user_container">
