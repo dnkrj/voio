@@ -5,7 +5,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "gifs/gifcv.h"
 #include <iostream>
-#include "gifs/fps.c"
 
 //Configurations for strategy
 //Config for face detection

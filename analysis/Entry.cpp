@@ -8,7 +8,6 @@
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
 #include "EmailPingback.c"
-#include "gifs/fps.c"
 #define GifLength 3
 
 using namespace cv;

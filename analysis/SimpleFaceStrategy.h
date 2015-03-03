@@ -1,4 +1,5 @@
 #include "Strategy.h"
+
 class SimpleFaceStrategy : Strategy
 {
 public:

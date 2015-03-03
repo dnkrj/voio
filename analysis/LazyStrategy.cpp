@@ -1,6 +1,5 @@
 #include "LazyStrategy.h"
 #include "gifs/gifcv.h"
-#include "gifs/fps.c"
 #ifndef _OPEN_CV
 #define _OPEN_CV
 #include "opencv2/highgui/highgui.hpp"
