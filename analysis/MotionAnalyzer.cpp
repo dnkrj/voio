@@ -24,8 +24,8 @@ using namespace cv;
 /*
 Number of grid points is nX*nY.
 */
-const int nX = 32;
-const int nY = 32;
+const int nX = 42;
+const int nY = 42;
 
 MotionAnalyzer::MotionAnalyzer() {
 	std::srand(std::time(0));
@@ -64,21 +64,38 @@ static void update(std::vector<double>& values, double& sum, double value, unsig
 }
 
 //Precondition: points are ordered as {{(x1,y1), (x2,y1), ...}, {(x1,y2), (x2,y2), ...}, ...}
-double MotionAnalyzer::calcRotation(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double dx, double dy) {
+double MotionAnalyzer::calcRotation(const std::vector<Point2f>& values, const std::vector<Point2f>& oldvalues, double dx, double dy) {
 	std::vector<double> vals;
-	for(int y = 2; y<nY-2; y++) {
-		for(int x = 2; x<nX-2; x++) {
+	for(int y = 3; y<nY-2; y++) {
+		for(int x = 3; x<nX-2; x++) {
 			vals.push_back(std::abs(gx(values, oldvalues, dx, x, y) - fy(values, oldvalues, dy, x, y)));
 		}
 	}
 	return mean(vals)[0];
 }
 
-double MotionAnalyzer::gx(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double delta, int x, int y) {
+double MotionAnalyzer::calcRotationShow(const std::vector<Point2f>& values, const std::vector<Point2f>& oldvalues, double dx, double dy) {
+	std::vector<double> vals;
+	Mat toshow = Mat::zeros(int(dy*nY), int(dx*nX), CV_32FC3);
+	for(int y = 3; y<nY-2; y++) {
+		for(int x = 3; x<nX-2; x++) {
+			double val = std::abs(gx(values, oldvalues, dx, x, y) - fy(values, oldvalues, dy, x, y));
+			vals.push_back(val);
+			double r = (fmin(255, 50*log(val+1)/log(2)));
+			double b = 100 - r;
+			if(b<0) b = 0;
+			if(val>0) circle(toshow, oldvalues[y*nX + x], 6*log(val+1)/log(2), CV_RGB(r, 20, b), -1, CV_AA);
+		}
+	}
+	imshow("Rotation", toshow);
+	return mean(vals)[0];
+}
+
+double MotionAnalyzer::gx(const std::vector<Point2f>& values, const std::vector<Point2f>& oldvalues, double delta, int x, int y) {
 	return ((values[y*nX + x + 1].y - oldvalues[y*nX + x + 1].y) - (values[y*nX + x - 1].y - oldvalues[y*nX + x - 1].y))/(2*delta);
 }
 
-double MotionAnalyzer::fy(std::vector<Point2f>& values, std::vector<Point2f>& oldvalues, double delta, int x, int y) {
+double MotionAnalyzer::fy(const std::vector<Point2f>& values, const std::vector<Point2f>& oldvalues, double delta, int x, int y) {
 	return ((values[(y + 1)*nX + x].x - oldvalues[(y + 1)*nX + x].x) - (values[(y - 1)*nX + x].x - oldvalues[(y - 1)*nX + x].x))/(2*delta);
 }
 
@@ -96,7 +113,7 @@ void MotionAnalyzer::fillRandom(std::vector<Point2f>& list, int amount, double w
 
 std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, double length, double clipLength) {
 	TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
-	Size subPixWinSize(10,10), winSize(31,31);
+	Size subPixWinSize(10, 10), winSize(31, 31);
 
 	const int MAX_COUNT = 500;
 	std::map<double, Timestamp> func;
@@ -130,14 +147,14 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		double sum = 0;
 		double start = ts[i].getStart();
 		double end = ts[i].getEnd();
-		std::cout << "Analyzing: " << start << ", " << end << std::endl;
+
 		Mat gray, prevGray, image, diffx, diffy, mag;
 		std::vector<Point2f> points[2];
 		cap.set(CV_CAP_PROP_POS_MSEC, start);
 		
 		Mat f;
 		cap >> f;
-		if(f.empty()) throw "Empty frames.";
+		if(f.empty()) throw "\nEmpty frame.";
 	
 		f.copyTo(image);
 		cvtColor(image, prevGray, COLOR_BGR2GRAY);
@@ -149,7 +166,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 	
 		while(cap.get(CV_CAP_PROP_POS_MSEC)<end && cap.get(CV_CAP_PROP_POS_MSEC)<clipLength + start) {
 			cap >> f;
-			if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
+			if(f.empty()) {std::cout << "\nEmpty frame." << std::endl; break;}
 	  
 			f.copyTo(image);
 			cvtColor(image, gray, COLOR_BGR2GRAY);
@@ -180,7 +197,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		int round = 0;
 		while(cap.get(CV_CAP_PROP_POS_MSEC)<end) {
 			cap >> f;
-			if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
+			if(f.empty()) {std::cout << "\nEmpty frame." << std::endl; break;}
 			f.copyTo(image);
 			cvtColor(image, prevGray, COLOR_BGR2GRAY);
 	
@@ -190,7 +207,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 						
 			while(round<4) {
 				cap >> f;
-				if(f.empty()) {std::cout << "Empty frames" << std::endl; break;}
+				if(f.empty()) {std::cout << "\nEmpty frame." << std::endl; break;}
 				f.copyTo(image);
 				cvtColor(image, gray, COLOR_BGR2GRAY);
 				//imshow("Testing", gray);
@@ -230,6 +247,7 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		}
 		
 		func.insert(std::pair<double, Timestamp>(1/sumr, best));
+		std::cout << '\r' << "Processing: " << int(end*100/length) << "%" << std::flush;
 	}
 	
 	int i = 0;
@@ -240,12 +258,58 @@ std::vector<Timestamp> MotionAnalyzer::finalFilter(std::vector<Timestamp>& ts, d
 		if(i>10) break;
 		normi = minT/kv.first;
 		std::cout << normi << std::endl;
-		if(normi>0.67) ret.push_back(kv.second);
+		if(normi>0.66) ret.push_back(kv.second);
 		i++;
 	}
 	
-	std::cout << "Saving clips." << std::endl;
+	std::cout << "\nSaving clips." << std::endl;
 	return ret;
+}
+
+void MotionAnalyzer::runDemo(const std::string& filename) {
+	std::cout << "Running demo." << std::endl;
+	std::cout << "Press ESC to end." << std::endl;
+	namedWindow("Rotation", WINDOW_NORMAL);
+	namedWindow("Original image", WINDOW_NORMAL);
+	VideoCapture cam(filename);
+	TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
+	Size subPixWinSize(10, 10), winSize(31, 31);
+
+	std::vector<uchar> status;
+	std::vector<Point2f> fields[2];
+	std::vector<float> err;
+
+	if(!cam.isOpened()) throw "Cannot open webcam.";
+    
+	Mat temp;
+	cam >> temp;
+	if(temp.empty()) throw "Empty frame.";
+
+	Size sz = temp.size();
+	double width = double(sz.width);
+	double height = double(sz.height);
+	double dx = width/double(nX);
+	double dy = height/double(nY);
+	for(int y = 0; y<nY; y++) {
+		for(int x = 0; x<nX; x++) {
+			fields[0].push_back(Point2f(float(x*dx), float(y*dy)));
+		}
+	}
+	
+	Mat gray, prevGray, image;
+	for(;;) {
+		Mat f;
+		cam >> f;
+		if(f.empty()) {std::cout << "Empty frame." << std::endl; break;}
+		f.copyTo(image);
+		cvtColor(image, gray, COLOR_BGR2GRAY);
+		if(prevGray.empty()) gray.copyTo(prevGray);
+		calcOpticalFlowPyrLK(prevGray, gray, fields[0], fields[1], status, err, winSize, 3, termcrit, 0, 0.001);
+		calcRotationShow(fields[1], fields[0], dx, dy);
+		imshow("Original image", prevGray);
+		if(((char) waitKey(10)) == 27) break;
+		gray.copyTo(prevGray);
+	}
 }
 
 std::vector<Timestamp> MotionAnalyzer::processVideo(const std::string& filename, int secondsPerClip) {

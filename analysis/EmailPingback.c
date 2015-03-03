@@ -13,7 +13,7 @@ int confirm(const char *arg)
     /* first what are we going to send and where are we going to send it? */
     int portno =        80;
     char *host =        "voio.io";
-    char *message_fmt = "GET /ready?user=%s HTTP/1.0\n";
+    char *message_fmt = "GET /ready?user=%s HTTP/1.0\n\n";
 
     struct hostent *server;
     struct sockaddr_in serv_addr;

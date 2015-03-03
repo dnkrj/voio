@@ -5,6 +5,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "gifs/gifcv.h"
 #include <iostream>
+#include "gifs/fps.c"
 
 //Configurations for strategy
 //Config for face detection
@@ -56,7 +57,7 @@ std::vector<Timestamp> SimpleFaceStrategy::processVideo(const std::string & file
 	VideoCapture readAhead(filename);
 
 	long frameCount = readAhead.get(CV_CAP_PROP_FRAME_COUNT);
-	double fps = readAhead.get(CV_CAP_PROP_FPS);
+	double fps = getFPS(filename);
 	int framesPerSample = (fps / samplesPerSecond); //Sample 4 frames a second
 	int numFramesToSkip = framesPerSample - 1;
 	int numWindows = frameCount / framesPerSample; //Actual value will be smaller than this
