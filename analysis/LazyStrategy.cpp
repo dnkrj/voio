@@ -1,5 +1,6 @@
 #include "LazyStrategy.h"
 #include "gifs/gifcv.h"
+#include "gifs/fps.c"
 #ifndef _OPEN_CV
 #define _OPEN_CV
 #include "opencv2/highgui/highgui.hpp"
@@ -17,7 +18,7 @@ std::vector<Timestamp>  LazyStrategy::processVideo(const std::string& filename, 
 
 	VideoCapture vidReader(filename);
 	long frameCount = vidReader.get(CV_CAP_PROP_FRAME_COUNT);
-	double fps = vidReader.get(CV_CAP_PROP_FPS);
+	double fps = getFPS();
 
 	std::vector<Timestamp> timestamps;
 	

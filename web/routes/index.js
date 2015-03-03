@@ -238,7 +238,8 @@ module.exports = function(passport) {
 
 				  		});
 				  	}
-				  	res.end();
+				  	res.writeHead(200, {'Content-Type': 'text/plain'});
+  					res.end(newgifname.split(".")[0]);
 				  });
 	});
 
@@ -285,11 +286,9 @@ module.exports = function(passport) {
 	router.get('/reblog', isLoggedIn(true), function(req, res) {
 		var gif = req.query.gif;
 		var op  = req.query.op;
-		console.log('reblogging: ' + gif + " " + op);
 		var gifObject = {};
 		gifObject['gif'] = gif;
 		gifObject['op']  = op;
-		console.log(gifObject);
 	    User.update(
 				{ '_id' : req.user._id },
 				{ $push: { "local.reblog_gifs_ops" : gifObject } },
@@ -334,7 +333,6 @@ module.exports = function(passport) {
 			var gifOps = [];
 			var stream = User.find( { '_id' : { $in : req.user.local.subscribe } } ).stream();
 			stream.on('data', function(user) {
-				console.log("pause");
 				stream.pause();
 				var i, j;
 				for (i=0; i < user.local.own_gifs.length; i++) {
@@ -350,15 +348,9 @@ module.exports = function(passport) {
 						gifOps.push('"' + gifObject.op + '"');
 						DBgifs.push('"' + gifObject.gif + '.mp4"');	
 					}
-					console.log("ADDING GIF: " + DBgifs);
 				}
-
-
-				console.log("resume");
 				stream.resume();
 			}).on('end', function() {
-				console.log("DBgifs CLOSE: " + DBgifs);
-				console.log("gifOps CLOSE: " + gifOps);
 				res.render('feed', {
 					user : req.user.local,
 			      	title: 'Voio',

@@ -8,7 +8,7 @@
 #include "LazyStrategy.h"
 #include "SimpleFaceStrategy.h"
 #include "EmailPingback.c"
-
+#include "gifs/fps.c"
 #define GifLength 3
 
 using namespace cv;
@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
 
 	VideoCapture vidInfo(filename);
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
-	double fps = vidInfo.get(CV_CAP_PROP_FPS);
+	double fps = getFPS();
 
 
 	
