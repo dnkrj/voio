@@ -183,6 +183,10 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 	std::cout << "FPS: " << fps << std::endl;
 	if(!cap.open(src)) throw "Error opening file.";
 	else {
+		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 1);
+		double length = cap.get(CV_CAP_PROP_POS_MSEC);
+		if(end>length || start<0) return;
+		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
 		Mat temp;
 		/*cap.set(CV_CAP_PROP_POS_MSEC, start);
 		double t0 = cap.get(CV_CAP_PROP_POS_MSEC);
