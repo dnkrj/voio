@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _PROBE_FPS
 #define _PROBE_FPS
 
@@ -5,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-double findFPS(const std::string& input) {
+inline double findFPS(const std::string& input) {
 	std::string m("fps");
 	double fps = 24;
 	// different member versions of find in the same order as above:
@@ -26,7 +28,7 @@ double findFPS(const std::string& input) {
 	return fps;
 }
 
-double getFPS(const std::string& filename) {
+inline double getFPS(const std::string& filename) {
 	FILE *in;
 	char buff[512];
 	std::string command = "avprobe " + filename + " 2>&1";

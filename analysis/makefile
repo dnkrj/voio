@@ -5,10 +5,10 @@ LINKLOCAL = gifs/gifcv.o libgif.so.7 gifs/timestamp.o
 OUTPUT= -o mainOutput.o
 CC = g++ -std=c++0x
 
-compile: SimpleFaceStrategy.cpp LazyStrategy.cpp Entry.cpp 
-	$(CC) Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp $(CFLAGS) $(LIBS) $(LINK) $(OUTPUT)
+compile: SimpleFaceStrategy.cpp LazyStrategy.cpp Entry.cpp  
+	$(CC) Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp gifs/fps.c  $(CFLAGS) $(LIBS) $(LINK) $(OUTPUT)
 
 compile-local: SimpleFaceStrategy.cpp LazyStrategy.cpp Entry.cpp
-	$(CC)  Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp $(CFLAGS) $(LINKLOCAL) $(LIBS) $(OUTPUT)
+	$(CC)  Entry.cpp SimpleFaceStrategy.cpp LazyStrategy.cpp gifs/fps.c $(CFLAGS) $(LINKLOCAL) $(LIBS) $(OUTPUT)
 	
 	cp mainOutput.o ~/Development/mainOutput.o

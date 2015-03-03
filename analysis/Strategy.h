@@ -2,6 +2,7 @@
 #include <iostream>
 #include "gifs/gifcv.h"
 #include "gifs/timestamp.h"
+#include "gifs/fps.c"
 
 #ifndef STRAT
 #define STRAT
