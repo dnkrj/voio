@@ -310,7 +310,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
 		+ " -acodec copy -vcodec libx264"
 		+ " -s 300x300 "
-		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
+		+ getFinalPath(uid, gid, src, path) + ".mp4";// > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
 		system(cmd.c_str());
 		Mat ft;
