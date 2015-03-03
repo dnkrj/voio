@@ -76,9 +76,15 @@ int main(int argc, char ** argv)
 
 	std::cout << "TS generated starting GIF(TS:) " << timestamps.size()  <<  std::endl;
 
-	Filter filter;
-	filter.extractVids(filename, outputdir, 0, timestamps);
-
+	try
+	{
+		Filter filter;
+		filter.extractVids(filename, outputdir, 0, timestamps);
+	}
+	catch (const char * str)
+	{
+		std::cout << std::string(str) << std::endl;
+	}
 	std::cout << "Pinging website for E-mail" << std::endl;
 	std::vector<std::string> sp = split(outputdir,'/' );
 	confirm(sp[sp.size()-2].c_str());
