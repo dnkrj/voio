@@ -38,9 +38,5 @@ $(function() {
       
       xhr.send(formData);
     }
-      
-      
-
-    
   });
 });

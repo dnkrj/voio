@@ -26,12 +26,12 @@
 			   	<div class="message"><%= message %></div> 
             <% } %>
 			<h1><% if(isOwner){%>Hi, <%}%><%= userpage %></h1>
-            <% if(isOwner) { %> <a href="/logout"><span>Log Out</span></a> 
+            <% if(isOwner) { %> <a href="/logout"><h4>Log Out</h4></a> 
             <% } else if(typeof user !== 'undefined') { %>
             	<% if (subscribed < 0) {%>
-            		<a href="/subscribe?user=<%- userpage %>"><span>Subscribe</span></a>
+            		<a href="/subscribe?user=<%- userpage %>"><h4>Subscribe</h4></a>
             	<% } else {%>
-            		<a href="/unsubscribe?user=<%- userpage %>"><span>Unsubscribe</span></a>
+            		<a href="/unsubscribe?user=<%- userpage %>"><h4>Unsubscribe</h4></a>
             	<% } %>
             <% } %>
 		</div>

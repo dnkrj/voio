@@ -38,6 +38,12 @@ h3 {
 	letter-spacing: 5px;
 }
 
+h4 {
+	font: 13px 'League Spartan', sans-serif;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+}
+
 body {
 	margin: 0 0 0 0;
 	font: 14px 'League Spartan', sans-serif;
@@ -109,8 +115,9 @@ body {
 	box-sizing: border-box;
 	padding: 120px 0 120px 0;
 	text-align: center;
-	background: #000 url('/images/bg1.jpg') no-repeat right top;
+	background: #000 url('/images/bg.jpg') no-repeat right top;
 	background-size: cover;
+	margin-bottom: -50px;
 }
 
 .gif {
@@ -129,6 +136,14 @@ body {
 }
 
 .pending video {
+	margin-bottom: -5px;
+}
+
+.regif {
+	height: 350px;
+}
+
+.regif video {
 	margin-bottom: -5px;
 }
 

@@ -1,18 +1,13 @@
 <% include head %>
-
-	<script>
-		var isOwner     = "<%- isOwner %>";
-	</script>
-
 <% include title %>
 		<div id="container">
 			<h1><a href="/u/<%= userpage %>"><%= userpage %></a></h1>
-			<div class="gif" id="<%= gifview %>" style="">
+			<div class="gif <% if(!isOwner){%>regif<%}%>" id="<%= gifview %>" style="">
 				<a href="/u/<%= userpage %>">
 					<video width='300' height='300' loop webkit-playsinline><source src="/user/<%= userpage %>/a/<%= gifview %>.mp4" type='video/mp4'></video>
 				</a>
 				<% if(!isOwner){%>
-					<a id="reblog" href="/reblog?gif=<%= gifview %>">
+					<a id="reblog" href="#">
 						<div class='gifButton'>Reblog Gif</div>
 					</a>
 				<% } %>
@@ -25,6 +20,11 @@
         	this.play();
     	},function(){
     	    this.pause()
+    	});
+    	$('#reblog').click(function(e){
+    		jQuery.get('/reblog?gif=<%= gifview %>');
+    		$("#reblog").replaceWith("<div class='gifButton'>reblogged</div>");
+    		e.preventDefault();
     	});
 	</script>
 </html>

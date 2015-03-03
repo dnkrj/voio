@@ -137,7 +137,7 @@ module.exports = function(passport) {
 	/* GET login page */
     router.get('/login', isLoggedIn(false), function (req, res) {
         res.render('login', { 
-        	title	: 'Login &middot; Voio',
+        	title	: 'Sign In &middot; Voio',
         	message : req.flash('loginMessage')
         }); 
     });
@@ -278,7 +278,7 @@ module.exports = function(passport) {
 			}
 		});
 
-		res.redirect('/profile');
+		res.redirect('/u/' + subscribeTo);
 	});
 
 	/* GET reblog a gif */
@@ -292,7 +292,7 @@ module.exports = function(passport) {
 						console.log("/// Failed to reblog gif.")
 						console.log(err);
 					}
-					res.redirect('/');
+					res.end();
 				}
 		);
 	})
@@ -318,7 +318,7 @@ module.exports = function(passport) {
 			}
 		});
 
-		res.redirect('/profile');
+		res.redirect('/u/' + unsubscribeFrom);
 	});	
 
 	/* GET feed page. */
