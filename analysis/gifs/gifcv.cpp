@@ -308,18 +308,17 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		+ " -ss " + starth + ":" + startm + ":" + starts + startd
 		+ " -t " + endh + ":" + endm + ":" + ends + endd
 		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
-		+ " -vsync 2"
-		+ " -an -vcodec libx264 "
-		+ getFinalPath(uid, gid, src, path) + "TMP.mp4";// > /dev/null 2>&1";
+		+ " -an -vcodec libvpx "
+		+ getFinalPath(uid, gid, src, path) + "TMP.webm";// > /dev/null 2>&1";
 		
-		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.mp4"
+		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.webm"
 		+ " -vcodec libx264"
-		+ " -an -s 300x300 "
+		+ " -s 300x300 "
 		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
 		system(cmd.c_str());
 		system(cmd2.c_str());
-		if(remove((getFinalPath(uid, gid, src, path) + "TMP.mp4").c_str()) != 0) std::cerr << "Couldn't delete temporary file." << std::endl;
+		if(remove((getFinalPath(uid, gid, src, path) + "TMP.webm").c_str()) != 0) std::cerr << "Couldn't delete temporary file." << std::endl;
 		Mat ft;
 		VideoCapture thumbVid;
 		if(!thumbVid.open(getFinalPath(uid, gid, src, path) + ".mp4")) std::cerr << "Couldn't create thumbnail." << std::endl;
