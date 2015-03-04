@@ -308,11 +308,13 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		+ " -ss " + starth + ":" + startm + ":" + starts + startd
 		+ " -t " + endh + ":" + endm + ":" + ends + endd
 		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
-		+ " -acodec copy -vcodec libx264 "
+		+ " -vsync 2"
+		+ " -an -vcodec libx264 "
 		+ getFinalPath(uid, gid, src, path) + "TMP.mp4";// > /dev/null 2>&1";
 		
 		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.mp4"
-		+ " -acodec copy -vcodec libx264"
+		+ " -vcodec libx264"
+		+ " -vsync 2"
 		+ " -s 300x300 "
 		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
