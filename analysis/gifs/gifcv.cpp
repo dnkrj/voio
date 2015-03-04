@@ -314,8 +314,7 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		
 		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.mp4"
 		+ " -vcodec libx264"
-		+ " -vsync 2"
-		+ " -s 300x300 "
+		+ " -an -s 300x300 "
 		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
 		system(cmd.c_str());
