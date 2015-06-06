@@ -4,6 +4,7 @@
 AnalysisOutput
 /db*
 /web/node_modules
+/analysis/output
 /analysis/output*
 *.gif
 *.mp4
