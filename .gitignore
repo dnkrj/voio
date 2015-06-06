@@ -7,4 +7,5 @@ AnalysisOutput
 /analysis/output
 /analysis/output*
 *.gif
+*.log
 *.mp4
