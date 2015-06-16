@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
 	std::string outputdir = std::string(argv[2]);
 
 	VideoCapture vidInfo;
-	if (vidInfo.open(filename) == false)
+	if (!vidInfo.open(filename))
 	{
 		std::cout << "Error opening video" << std::endl;
 	}
