@@ -24,11 +24,13 @@ int main(int argc, char ** argv)
 	std::string filename = std::string(argv[1]);
 	std::string outputdir = std::string(argv[2]);
 
-	VideoCapture vidInfo(filename);
+	VideoCapture vidInfo;
+	if (vidInfo.open(filename) == false)
+	{
+		std::cout << "Error opening video" << std::endl;
+	}
 	long frameCount = vidInfo.get(CV_CAP_PROP_FRAME_COUNT);
 	double fps = getFPS(filename);
-
-
 	
 	int time = frameCount / fps;
 	int numGifs;

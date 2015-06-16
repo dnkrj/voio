@@ -55,6 +55,7 @@ class VideoConverter {
 		bool reset(void);
 		void extractGif(const std::string& src, const std::string& path, int uid, double start, double end);
 		void extractVid(const std::string& src, const std::string& path, int uid, double start, double end);
+		void downsample(const std::string& src);
 };
 
 /*

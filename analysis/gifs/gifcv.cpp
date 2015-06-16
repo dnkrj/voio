@@ -308,23 +308,70 @@ void VideoConverter::extractVid(const std::string& src, const std::string& path,
 		+ " -ss " + starth + ":" + startm + ":" + starts + startd
 		+ " -t " + endh + ":" + endm + ":" + ends + endd
 		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
-		+ " -an -vcodec libvpx "
-		+ getFinalPath(uid, gid, src, path) + "TMP.webm";// > /dev/null 2>&1";
+		+ " -an -vcodec libx264 "
+		+ getFinalPath(uid, gid, src, path) + "TMP.mp4";// > /dev/null 2>&1";
 		
-		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.webm"
+		std::string cmd2 = "/usr/bin/avconv -y -i " + getFinalPath(uid, gid, src, path) + "TMP.mp4"
 		+ " -vcodec libx264"
 		+ " -s 300x300 "
 		+ getFinalPath(uid, gid, src, path) + ".mp4 > /dev/null 2>&1";
 		//std::cout << cmd << std::endl;
 		system(cmd.c_str());
 		system(cmd2.c_str());
-		if(remove((getFinalPath(uid, gid, src, path) + "TMP.webm").c_str()) != 0) std::cerr << "Couldn't delete temporary file." << std::endl;
+		if(remove((getFinalPath(uid, gid, src, path) + "TMP.mp4").c_str()) != 0) std::cerr << "Couldn't delete temporary file." << std::endl;
 		Mat ft;
 		VideoCapture thumbVid;
 		if(!thumbVid.open(getFinalPath(uid, gid, src, path) + ".mp4")) std::cerr << "Couldn't create thumbnail." << std::endl;
 		else if(!thumbVid.read(ft)) std::cerr << "Couldn't create thumbnail." << std::endl;
 		else imwrite(getFinalPath(uid, gid, src, path) + ".png", ft);
 		gid++;
+	}
+}
+
+void VideoConverter::downsample(const std::string& src) {
+	std::cout << "Downsampling video." << std::endl;
+	if(!cap.open(src)) {
+		std::cerr << "Couldn't downsample video." << std::endl;
+		return;
+	} else {
+		double width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+		double height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+		double ratio = width/height;
+		int x;
+		int y;
+		double size;
+		if(ratio < 1) {
+			x = 0;
+			y = (int) ((height - width)/2);
+			size = width;
+		} else if(ratio > 1) {
+			x = (int) ((width - height)/2);
+			y = 0;
+			size = height;
+		} else {
+			x = 0;
+			y = 0;
+			size = width;
+		}
+		
+		std::string sx = std::string(std::to_string(x));
+		std::string sy = std::string(std::to_string(y));
+		std::string strw = std::string(std::to_string((int) size));
+		std::string strh = std::string(std::to_string((int) size));
+		
+		std::string cmd = "/usr/bin/avconv -y -i " + src
+		+ " -vf crop=" + strw + ":" + strh + ":" + sx + ":" + sy
+		+ " -an -vcodec libx264 "
+		+ src + "LQT.mp4";// > /dev/null 2>&1";
+		
+		std::string cmd2 = "/usr/bin/avconv -y -i " + src + "LQT.mp4"
+		+ " -vcodec libx264"
+		+ " -s 300x300 "
+		+ src + "LQ.mp4";// > /dev/null 2>&1";
+		//std::cout << cmd << std::endl;
+		system(cmd.c_str());
+		system(cmd2.c_str());
+		if(remove((src + "LQT.mp4").c_str()) != 0) std::cerr << "Couldn't delete temporary file." << std::endl;
 	}
 }
 
